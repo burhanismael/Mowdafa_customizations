@@ -85,6 +85,25 @@ class AdmissionForm(models.Model):
         ('done', 'Done'),
     ], string='Status', default='draft', tracking=True)
 
+    @api.onchange('survivor_id')
+    def _onchange_survivor_id(self):
+        for record in self:
+            if record.survivor_id:
+                record.date_of_birth = record.survivor_id.birth_date
+                record.id_number = record.survivor_id.generated_code
+                if record.survivor_id.birth_date:
+                    today = fields.Date.context_today(record)
+                    birth_date = record.survivor_id.birth_date
+                    age = today.year - birth_date.year - (
+                        (today.month, today.day) < (birth_date.month, birth_date.day))
+                    record.age = str(age)
+                else:
+                    record.age = False
+            else:
+                record.date_of_birth = False
+                record.id_number = False
+                record.age = False
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
