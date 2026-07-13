@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format: slim margins so the form fills the A4 page -->
+    <record id="paperformat_consent_for_services" model="report.paperformat">
+        <field name="name">Consent for Services A4</field>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">8</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Report Action -->
+    <record id="action_report_consent_for_services" model="ir.actions.report">
+        <field name="name">Consent for Services</field>
+        <field name="model">survivor.case</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">survivor_case_form.report_consent_for_services</field>
+        <field name="report_file">survivor_case_form.report_consent_for_services</field>
+        <field name="print_report_name">'Consent for Services - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="paperformat_consent_for_services"/>
+        <field name="binding_model_id" ref="model_survivor_case"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Template -->
+    <template id="report_consent_for_services">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+                    <div class="page"
+                         style="border: 4px solid #2596be; min-height: 322mm; padding: 30px 45px 70px;
+                                font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+                                font-size: 13.5px; color: #1a1a1a; line-height: 1.6;
+                                position: relative;">
+
+                        <!-- Heading -->
+                        <div class="text-center" style="margin-bottom: 28px;">
+                            <div style="font-size: 26px; font-weight: bold; letter-spacing: 4px; color: #2596be;">
+                                CONFIDENTIAL
+                            </div>
+                            <div style="font-weight: bold; font-size: 13px; letter-spacing: 2px; margin-top: 4px;">
+                                CONSENT FOR SERVICES
+                            </div>
+                            <div style="width: 90px; border-bottom: 2px solid #2596be; margin: 10px auto 0;"/>
+                        </div>
+
+                        <!-- Purpose -->
+                        <p style="font-weight: bold; text-align: justify; background-color: #f0f7fa;
+                                  border-left: 4px solid #2596be; padding: 10px 14px; margin-bottom: 22px;">
+                            The purpose of this form is to document a conversation between the caseworker and the
+                            survivor during the initial meeting about your organization's case management services,
+                            confidentiality and exceptions to confidentiality, and the survivor's rights. This form should be
+                            stored in a separate file from the case file.
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 14px;">
+                            I, <span style="border-bottom: 1px solid #000; padding: 0 20px; display: inline-block;
+                                           min-width: 240px; text-align: center; font-weight: bold;">
+                                <t t-esc="doc.survivor_id.survivor_name"/>
+                            </span>, hereby give permission to receive case management services according
+                            to the following:
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 14px;">
+                            My caseworker's primary purpose is to promote my safety, dignity, and well-being according to my
+                            wishes. She/he understands that only I fully know my own situation. Therefore, I will guide the process
+                            of identifying my needs, goals, and what I would like help with.
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 14px;">
+                            I have the right to decide what information I wish to share with my caseworker. She/he will never
+                            pressure me to share any information which I do not wish to share.
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 14px;">
+                            If I am dissatisfied with the services I am receiving, I have the right to discuss any concerns with my
+                            caseworker or their supervisor or to discontinue services at any time.
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 14px;">
+                            My caseworker will not refer me to any other service without first explaining the purpose of the
+                            referral, the way it would be made, and the expected consequences, and receiving my consent. At my
+                            request, my caseworker may accompany me to meet with the referred agency.
+                        </p>
+
+                        <p style="text-align: justify; margin-bottom: 10px;">
+                            My name and information about my case will be kept confidential. My caseworker will not share this
+                            information with anyone, with the following exceptions:
+                        </p>
+
+                        <ol style="padding-left: 32px; margin-right: 10px; line-height: 1.6; margin-bottom: 24px;">
+                            <li style="margin-bottom: 10px; text-align: justify;">
+                                My caseworker may seek guidance from a supervisor in relation to my case. My caseworker
+                                would only share information as needed to support me and it will not include information that
+                                could identify me.
+                            </li>
+                            <li style="text-align: justify;">
+                                If I express thoughts or plans of committing physical harm to myself or others, my caseworker
+                                will take action to protect my safety and the safety of those around me. This action may include
+                                speaking with others in my community about my situation. If there is a risk of immediate danger,
+                                my caseworker would not need to seek my consent in such cases, but would do her/his best to
+                                inform me of actions taken.
+                            </li>
+                        </ol>
+
+                        <!-- Signature block -->
+                        <div style="margin-top: 30px;">
+                            <div style="font-weight: bold;">Signature/Thumbprint of client:</div>
+                            <div style="font-size: 12px; color: #555;">(or parent/guardian if client is under 18)</div>
+                        </div>
+
+                        <div style="margin-top: 14px;">
+                            <t t-if="doc.survivor_signature">
+                                <t t-esc="doc.survivor_signature"/>
+                            </t>
+                            <t t-elif="doc.guardian_signature">
+                                <t t-esc="doc.guardian_signature"/>
+                            </t>
+                        </div>
+                        <div style="border-bottom: 1px solid #000; width: 300px; margin-top: 2px;"/>
+
+                        <!-- Footer line -->
+                        <div style="margin-top: 40px; width: 100%;">
+                            <div style="display: inline-block; width: 55%;">
+                                <span style="font-weight: bold;">Caseworker Code:</span>
+                                <span style="border-bottom: 1px solid #000; padding: 0 12px; display: inline-block;
+                                             min-width: 190px; text-align: center;">
+                                    <t t-esc="doc.case_worker_id.code"/>
+                                </span>
+                            </div>
+                            <div style="display: inline-block;">
+                                <span style="font-weight: bold;">Date:</span>
+                                <span style="border-bottom: 1px solid #000; padding: 0 12px; display: inline-block;
+                                             min-width: 180px; text-align: center;">
+                                    <t t-esc="doc.date" t-options="{'widget': 'date'}"/>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Footer pinned to the bottom edge of the frame -->
+                        <div style="position: absolute; bottom: 12px; left: 45px; right: 45px;
+                                    border-top: 2px solid #2596be; padding-top: 6px;
+                                    font-size: 11px; color: #555;">
+                            <div style="display: inline-block; width: 33%;">
+                                <span t-esc="doc.name"/>
+                            </div>
+                            <div style="display: inline-block; width: 33%; text-align: center;
+                                        font-weight: bold; letter-spacing: 1px; color: #2596be;">
+                                CONFIDENTIAL
+                            </div>
+                            <div style="display: inline-block; width: 32%; text-align: right;">
+                                <span t-esc="doc.date" t-options="{'widget': 'date'}"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

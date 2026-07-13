@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_survivor_master_form" model="ir.ui.view">
+        <field name="name">survivor.master.form</field>
+        <field name="model">survivor.master</field>
+        <field name="arch" type="xml">
+            <form string="Survivor">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="survivor_name" placeholder="Survivor Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mother_first_name"/>
+                            <field name="birth_date"/>
+                        </group>
+                        <group>
+                            <field name="birth_order"/>
+                            <field name="place_of_birth"/>
+                            <field name="generated_code" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_survivor_master_tree" model="ir.ui.view">
+        <field name="name">survivor.master.tree</field>
+        <field name="model">survivor.master</field>
+        <field name="arch" type="xml">
+            <tree string="Survivors">
+                <field name="survivor_name"/>
+                <field name="mother_first_name"/>
+                <field name="birth_date"/>
+                <field name="birth_order"/>
+                <field name="place_of_birth"/>
+                <field name="generated_code"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_survivor_master_search" model="ir.ui.view">
+        <field name="name">survivor.master.search</field>
+        <field name="model">survivor.master</field>
+        <field name="arch" type="xml">
+            <search string="Survivors">
+                <field name="survivor_name"/>
+                <field name="generated_code"/>
+                <field name="mother_first_name"/>
+                <field name="place_of_birth"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_survivor_master" model="ir.actions.act_window">
+        <field name="name">Survivors</field>
+        <field name="res_model">survivor.master</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first survivor record
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_survivor_master" name="Survivor"
+              parent="menu_survivor_case_root" action="action_survivor_master" sequence="5"/>
+</odoo>

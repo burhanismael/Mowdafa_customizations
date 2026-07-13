@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence -->
+    <record id="seq_admission_form" model="ir.sequence">
+        <field name="name">Admission Form</field>
+        <field name="code">admission.form</field>
+        <field name="prefix">ADM/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_admission_form_form" model="ir.ui.view">
+        <field name="name">admission.form.form</field>
+        <field name="model">admission.form</field>
+        <field name="arch" type="xml">
+            <form string="Admission Form">
+                <header>
+                    <button name="action_admit" string="Admit" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Done" type="object"
+                            class="oe_highlight" invisible="state != 'admitted'"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,admitted,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="file_no"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="survivor_id"/>
+                            <field name="surname"/>
+                            <field name="first_names"/>
+                            <field name="id_number"/>
+                        </group>
+                        <group>
+                            <field name="date_of_birth"/>
+                            <field name="age"/>
+                            <field name="cellphone_number"/>
+                        </group>
+                    </group>
+                    <group string="Arrival">
+                        <group>
+                            <field name="date_of_arrival"/>
+                            <field name="time_of_arrival" widget="float_time"/>
+                            <field name="total_admitting"/>
+                        </group>
+                        <group>
+                            <field name="children_names_ages"/>
+                            <field name="last_permanent_address"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="If Employed" name="employment">
+                            <group>
+                                <group>
+                                    <field name="company_name"/>
+                                    <field name="company_address"/>
+                                </group>
+                                <group>
+                                    <field name="company_phone"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Referral Details" name="referral">
+                            <group>
+                                <group>
+                                    <field name="referred_by"/>
+                                    <field name="referral_phone"/>
+                                </group>
+                                <group>
+                                    <field name="offered_shelter_before"/>
+                                    <field name="skills_to_nurture"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Emergency Contact" name="emergency">
+                            <group>
+                                <group>
+                                    <field name="emergency_surname"/>
+                                    <field name="emergency_first_names"/>
+                                    <field name="emergency_relationship"/>
+                                </group>
+                                <group>
+                                    <field name="emergency_address"/>
+                                    <field name="emergency_phone"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="History of Abuse" name="history">
+                            <group>
+                                <field name="history_of_abuse"/>
+                                <field name="injuries_sustained"/>
+                                <field name="special_medical_needs"/>
+                            </group>
+                        </page>
+                        <page string="Signatures" name="signatures">
+                            <group>
+                                <group>
+                                    <field name="client_full_name"/>
+                                    <field name="client_signature" widget="signature"/>
+                                    <field name="client_signature_date"/>
+                                </group>
+                                <group>
+                                    <field name="staff_signature" widget="signature"/>
+                                    <field name="staff_signature_date"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_admission_form_tree" model="ir.ui.view">
+        <field name="name">admission.form.tree</field>
+        <field name="model">admission.form</field>
+        <field name="arch" type="xml">
+            <tree string="Admission Forms">
+                <field name="file_no"/>
+                <field name="date"/>
+                <field name="surname"/>
+                <field name="first_names"/>
+                <field name="cellphone_number"/>
+                <field name="date_of_arrival"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_admission_form_search" model="ir.ui.view">
+        <field name="name">admission.form.search</field>
+        <field name="model">admission.form</field>
+        <field name="arch" type="xml">
+            <search string="Admission Forms">
+                <field name="file_no"/>
+                <field name="surname"/>
+                <field name="first_names"/>
+                <field name="id_number"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Admitted" name="admitted" domain="[('state', '=', 'admitted')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_admission_form" model="ir.actions.act_window">
+        <field name="name">Admission Forms</field>
+        <field name="res_model">admission.form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first admission form
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_admission_form" name="Admission Form"
+              parent="menu_survivor_case_root" action="action_admission_form" sequence="15"/>
+</odoo>
