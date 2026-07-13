@@ -7,3 +7,4 @@ access_case_worker_user,case.worker.user,model_case_worker,base.group_user,1,1,1
 access_case_worker_manager,case.worker.manager,model_case_worker,base.group_system,1,1,1,1
 access_admission_form_user,admission.form.user,model_admission_form,base.group_user,1,1,1,0
 access_admission_form_manager,admission.form.manager,model_admission_form,base.group_system,1,1,1,1
+access_admission_form_child_user,admission.form.child.user,model_admission_form_child,base.group_user,1,1,1,1

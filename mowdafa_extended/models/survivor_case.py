@@ -66,7 +66,6 @@ class SurvivorCase(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
-        ('done', 'Done'),
     ], string='Status', default='draft', tracking=True)
     notes = fields.Text(string='Notes')
     admission_count = fields.Integer(
@@ -114,9 +113,6 @@ class SurvivorCase(models.Model):
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
-
-    def action_done(self):
-        self.write({'state': 'done'})
 
     def action_reset_draft(self):
         self.write({'state': 'draft'})

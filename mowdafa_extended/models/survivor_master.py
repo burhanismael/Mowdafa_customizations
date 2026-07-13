@@ -6,7 +6,8 @@ class SurvivorMaster(models.Model):
     _name = 'survivor.master'
     _description = 'Survivor Master'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'survivor_name'
+    _rec_name = 'generated_code'
+    _rec_names_search = ['generated_code', 'survivor_name']
     _order = 'id desc'
 
     survivor_name = fields.Char(
@@ -41,6 +42,12 @@ class SurvivorMaster(models.Model):
         tracking=True,
     )
 
+    def init(self):
+        self.env.cr.execute(
+            "UPDATE survivor_master SET generated_code = UPPER(generated_code) "
+            "WHERE generated_code IS NOT NULL AND generated_code != UPPER(generated_code)"
+        )
+
     @api.depends('mother_first_name', 'birth_date',
                  'birth_order', 'place_of_birth')
     def _compute_generated_code(self):
@@ -59,6 +66,6 @@ class SurvivorMaster(models.Model):
             ]
             code = ''
             for value in parts:
-                value = (value or '').strip().lower()
+                value = (value or '').strip().upper()
                 code += value[2] if len(value) >= 3 else ''
             record.generated_code = code

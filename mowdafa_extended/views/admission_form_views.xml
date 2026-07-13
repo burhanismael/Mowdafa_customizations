@@ -31,9 +31,6 @@
                         <group>
                             <field name="date"/>
                             <field name="survivor_id"/>
-                            <field name="surname"/>
-                            <field name="first_names"/>
-                            <field name="id_number"/>
                         </group>
                         <group>
                             <field name="date_of_birth"/>
@@ -48,11 +45,18 @@
                             <field name="total_admitting"/>
                         </group>
                         <group>
-                            <field name="children_names_ages"/>
                             <field name="last_permanent_address"/>
                         </group>
                     </group>
                     <notebook>
+                        <page string="Names and Ages of Children" name="children">
+                            <field name="child_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="age"/>
+                                </tree>
+                            </field>
+                        </page>
                         <page string="If Employed" name="employment">
                             <group>
                                 <group>
@@ -128,8 +132,7 @@
             <tree string="Admission Forms">
                 <field name="file_no"/>
                 <field name="date"/>
-                <field name="surname"/>
-                <field name="first_names"/>
+                <field name="survivor_id"/>
                 <field name="cellphone_number"/>
                 <field name="date_of_arrival"/>
                 <field name="state"/>
@@ -144,9 +147,7 @@
         <field name="arch" type="xml">
             <search string="Admission Forms">
                 <field name="file_no"/>
-                <field name="surname"/>
-                <field name="first_names"/>
-                <field name="id_number"/>
+                <field name="survivor_id"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Admitted" name="admitted" domain="[('state', '=', 'admitted')]"/>
                 <group expand="0" string="Group By">

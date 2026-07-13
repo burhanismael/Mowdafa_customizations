@@ -6,7 +6,8 @@ class CaseWorker(models.Model):
     _name = 'case.worker'
     _description = 'Case Worker'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'employee_id'
+    _rec_name = 'code'
+    _rec_names_search = ['code', 'employee_id.name']
     _order = 'id desc'
 
     employee_id = fields.Many2one(

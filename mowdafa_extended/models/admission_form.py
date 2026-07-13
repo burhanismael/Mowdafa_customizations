@@ -24,12 +24,10 @@ class AdmissionForm(models.Model):
     )
     survivor_id = fields.Many2one(
         'survivor.master',
-        string='Survivor',
+        string='ID Number',
+        required=True,
         tracking=True,
     )
-    surname = fields.Char(string='Surname', required=True, tracking=True)
-    first_names = fields.Char(string='First Names', required=True, tracking=True)
-    id_number = fields.Char(string='ID Number', tracking=True)
     date_of_birth = fields.Date(string='Date of Birth', tracking=True)
     age = fields.Char(string='Age/Estimate Age', tracking=True)
     cellphone_number = fields.Char(string='Cellphone Number', tracking=True)
@@ -39,7 +37,11 @@ class AdmissionForm(models.Model):
     total_admitting = fields.Integer(
         string='Total Admitting (if accompanied by children)',
     )
-    children_names_ages = fields.Text(string='Names and Ages of Children')
+    child_ids = fields.One2many(
+        'admission.form.child',
+        'admission_id',
+        string='Children',
+    )
     last_permanent_address = fields.Char(string='Last Permanent Address')
 
     # If Employed
@@ -90,7 +92,6 @@ class AdmissionForm(models.Model):
         for record in self:
             if record.survivor_id:
                 record.date_of_birth = record.survivor_id.birth_date
-                record.id_number = record.survivor_id.generated_code
                 if record.survivor_id.birth_date:
                     today = fields.Date.context_today(record)
                     birth_date = record.survivor_id.birth_date
@@ -101,7 +102,6 @@ class AdmissionForm(models.Model):
                     record.age = False
             else:
                 record.date_of_birth = False
-                record.id_number = False
                 record.age = False
 
     @api.model_create_multi
@@ -120,3 +120,17 @@ class AdmissionForm(models.Model):
 
     def action_reset_draft(self):
         self.write({'state': 'draft'})
+
+
+class AdmissionFormChild(models.Model):
+    _name = 'admission.form.child'
+    _description = 'Admission Form Child'
+
+    admission_id = fields.Many2one(
+        'admission.form',
+        string='Admission Form',
+        required=True,
+        ondelete='cascade',
+    )
+    name = fields.Char(string='Child Name', required=True)
+    age = fields.Char(string='Age')
