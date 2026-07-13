@@ -14,11 +14,11 @@ signatures of the guardian, case worker and survivor.
     'depends': ['base', 'mail', 'hr'],
     'data': [
         'security/ir.model.access.csv',
+        'report/consent_for_services_report.xml',
         'views/survivor_case_views.xml',
         'views/survivor_master_views.xml',
         'views/case_worker_views.xml',
         'views/admission_form_views.xml',
-        'report/consent_for_services_report.xml',
     ],
     'installable': True,
     'application': True,

@@ -42,6 +42,28 @@ class SurvivorMaster(models.Model):
         tracking=True,
     )
 
+    consent_count = fields.Integer(
+        string='Consent Forms',
+        compute='_compute_consent_count',
+    )
+
+    def _compute_consent_count(self):
+        for record in self:
+            record.consent_count = self.env['survivor.case'].search_count(
+                [('survivor_id', '=', record.id)]
+            )
+
+    def action_view_consent_forms(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Consent Forms',
+            'res_model': 'survivor.case',
+            'view_mode': 'tree,form',
+            'domain': [('survivor_id', '=', self.id)],
+            'context': {'default_survivor_id': self.id},
+        }
+
     def init(self):
         self.env.cr.execute(
             "UPDATE survivor_master SET generated_code = UPPER(generated_code) "

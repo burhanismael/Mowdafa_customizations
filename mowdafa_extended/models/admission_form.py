@@ -83,9 +83,30 @@ class AdmissionForm(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('admitted', 'Admitted'),
-        ('done', 'Done'),
+        ('admitted', 'Confirmed'),
     ], string='Status', default='draft', tracking=True)
+    consent_count = fields.Integer(
+        string='Consent Forms',
+        compute='_compute_consent_count',
+    )
+
+    @api.depends('survivor_id')
+    def _compute_consent_count(self):
+        for record in self:
+            record.consent_count = self.env['survivor.case'].search_count(
+                [('survivor_id', '=', record.survivor_id.id)]
+            ) if record.survivor_id else 0
+
+    def action_view_consent_forms(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Consent Forms',
+            'res_model': 'survivor.case',
+            'view_mode': 'tree,form',
+            'domain': [('survivor_id', '=', self.survivor_id.id)],
+            'context': {'default_survivor_id': self.survivor_id.id},
+        }
 
     @api.onchange('survivor_id')
     def _onchange_survivor_id(self):
@@ -114,9 +135,6 @@ class AdmissionForm(models.Model):
 
     def action_admit(self):
         self.write({'state': 'admitted'})
-
-    def action_done(self):
-        self.write({'state': 'done'})
 
     def action_reset_draft(self):
         self.write({'state': 'draft'})

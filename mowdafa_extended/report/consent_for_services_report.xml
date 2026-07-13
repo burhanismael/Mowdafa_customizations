@@ -19,8 +19,8 @@
         <field name="name">Consent for Services</field>
         <field name="model">survivor.case</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">survivor_case_form.report_consent_for_services</field>
-        <field name="report_file">survivor_case_form.report_consent_for_services</field>
+        <field name="report_name">mowdafa_extended.report_consent_for_services</field>
+        <field name="report_file">mowdafa_extended.report_consent_for_services</field>
         <field name="print_report_name">'Consent for Services - %s' % (object.name)</field>
         <field name="paperformat_id" ref="paperformat_consent_for_services"/>
         <field name="binding_model_id" ref="model_survivor_case"/>

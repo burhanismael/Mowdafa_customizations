@@ -19,6 +19,8 @@
                             class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object"
                             invisible="state == 'draft'"/>
+                    <button name="%(mowdafa_extended.action_report_consent_for_services)d"
+                            string="Consent Report" type="action"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>

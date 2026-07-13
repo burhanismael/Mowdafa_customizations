@@ -7,6 +7,12 @@
         <field name="arch" type="xml">
             <form string="Survivor">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_consent_forms" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="consent_count" widget="statinfo" string="Consent Form"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             <field name="survivor_name" placeholder="Survivor Name"/>
