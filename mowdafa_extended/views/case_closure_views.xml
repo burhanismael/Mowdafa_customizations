@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence -->
+    <record id="seq_case_closure" model="ir.sequence">
+        <field name="name">Case Closure</field>
+        <field name="code">case.closure</field>
+        <field name="prefix">CL/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_case_closure_form" model="ir.ui.view">
+        <field name="name">case.closure.form</field>
+        <field name="model">case.closure</field>
+        <field name="arch" type="xml">
+            <form string="Case Closure">
+                <header>
+                    <button name="action_close" string="Close Case" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_reopen" string="Re-open Case" type="object"
+                            invisible="state != 'closed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="survivor_id"/>
+                            <field name="case_worker_id"/>
+                            <field name="supervisor_id"/>
+                        </group>
+                        <group>
+                            <field name="case_opening_date"/>
+                            <field name="case_closure_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Closure Summary" name="summary">
+                            <field name="closure_summary"
+                                   placeholder="Reasons, progress vs action plan, continued-service provisions..."/>
+                        </page>
+                        <page string="Closure Checklist" name="checklist">
+                            <group>
+                                <group>
+                                    <field name="safety_plan_reviewed"/>
+                                    <field name="safety_plan_note"
+                                           invisible="not safety_plan_reviewed"/>
+                                    <field name="client_informed_resume"/>
+                                    <field name="client_informed_note"
+                                           invisible="not client_informed_resume"/>
+                                </group>
+                                <group>
+                                    <field name="supervisor_reviewed"/>
+                                    <field name="supervisor_reviewed_note"
+                                           invisible="not supervisor_reviewed"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Signatures" name="signatures">
+                            <group>
+                                <group>
+                                    <field name="case_worker_signature"/>
+                                    <field name="case_worker_signature_date"/>
+                                </group>
+                                <group>
+                                    <field name="supervisor_signature"/>
+                                    <field name="supervisor_signature_date"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Additional notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_case_closure_tree" model="ir.ui.view">
+        <field name="name">case.closure.tree</field>
+        <field name="model">case.closure</field>
+        <field name="arch" type="xml">
+            <tree string="Case Closures">
+                <field name="name"/>
+                <field name="survivor_id"/>
+                <field name="case_worker_id"/>
+                <field name="case_opening_date"/>
+                <field name="case_closure_date"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'closed'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_case_closure_search" model="ir.ui.view">
+        <field name="name">case.closure.search</field>
+        <field name="model">case.closure</field>
+        <field name="arch" type="xml">
+            <search string="Case Closures">
+                <field name="name"/>
+                <field name="survivor_id"/>
+                <field name="case_worker_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Closed" name="closed" domain="[('state', '=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Survivor" name="group_survivor"
+                            context="{'group_by': 'survivor_id'}"/>
+                    <filter string="Caseworker" name="group_case_worker"
+                            context="{'group_by': 'case_worker_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Closure Date" name="group_date"
+                            context="{'group_by': 'case_closure_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_case_closure" model="ir.actions.act_window">
+        <field name="name">Case Closures</field>
+        <field name="res_model">case.closure</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first case closure
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_case_closure" name="Case Closure"
+              parent="menu_survivor_case_root" action="action_case_closure" sequence="21"/>
+</odoo>

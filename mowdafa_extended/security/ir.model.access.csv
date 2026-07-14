@@ -8,3 +8,15 @@ access_case_worker_manager,case.worker.manager,model_case_worker,base.group_syst
 access_admission_form_user,admission.form.user,model_admission_form,base.group_user,1,1,1,0
 access_admission_form_manager,admission.form.manager,model_admission_form,base.group_system,1,1,1,1
 access_admission_form_child_user,admission.form.child.user,model_admission_form_child,base.group_user,1,1,1,1
+access_action_plan_user,action.plan.user,model_action_plan,base.group_user,1,1,1,0
+access_action_plan_manager,action.plan.manager,model_action_plan,base.group_system,1,1,1,1
+access_action_plan_goal_user,action.plan.goal.user,model_action_plan_goal,base.group_user,1,1,1,1
+access_followup_form_user,followup.form.user,model_followup_form,base.group_user,1,1,1,0
+access_followup_form_manager,followup.form.manager,model_followup_form,base.group_system,1,1,1,1
+access_followup_goal_line_user,followup.goal.line.user,model_followup_goal_line,base.group_user,1,1,1,1
+access_referral_form_user,referral.form.user,model_referral_form,base.group_user,1,1,1,0
+access_referral_form_manager,referral.form.manager,model_referral_form,base.group_system,1,1,1,1
+access_referral_service_user,referral.service.user,model_referral_service,base.group_user,1,0,0,0
+access_referral_service_manager,referral.service.manager,model_referral_service,base.group_system,1,1,1,1
+access_case_closure_user,case.closure.user,model_case_closure,base.group_user,1,1,1,0
+access_case_closure_manager,case.closure.manager,model_case_closure,base.group_system,1,1,1,1
