@@ -20,12 +20,14 @@ class FollowupForm(models.Model):
         string='Survivor Code',
         required=True,
         tracking=True,
+        copy=False,
     )
     case_worker_id = fields.Many2one(
         'case.worker',
         string='Caseworker Code',
         required=True,
         tracking=True,
+        copy=False,
     )
     date = fields.Date(
         string='Date',
@@ -39,31 +41,58 @@ class FollowupForm(models.Model):
         'followup.goal.line',
         'followup_id',
         string='Progress Towards Goals',
+        copy=False,
+        default=lambda self: self._default_goal_lines(),
+    )
+
+    @api.model
+    def _default_goal_lines(self):
+        return [
+            (0, 0, {'domain_type': 'Safety'}),
+            (0, 0, {'domain_type': 'Health Care'}),
+            (0, 0, {'domain_type': 'Psychosocial Support'}),
+            (0, 0, {'domain_type': 'Access to Justice'}),
+            (0, 0, {'domain_type': 'Other (list other goals made here)'}),
+        ]
+
+    other_observations = fields.Text(
+        string='Other Observations/Caseworker Notes',
     )
 
     # Re-assessing safety
-    risk_at_home = fields.Boolean(
-        string='New/Continued Risks at Home?',
-        tracking=True,
+    safety_line_ids = fields.One2many(
+        'followup.safety.line',
+        'followup_id',
+        string='Re-assessing Safety',
+        copy=False,
+        default=lambda self: self._default_safety_lines(),
     )
-    risk_at_home_action = fields.Text(string='Action (Risks at Home)')
-    risk_in_community = fields.Boolean(
-        string='Safety Issues in Community?',
-        tracking=True,
-    )
-    risk_in_community_action = fields.Text(string='Action (Community Safety)')
+
+    @api.model
+    def _default_safety_lines(self):
+        return [
+            (0, 0, {'question': 'Are there new or continued risks of danger at home?'}),
+            (0, 0, {'question': 'Are there any new or ongoing safety issues the survivor is facing in the community?'}),
+        ]
 
     # Final assessment
-    safety_stable = fields.Boolean(string='Safety Stable?')
-    safety_stable_note = fields.Text(string='Safety Note')
-    health_stable = fields.Boolean(string='Health Stable?')
-    health_stable_note = fields.Text(string='Health Note')
-    psychosocial_improved = fields.Boolean(string='Psychosocial Improved?')
-    psychosocial_improved_note = fields.Text(string='Psychosocial Note')
-    justice_secured = fields.Boolean(string='Access to Justice Secured?')
-    justice_secured_note = fields.Text(string='Justice Note')
-    other_intervention_needed = fields.Boolean(string='Other Intervention Needed?')
-    other_intervention_note = fields.Text(string='Other Intervention Note')
+    assessment_line_ids = fields.One2many(
+        'followup.assessment.line',
+        'followup_id',
+        string='Final Assessment',
+        copy=False,
+        default=lambda self: self._default_assessment_lines(),
+    )
+
+    @api.model
+    def _default_assessment_lines(self):
+        return [
+            (0, 0, {'question': 'Safety situation is stable (survivor is physically safe, and/or has a plan to keep physically safe)'}),
+            (0, 0, {'question': 'Health situation is stable (survivor has no medical problems that require treatment)'}),
+            (0, 0, {'question': 'Psychosocial wellbeing has improved (survivor is engaging in regular behavior, has a safe person to talk to)'}),
+            (0, 0, {'question': 'Access to Justice secured (if applicable)'}),
+            (0, 0, {'question': 'Other Intervention Needed'}),
+        ]
 
     # Next follow-up meeting
     next_followup_datetime = fields.Datetime(
@@ -80,6 +109,49 @@ class FollowupForm(models.Model):
         ('confirmed', 'Confirmed'),
     ], string='Status', default='draft', tracking=True)
     notes = fields.Text(string='Notes')
+
+    consent_count = fields.Integer(compute='_compute_related_counts')
+    admission_count = fields.Integer(compute='_compute_related_counts')
+    action_plan_count = fields.Integer(compute='_compute_related_counts')
+    closure_count = fields.Integer(compute='_compute_related_counts')
+
+    @api.depends('survivor_id')
+    def _compute_related_counts(self):
+        for record in self:
+            domain = [('survivor_id', '=', record.survivor_id.id)]
+            if record.survivor_id:
+                record.consent_count = self.env['survivor.case'].search_count(domain)
+                record.admission_count = self.env['admission.form'].search_count(domain)
+                record.action_plan_count = self.env['action.plan'].search_count(domain)
+                record.closure_count = self.env['case.closure'].search_count(domain)
+            else:
+                record.consent_count = 0
+                record.admission_count = 0
+                record.action_plan_count = 0
+                record.closure_count = 0
+
+    def _action_view_related(self, res_model, name):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': name,
+            'res_model': res_model,
+            'view_mode': 'tree,form',
+            'domain': [('survivor_id', '=', self.survivor_id.id)],
+            'context': {'default_survivor_id': self.survivor_id.id},
+        }
+
+    def action_view_consent_forms(self):
+        return self._action_view_related('survivor.case', 'Consent Forms')
+
+    def action_view_admissions(self):
+        return self._action_view_related('admission.form', 'Admission Forms')
+
+    def action_view_action_plans(self):
+        return self._action_view_related('action.plan', 'Action Plans')
+
+    def action_view_closures(self):
+        return self._action_view_related('case.closure', 'Case Closures')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -106,15 +178,47 @@ class FollowupGoalLine(models.Model):
         required=True,
         ondelete='cascade',
     )
-    domain_type = fields.Selection([
-        ('safety', 'Safety'),
-        ('health', 'Health Care'),
-        ('psychosocial', 'Psychosocial Support'),
-        ('justice', 'Access to Justice'),
-        ('other', 'Other'),
-    ], string='Goal Domain', required=True)
+    domain_type = fields.Char(string='Goal Domain', required=True)
     status = fields.Selection([
         ('met', 'Met'),
         ('not_met', 'Not Met'),
     ], string='Status')
-    explanation = fields.Char(string='Explanation')
+    explanation = fields.Html(string='Explain')
+
+
+class FollowupAssessmentLine(models.Model):
+    _name = 'followup.assessment.line'
+    _description = 'Follow-up Final Assessment Line'
+
+    followup_id = fields.Many2one(
+        'followup.form',
+        string='Follow-up Form',
+        required=True,
+        ondelete='cascade',
+    )
+    question = fields.Char(string='Assessment', required=True)
+    answer = fields.Selection([
+        ('yes', 'Y'),
+        ('no', 'N'),
+    ], string='Y/N')
+    explain = fields.Html(string='Explain')
+    intervention = fields.Html(string='Additional Interventions Planned')
+
+
+class FollowupSafetyLine(models.Model):
+    _name = 'followup.safety.line'
+    _description = 'Follow-up Safety Re-assessment Line'
+
+    followup_id = fields.Many2one(
+        'followup.form',
+        string='Follow-up Form',
+        required=True,
+        ondelete='cascade',
+    )
+    question = fields.Char(string='Question', required=True)
+    answer = fields.Selection([
+        ('yes', 'Y'),
+        ('no', 'N'),
+    ], string='Y/N')
+    explain = fields.Html(string='Explain')
+    intervention = fields.Html(string='Additional Intervention Planned')

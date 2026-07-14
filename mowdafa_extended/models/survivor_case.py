@@ -22,12 +22,14 @@ class SurvivorCase(models.Model):
         string='Survivor',
         required=True,
         tracking=True,
+        copy=False,
     )
     case_worker_id = fields.Many2one(
         'case.worker',
         string='Case Worker',
         required=True,
         tracking=True,
+        copy=False,
     )
     date = fields.Date(
         string='Date',
@@ -70,8 +72,12 @@ class SurvivorCase(models.Model):
     notes = fields.Text(string='Notes')
     admission_count = fields.Integer(
         string='Admissions',
-        compute='_compute_admission_count',
+        compute='_compute_related_counts',
     )
+    action_plan_count = fields.Integer(compute='_compute_related_counts')
+    followup_count = fields.Integer(compute='_compute_related_counts')
+    referral_count = fields.Integer(compute='_compute_related_counts')
+    closure_count = fields.Integer(compute='_compute_related_counts')
 
     @api.depends('survivor_id.birth_date')
     def _compute_survivor_age(self):
@@ -86,22 +92,47 @@ class SurvivorCase(models.Model):
                 record.is_minor = False
 
     @api.depends('survivor_id')
-    def _compute_admission_count(self):
+    def _compute_related_counts(self):
         for record in self:
-            record.admission_count = self.env['admission.form'].search_count(
-                [('survivor_id', '=', record.survivor_id.id)]
-            ) if record.survivor_id else 0
+            domain = [('survivor_id', '=', record.survivor_id.id)]
+            if record.survivor_id:
+                record.admission_count = self.env['admission.form'].search_count(domain)
+                record.action_plan_count = self.env['action.plan'].search_count(domain)
+                record.followup_count = self.env['followup.form'].search_count(domain)
+                record.referral_count = self.env['referral.form'].search_count(domain)
+                record.closure_count = self.env['case.closure'].search_count(domain)
+            else:
+                record.admission_count = 0
+                record.action_plan_count = 0
+                record.followup_count = 0
+                record.referral_count = 0
+                record.closure_count = 0
 
-    def action_view_admissions(self):
+    def _action_view_related(self, res_model, name):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Admission Forms',
-            'res_model': 'admission.form',
+            'name': name,
+            'res_model': res_model,
             'view_mode': 'tree,form',
             'domain': [('survivor_id', '=', self.survivor_id.id)],
             'context': {'default_survivor_id': self.survivor_id.id},
         }
+
+    def action_view_admissions(self):
+        return self._action_view_related('admission.form', 'Admission Forms')
+
+    def action_view_action_plans(self):
+        return self._action_view_related('action.plan', 'Action Plans')
+
+    def action_view_followups(self):
+        return self._action_view_related('followup.form', 'Follow-up Forms')
+
+    def action_view_referrals(self):
+        return self._action_view_related('referral.form', 'Referral Forms')
+
+    def action_view_closures(self):
+        return self._action_view_related('case.closure', 'Case Closures')
 
     @api.model_create_multi
     def create(self, vals_list):

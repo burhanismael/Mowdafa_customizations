@@ -27,9 +27,33 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_admissions" type="object"
                                 class="oe_stat_button" icon="fa-book"
-                                invisible="not survivor_id">
+                                invisible="admission_count == 0">
                             <field name="admission_count" widget="statinfo"
                                    string="Admissions"/>
+                        </button>
+                        <button name="action_view_action_plans" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                invisible="action_plan_count == 0">
+                            <field name="action_plan_count" widget="statinfo"
+                                   string="Action Plans"/>
+                        </button>
+                        <button name="action_view_followups" type="object"
+                                class="oe_stat_button" icon="fa-calendar-check-o"
+                                invisible="followup_count == 0">
+                            <field name="followup_count" widget="statinfo"
+                                   string="Follow-ups"/>
+                        </button>
+                        <button name="action_view_referrals" type="object"
+                                class="oe_stat_button" icon="fa-share-square-o"
+                                invisible="referral_count == 0">
+                            <field name="referral_count" widget="statinfo"
+                                   string="Referrals"/>
+                        </button>
+                        <button name="action_view_closures" type="object"
+                                class="oe_stat_button" icon="fa-archive"
+                                invisible="closure_count == 0">
+                            <field name="closure_count" widget="statinfo"
+                                   string="Case Closures"/>
                         </button>
                     </div>
                     <div class="oe_title">

@@ -27,6 +27,7 @@ class AdmissionForm(models.Model):
         string='ID Number',
         required=True,
         tracking=True,
+        copy=False,
     )
     date_of_birth = fields.Date(string='Date of Birth', tracking=True)
     age = fields.Char(string='Age/Estimate Age', tracking=True)
@@ -41,6 +42,7 @@ class AdmissionForm(models.Model):
         'admission.form.child',
         'admission_id',
         string='Children',
+        copy=False,
     )
     last_permanent_address = fields.Char(string='Last Permanent Address')
 
@@ -87,26 +89,55 @@ class AdmissionForm(models.Model):
     ], string='Status', default='draft', tracking=True)
     consent_count = fields.Integer(
         string='Consent Forms',
-        compute='_compute_consent_count',
+        compute='_compute_related_counts',
     )
+    action_plan_count = fields.Integer(compute='_compute_related_counts')
+    followup_count = fields.Integer(compute='_compute_related_counts')
+    referral_count = fields.Integer(compute='_compute_related_counts')
+    closure_count = fields.Integer(compute='_compute_related_counts')
 
     @api.depends('survivor_id')
-    def _compute_consent_count(self):
+    def _compute_related_counts(self):
         for record in self:
-            record.consent_count = self.env['survivor.case'].search_count(
-                [('survivor_id', '=', record.survivor_id.id)]
-            ) if record.survivor_id else 0
+            domain = [('survivor_id', '=', record.survivor_id.id)]
+            if record.survivor_id:
+                record.consent_count = self.env['survivor.case'].search_count(domain)
+                record.action_plan_count = self.env['action.plan'].search_count(domain)
+                record.followup_count = self.env['followup.form'].search_count(domain)
+                record.referral_count = self.env['referral.form'].search_count(domain)
+                record.closure_count = self.env['case.closure'].search_count(domain)
+            else:
+                record.consent_count = 0
+                record.action_plan_count = 0
+                record.followup_count = 0
+                record.referral_count = 0
+                record.closure_count = 0
 
-    def action_view_consent_forms(self):
+    def _action_view_related(self, res_model, name):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Consent Forms',
-            'res_model': 'survivor.case',
+            'name': name,
+            'res_model': res_model,
             'view_mode': 'tree,form',
             'domain': [('survivor_id', '=', self.survivor_id.id)],
             'context': {'default_survivor_id': self.survivor_id.id},
         }
+
+    def action_view_consent_forms(self):
+        return self._action_view_related('survivor.case', 'Consent Forms')
+
+    def action_view_action_plans(self):
+        return self._action_view_related('action.plan', 'Action Plans')
+
+    def action_view_followups(self):
+        return self._action_view_related('followup.form', 'Follow-up Forms')
+
+    def action_view_referrals(self):
+        return self._action_view_related('referral.form', 'Referral Forms')
+
+    def action_view_closures(self):
+        return self._action_view_related('case.closure', 'Case Closures')
 
     @api.onchange('survivor_id')
     def _onchange_survivor_id(self):

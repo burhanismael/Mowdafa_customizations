@@ -68,6 +68,28 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_consent_forms" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="consent_count == 0">
+                            <field name="consent_count" widget="statinfo" string="Consent Form"/>
+                        </button>
+                        <button name="action_view_admissions" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="admission_count == 0">
+                            <field name="admission_count" widget="statinfo" string="Admissions"/>
+                        </button>
+                        <button name="action_view_action_plans" type="object"
+                                class="oe_stat_button" icon="fa-tasks"
+                                invisible="action_plan_count == 0">
+                            <field name="action_plan_count" widget="statinfo" string="Action Plans"/>
+                        </button>
+                        <button name="action_view_closures" type="object"
+                                class="oe_stat_button" icon="fa-archive"
+                                invisible="closure_count == 0">
+                            <field name="closure_count" widget="statinfo" string="Case Closures"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                     </div>

@@ -20,12 +20,14 @@ class ActionPlan(models.Model):
         string='Survivor Code',
         required=True,
         tracking=True,
+        copy=False,
     )
     case_worker_id = fields.Many2one(
         'case.worker',
         string='Caseworker Code',
         required=True,
         tracking=True,
+        copy=False,
     )
     date = fields.Date(
         string='Date',
@@ -37,9 +39,13 @@ class ActionPlan(models.Model):
         'action.plan.goal',
         'plan_id',
         string='Action Points / Goals',
+        copy=False,
     )
-    can_provide_services = fields.Boolean(
-        string='Can MOWDAFA provide all required services?',
+    can_provide_services = fields.Selection([
+        ('yes', 'Yes'),
+        ('no', 'No'),
+    ], string='Can MOWDAFA provide all required services?',
+        required=True,
         tracking=True,
     )
     followup_datetime = fields.Datetime(
@@ -70,6 +76,49 @@ class ActionPlan(models.Model):
     ], string='Status', default='draft', tracking=True)
     notes = fields.Text(string='Notes')
 
+    consent_count = fields.Integer(compute='_compute_related_counts')
+    admission_count = fields.Integer(compute='_compute_related_counts')
+    followup_count = fields.Integer(compute='_compute_related_counts')
+    referral_count = fields.Integer(compute='_compute_related_counts')
+
+    @api.depends('survivor_id')
+    def _compute_related_counts(self):
+        for record in self:
+            domain = [('survivor_id', '=', record.survivor_id.id)]
+            if record.survivor_id:
+                record.consent_count = self.env['survivor.case'].search_count(domain)
+                record.admission_count = self.env['admission.form'].search_count(domain)
+                record.followup_count = self.env['followup.form'].search_count(domain)
+                record.referral_count = self.env['referral.form'].search_count(domain)
+            else:
+                record.consent_count = 0
+                record.admission_count = 0
+                record.followup_count = 0
+                record.referral_count = 0
+
+    def _action_view_related(self, res_model, name):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': name,
+            'res_model': res_model,
+            'view_mode': 'tree,form',
+            'domain': [('survivor_id', '=', self.survivor_id.id)],
+            'context': {'default_survivor_id': self.survivor_id.id},
+        }
+
+    def action_view_consent_forms(self):
+        return self._action_view_related('survivor.case', 'Consent Forms')
+
+    def action_view_admissions(self):
+        return self._action_view_related('admission.form', 'Admission Forms')
+
+    def action_view_followups(self):
+        return self._action_view_related('followup.form', 'Follow-up Forms')
+
+    def action_view_referrals(self):
+        return self._action_view_related('referral.form', 'Referral Forms')
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -80,6 +129,33 @@ class ActionPlan(models.Model):
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
+
+    def action_create_followup(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Follow-up Form',
+            'res_model': 'followup.form',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_survivor_id': self.survivor_id.id,
+                'default_case_worker_id': self.case_worker_id.id,
+            },
+        }
+
+    def action_create_referral(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Referral Form',
+            'res_model': 'referral.form',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_survivor_id': self.survivor_id.id,
+            },
+        }
 
     def action_reset_draft(self):
         self.write({'state': 'draft'})

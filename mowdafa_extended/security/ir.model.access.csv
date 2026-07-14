@@ -20,3 +20,5 @@ access_referral_service_user,referral.service.user,model_referral_service,base.g
 access_referral_service_manager,referral.service.manager,model_referral_service,base.group_system,1,1,1,1
 access_case_closure_user,case.closure.user,model_case_closure,base.group_user,1,1,1,0
 access_case_closure_manager,case.closure.manager,model_case_closure,base.group_system,1,1,1,1
+access_followup_safety_line_user,followup.safety.line.user,model_followup_safety_line,base.group_user,1,1,1,1
+access_followup_assessment_line_user,followup.assessment.line.user,model_followup_assessment_line,base.group_user,1,1,1,1

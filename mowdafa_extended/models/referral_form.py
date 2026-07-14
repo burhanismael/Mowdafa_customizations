@@ -29,6 +29,7 @@ class ReferralForm(models.Model):
         string='Survivor Code',
         required=True,
         tracking=True,
+        copy=False,
     )
     priority = fields.Selection([
         ('high', 'High Risk (48 hours)'),
@@ -128,6 +129,49 @@ class ReferralForm(models.Model):
         ('confirmed', 'Confirmed'),
     ], string='Status', default='draft', tracking=True)
     notes = fields.Text(string='Notes')
+
+    consent_count = fields.Integer(compute='_compute_related_counts')
+    admission_count = fields.Integer(compute='_compute_related_counts')
+    action_plan_count = fields.Integer(compute='_compute_related_counts')
+    closure_count = fields.Integer(compute='_compute_related_counts')
+
+    @api.depends('survivor_id')
+    def _compute_related_counts(self):
+        for record in self:
+            domain = [('survivor_id', '=', record.survivor_id.id)]
+            if record.survivor_id:
+                record.consent_count = self.env['survivor.case'].search_count(domain)
+                record.admission_count = self.env['admission.form'].search_count(domain)
+                record.action_plan_count = self.env['action.plan'].search_count(domain)
+                record.closure_count = self.env['case.closure'].search_count(domain)
+            else:
+                record.consent_count = 0
+                record.admission_count = 0
+                record.action_plan_count = 0
+                record.closure_count = 0
+
+    def _action_view_related(self, res_model, name):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': name,
+            'res_model': res_model,
+            'view_mode': 'tree,form',
+            'domain': [('survivor_id', '=', self.survivor_id.id)],
+            'context': {'default_survivor_id': self.survivor_id.id},
+        }
+
+    def action_view_consent_forms(self):
+        return self._action_view_related('survivor.case', 'Consent Forms')
+
+    def action_view_admissions(self):
+        return self._action_view_related('admission.form', 'Admission Forms')
+
+    def action_view_action_plans(self):
+        return self._action_view_related('action.plan', 'Action Plans')
+
+    def action_view_closures(self):
+        return self._action_view_related('case.closure', 'Case Closures')
 
     @api.model_create_multi
     def create(self, vals_list):
