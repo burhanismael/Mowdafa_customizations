@@ -20,14 +20,12 @@ class SurvivorCase(models.Model):
     survivor_id = fields.Many2one(
         'survivor.master',
         string='Survivor',
-        required=True,
         tracking=True,
         copy=False,
     )
     case_worker_id = fields.Many2one(
         'case.worker',
         string='Case Worker',
-        required=True,
         tracking=True,
         copy=False,
     )
@@ -68,7 +66,7 @@ class SurvivorCase(models.Model):
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
-    ], string='Status', default='draft', tracking=True)
+    ], string='Status', default='draft', tracking=True, copy=False)
     notes = fields.Text(string='Notes')
     admission_count = fields.Integer(
         string='Admissions',
@@ -110,7 +108,9 @@ class SurvivorCase(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
-        return {
+        records = self.env[res_model].search(
+            [('survivor_id', '=', self.survivor_id.id)])
+        action = {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
@@ -118,6 +118,27 @@ class SurvivorCase(models.Model):
             'domain': [('survivor_id', '=', self.survivor_id.id)],
             'context': {'default_survivor_id': self.survivor_id.id},
         }
+        if len(records) == 1:
+            action.update({'view_mode': 'form', 'res_id': records.id})
+        return action
+
+    def action_open_admission(self):
+        self.ensure_one()
+        admission = self.env['admission.form'].search(
+            [('survivor_id', '=', self.survivor_id.id)], limit=1)
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Admission Form',
+            'res_model': 'admission.form',
+            'view_mode': 'form',
+            'context': {
+                'default_survivor_id': self.survivor_id.id,
+                'default_consent_form_id': self.id,
+            },
+        }
+        if admission:
+            action['res_id'] = admission.id
+        return action
 
     def action_view_admissions(self):
         return self._action_view_related('admission.form', 'Admission Forms')

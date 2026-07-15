@@ -55,6 +55,7 @@
                     <group>
                         <group>
                             <field name="date"/>
+                            <field name="consent_form_id"/>
                             <field name="survivor_id"/>
                         </group>
                         <group>

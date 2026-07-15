@@ -22,6 +22,12 @@ class AdmissionForm(models.Model):
         default=fields.Date.context_today,
         tracking=True,
     )
+    consent_form_id = fields.Many2one(
+        'survivor.case',
+        string='Consent Form',
+        tracking=True,
+        copy=False,
+    )
     survivor_id = fields.Many2one(
         'survivor.master',
         string='ID Number',
@@ -138,6 +144,12 @@ class AdmissionForm(models.Model):
 
     def action_view_closures(self):
         return self._action_view_related('case.closure', 'Case Closures')
+
+    @api.onchange('consent_form_id')
+    def _onchange_consent_form_id(self):
+        for record in self:
+            if record.consent_form_id and record.consent_form_id.survivor_id:
+                record.survivor_id = record.consent_form_id.survivor_id
 
     @api.onchange('survivor_id')
     def _onchange_survivor_id(self):

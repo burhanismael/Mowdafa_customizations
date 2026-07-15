@@ -64,6 +64,31 @@ class SurvivorMaster(models.Model):
             'context': {'default_survivor_id': self.id},
         }
 
+    @api.model
+    def _pad_birth_order(self, vals):
+        birth_order = (vals.get('birth_order') or '').strip()
+        if birth_order.isdigit() and len(birth_order) < 3:
+            vals['birth_order'] = birth_order.zfill(3)
+        return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._pad_birth_order(vals)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'birth_order' in vals:
+            self._pad_birth_order(vals)
+        return super().write(vals)
+
+    @api.onchange('birth_order')
+    def _onchange_birth_order(self):
+        for record in self:
+            birth_order = (record.birth_order or '').strip()
+            if birth_order.isdigit() and len(birth_order) < 3:
+                record.birth_order = birth_order.zfill(3)
+
     def init(self):
         self.env.cr.execute(
             "UPDATE survivor_master SET generated_code = UPPER(generated_code) "

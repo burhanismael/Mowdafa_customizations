@@ -19,6 +19,8 @@
                             class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object"
                             invisible="state == 'draft'"/>
+                    <button name="action_open_admission" string="Admission Form" type="object"
+                            class="oe_highlight" invisible="state != 'confirmed'"/>
                     <button name="%(mowdafa_extended.action_report_consent_for_services)d"
                             string="Consent Report" type="action"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
@@ -61,10 +63,10 @@
                     </div>
                     <group>
                         <group>
-                            <field name="survivor_id"/>
+                            <field name="survivor_id" required="1"/>
                             <field name="survivor_age" invisible="not survivor_id"/>
                             <field name="is_minor" invisible="1"/>
-                            <field name="case_worker_id"/>
+                            <field name="case_worker_id" required="1"/>
                             <field name="date"/>
                         </group>
                         <group>
