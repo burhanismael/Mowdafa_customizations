@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── sequence: GBV/2026/0001 ── -->
+    <record id="seq_gbv_case" model="ir.sequence">
+        <field name="name">GBV Case</field>
+        <field name="code">gbv.case</field>
+        <field name="prefix">GBV/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- ── FORM: the case spine ── -->
+    <record id="view_gbv_case_form" model="ir.ui.view">
+        <field name="name">gbv.case.form</field>
+        <field name="model">gbv.case</field>
+        <field name="arch" type="xml">
+            <form string="GBV Case">
+                <header>
+                    <field name="consent_confirmed" invisible="1"/>
+                    <button name="action_create_consent" type="object"
+                        string="Create Consent" class="btn-primary"
+                        invisible="service_stage != 'intake' or consent_count &gt; 0"/>
+                    <button name="action_create_admission" type="object"
+                        string="Create Admission Form" class="btn-primary"
+                        invisible="service_stage != 'consent' or not consent_confirmed or admission_count &gt; 0"/>
+                    <button name="action_new_followup" type="object"
+                        string="New Follow-up" class="btn-primary"
+                        invisible="service_stage in ('intake', 'consent')"/>
+                    <button name="action_refer_out" type="object"
+                        string="Refer Out (Form 9)"/>
+                    <button name="action_close_case" type="object"
+                        string="Close Case" invisible="service_stage == 'closure'"/>
+                    <field name="service_stage" widget="statusbar"
+                        options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_consents" type="object"
+                                class="oe_stat_button" icon="fa-check-square-o">
+                            <field name="consent_count" widget="statinfo" string="Consent"/>
+                        </button>
+                        <button name="action_view_admissions" type="object"
+                                class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="admission_count" widget="statinfo" string="Admission"/>
+                        </button>
+                        <button name="action_view_action_plans" type="object"
+                                class="oe_stat_button" icon="fa-list-ol">
+                            <field name="action_plan_count" widget="statinfo" string="Action Plans"/>
+                        </button>
+                        <button name="action_view_followups" type="object"
+                                class="oe_stat_button" icon="fa-repeat">
+                            <field name="followup_count" widget="statinfo" string="Follow-ups"/>
+                        </button>
+                        <button name="action_view_referrals" type="object"
+                                class="oe_stat_button" icon="fa-share">
+                            <field name="referral_count" widget="statinfo" string="Referrals"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Closed" bg_color="text-bg-danger"
+                        invisible="case_status != 'closed'"/>
+                    <div class="d-flex justify-content-between align-items-start w-100">
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                            <field name="case_status" widget="badge"
+                                decoration-success="case_status == 'open'"
+                                decoration-danger="case_status == 'closed'"/>
+                        </div>
+                        <field name="justice_stage" widget="justice_stage_selection"
+                               class="flex-shrink-0"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="survivor_id" options="{'no_create_edit': True}"/>
+                            <field name="case_worker_id" options="{'no_create_edit': True}"/>
+                            <field name="region_id" options="{'no_create_edit': True}"/>
+                            <field name="district_id" options="{'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="date_reported"/>
+                            <field name="date_incident"/>
+                            <field name="entry_channel"/>
+                            <field name="reported_by"/>
+                        </group>
+                    </group>
+                    <group string="Classification — this is what the dashboard counts">
+                        <group>
+                            <field name="violence_type_id" options="{'no_create_edit': True}"/>
+                            <field name="risk_level_id"
+                                options="{'no_create_edit': True}"/>
+                            <field name="population_group"/>
+                        </group>
+                        <group>
+                            <field name="sex"/>
+                            <field name="age_band"/>
+                            <field name="age_years"/>
+                            <field name="is_child"/>
+                        </group>
+                    </group>
+                    <div class="text-muted" colspan="2">
+                        Shaded fields are computed and stored — frozen at report date, so a
+                        survivor who turns 18 next month doesn't silently move out of the
+                        children figure.
+                    </div>
+                    <notebook>
+                        <page string="Perpetrators" name="perpetrators">
+                            <field name="perpetrator_ids">
+                                <tree editable="bottom">
+                                    <field name="name" string="Alias / name"/>
+                                    <field name="relationship"/>
+                                    <field name="sex"/>
+                                    <field name="age_estimate" string="Age"/>
+                                    <field name="status" widget="badge"
+                                        decoration-danger="status == 'at_large'"
+                                        decoration-info="status == 'arrested'"
+                                        decoration-warning="status == 'charged'"
+                                        decoration-success="status == 'convicted'"/>
+                                    <field name="age_years" string="Age (years)" optional="hide"/>
+                                    <field name="charge"/>
+                                    <field name="verdict"/>
+                                    <field name="notes" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Services &amp; Referrals" name="services">
+                            <field name="service_ids">
+                                <tree editable="bottom">
+                                    <field name="service_id" options="{'no_create_edit': True}"/>
+                                    <field name="state" widget="badge"
+                                        decoration-success="state == 'provided'"
+                                        decoration-info="state == 'referred'"
+                                        decoration-warning="state == 'needed'"/>
+                                    <field name="date"/>
+                                    <field name="provider"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Justice" name="justice">
+                            <group>
+                                <group>
+                                    <field name="police_reference"/>
+                                    <field name="investigating_officer"/>
+                                    <field name="investigation_opened"/>
+                                    <field name="arrest_date"/>
+                                </group>
+                                <group>
+                                    <field name="court"/>
+                                    <field name="court_file_no"/>
+                                    <field name="first_hearing"/>
+                                    <field name="verdict"/>
+                                    <field name="sentence"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>Deliberately independent of the service pipeline.</strong>
+                                The legal officer moves this; the caseworker moves the other.
+                                A case can sit in Closure and still read In Court — one status
+                                field could not.
+                            </div>
+                        </page>
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Case notes…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── KANBAN: 6 service stages ── -->
+    <record id="view_gbv_case_kanban" model="ir.ui.view">
+        <field name="name">gbv.case.kanban</field>
+        <field name="model">gbv.case</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="service_stage" quick_create="false">
+                <field name="name"/>
+                <field name="case_status"/>
+                <field name="risk_level_id"/>
+                <field name="justice_stage"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click p-2">
+                            <div>
+                                <strong class="font-monospace text-primary">
+                                    <field name="name"/>
+                                </strong>
+                            </div>
+                            <div class="fw-bold mt-1"><field name="survivor_id"/></div>
+                            <div class="text-muted small">
+                                <field name="region_id"/>
+                                <t t-if="record.district_id.value"> · <field name="district_id"/></t>
+                            </div>
+                            <div class="text-muted small"><field name="violence_type_id"/></div>
+                            <div class="mt-2">
+                                <span t-if="record.risk_level_id.value"
+                                      t-att-class="'badge me-1 ' +
+                                        ((record.risk_level_id.value || '').indexOf('High') !== -1 ? 'text-bg-danger'
+                                        : (record.risk_level_id.value || '').indexOf('Medium') !== -1 ? 'text-bg-warning'
+                                        : (record.risk_level_id.value || '').indexOf('Low') !== -1 ? 'text-bg-success'
+                                        : 'text-bg-secondary')">
+                                    <t t-esc="record.risk_level_id.value"/>
+                                </span>
+                                <span class="badge text-bg-light border">
+                                    <t t-esc="record.justice_stage.value"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ── LIST ── -->
+    <record id="view_gbv_case_list" model="ir.ui.view">
+        <field name="name">gbv.case.tree</field>
+        <field name="model">gbv.case</field>
+        <field name="arch" type="xml">
+            <tree string="Cases" decoration-muted="case_status == 'closed'">
+                <field name="name"/>
+                <field name="date_reported"/>
+                <field name="survivor_id"/>
+                <field name="region_id"/>
+                <field name="district_id" optional="show"/>
+                <field name="violence_type_id"/>
+                <field name="risk_level_id" widget="badge"/>
+                <field name="sex" optional="show"/>
+                <field name="age_band" optional="show"/>
+                <field name="service_stage" widget="badge"/>
+                <field name="justice_stage" widget="badge" optional="show"/>
+                <field name="case_status" widget="badge"
+                    decoration-success="case_status == 'open'"
+                    decoration-danger="case_status == 'closed'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ── SEARCH ── -->
+    <record id="view_gbv_case_search" model="ir.ui.view">
+        <field name="name">gbv.case.search</field>
+        <field name="model">gbv.case</field>
+        <field name="arch" type="xml">
+            <search string="Search Cases">
+                <field name="name"/>
+                <field name="survivor_id"/>
+                <field name="violence_type_id"/>
+                <filter string="Open" name="filter_open" domain="[('case_status', '=', 'open')]"/>
+                <filter string="Closed" name="filter_closed" domain="[('case_status', '=', 'closed')]"/>
+                <separator/>
+                <filter string="Children" name="filter_children" domain="[('is_child', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage" context="{'group_by': 'service_stage'}"/>
+                    <filter string="Region" name="group_region" context="{'group_by': 'region_id'}"/>
+                    <filter string="District" name="group_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Violence Type" name="group_violence" context="{'group_by': 'violence_type_id'}"/>
+                    <filter string="Risk Level" name="group_risk" context="{'group_by': 'risk_level_id'}"/>
+                    <filter string="Justice Stage" name="group_justice" context="{'group_by': 'justice_stage'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_gbv_case" model="ir.actions.act_window">
+        <field name="name">Cases</field>
+        <field name="res_model">gbv.case</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="search_view_id" ref="view_gbv_case_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Open a case</p>
+            <p>The case is the spine: consent, admission, action plan,
+               follow-ups, referrals and closure all hang off it — the
+               dashboard reads this one table.</p>
+        </field>
+    </record>
+
+    <!-- ── gbv.service master (6 sectors) ── -->
+    <record id="view_gbv_service_list" model="ir.ui.view">
+        <field name="name">gbv.service.tree</field>
+        <field name="model">gbv.service</field>
+        <field name="arch" type="xml">
+            <tree string="Service Sectors" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_gbv_service" model="ir.actions.act_window">
+        <field name="name">Service Sectors</field>
+        <field name="res_model">gbv.service</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ── Dashboard client action (OWL component) ── -->
+    <record id="action_gbv_dashboard" model="ir.actions.client">
+        <field name="name">GBV Dashboard</field>
+        <field name="tag">mowdafa_extended.gbv_dashboard</field>
+    </record>
+
+    <record id="action_gbv_case_analysis" model="ir.actions.act_window">
+        <field name="name">Cases Analysis</field>
+        <field name="res_model">gbv.case</field>
+        <field name="view_mode">pivot,graph</field>
+        <field name="search_view_id" ref="view_gbv_case_search"/>
+    </record>
+
+    <!-- ── menus: Cases first under the GBV root ── -->
+    <menuitem id="menu_gbv_case" name="Cases"
+        parent="menu_survivor_case_root" action="action_gbv_case" sequence="1"/>
+    <menuitem id="menu_gbv_dashboard" name="Dashboard"
+        parent="menu_survivor_case_root" action="action_gbv_dashboard" sequence="0"/>
+    <menuitem id="menu_gbv_reporting" name="Reporting"
+        parent="menu_survivor_case_root" sequence="80"/>
+    <menuitem id="menu_gbv_case_analysis" name="Cases Analysis"
+        parent="menu_gbv_reporting" action="action_gbv_case_analysis" sequence="5"/>
+    <menuitem id="menu_gbv_service" name="Service Sectors"
+        parent="menu_gbv_configuration" action="action_gbv_service" sequence="50"/>
+
+</odoo>

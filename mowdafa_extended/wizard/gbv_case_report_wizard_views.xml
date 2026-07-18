@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_gbv_case_report_wizard_form" model="ir.ui.view">
+    <field name="name">gbv.case.report.wizard.form</field>
+    <field name="model">gbv.case.report.wizard</field>
+    <field name="arch" type="xml">
+      <form string="GBV Cases Statistical Report">
+        <div class="oe_title">
+          <h1>Xogta Kiisaska</h1>
+          <p class="text-muted">
+            The Ministry's confidential statistical report, printed from live
+            case data. Choose an interval and, if you want one report per
+            violence type, choose the types.
+          </p>
+        </div>
+        <group>
+          <group string="Interval">
+            <field name="period"/>
+            <field name="year" invisible="period not in ('q1','q2','q3','q4')"/>
+            <field name="date_from"/>
+            <field name="date_to"/>
+          </group>
+          <group string="Violence type">
+            <field name="violence_type_ids" widget="many2many_tags"
+                   options="{'no_create': True}"/>
+            <field name="split_by_type"/>
+          </group>
+        </group>
+        <group>
+          <group string="Regions">
+            <field name="region_ids" widget="many2many_tags"
+                   options="{'no_create': True}"/>
+            <field name="no_data_region_ids" widget="many2many_tags"
+                   options="{'no_create': True}"/>
+          </group>
+          <group string="Presentation">
+            <field name="compare_previous"/>
+            <field name="title_override" placeholder="XOGTA KIISASKA KUFSIGA PUNTLAND 2026"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+          </group>
+        </group>
+        <footer>
+          <button name="action_print" string="Print report" type="object"
+                  class="btn-primary" data-hotkey="q"/>
+          <button string="Cancel" class="btn-secondary" special="cancel"
+                  data-hotkey="x"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_gbv_case_report_wizard" model="ir.actions.act_window">
+    <field name="name">Cases Statistical Report</field>
+    <field name="res_model">gbv.case.report.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="view_id" ref="view_gbv_case_report_wizard_form"/>
+  </record>
+
+  <!-- Parented in the post-init hook, under the module's own Reporting menu
+       when there is one. Left top-level here only so the record is valid. -->
+  <menuitem id="menu_gbv_case_report_wizard"
+            name="Cases Statistical Report"
+            parent="menu_gbv_reporting"
+            action="action_gbv_case_report_wizard"
+            sequence="15"/>
+
+</odoo>

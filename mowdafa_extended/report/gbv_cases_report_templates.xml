@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_gbv_cases_document">
+  <t t-call="web.html_container">
+    <style type="text/css">
+      .mw { font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+            color: #1B2227; font-size: 9.5px; line-height: 1.45; }
+      .mw h1, .mw h2, .mw h3, .mw h4 { margin: 0; font-weight: normal; }
+      .mw table { border-collapse: collapse; width: 100%; }
+      .mw .mast { width: 100%; margin-bottom: 10px; }
+      .mw .mast td { vertical-align: middle; padding: 0; }
+      .mw .mast .logo { width: 78px; }
+      .mw .mast .logo img { width: 72px; height: auto; }
+      .mw .ministry { font-size: 16px; font-weight: bold; color: #1F4E79;
+                      line-height: 1.25; }
+      .mw .ministry-en { font-size: 9px; font-weight: bold; color: #1F4E79; }
+      .mw .rule { border: 0; border-top: 2px solid #1F4E79; margin: 8px 0 12px; }
+      .mw .conf { text-align: center; font-size: 11px; font-weight: bold;
+                  letter-spacing: 1.2px; color: #C0392B; margin-bottom: 4px; }
+      .mw .title { text-align: center; font-size: 22px; font-weight: bold;
+                   letter-spacing: 0.6px; color: #1B2227; line-height: 1.2; }
+      .mw .subtitle { text-align: center; font-size: 9px; color: #6B7478;
+                      margin: 5px 0 14px; }
+      .mw .sect { font-size: 11px; font-weight: bold; color: #1F4E79;
+                  border-bottom: 1.5px solid #1F4E79; padding-bottom: 3px;
+                  margin: 16px 0 8px; text-transform: uppercase;
+                  letter-spacing: 0.4px; }
+
+      /* ---- matrix ---- */
+      .mw .grid th, .mw .grid td { border: 0.8px solid #34495E; padding: 3px 2px;
+                                   text-align: center; }
+      .mw .grid thead th { background: #1F4E79; color: #FFFFFF; font-size: 8.5px;
+                           letter-spacing: 0.3px; }
+      .mw .grid thead th .yr { display: block; font-size: 6.5px; font-weight: normal;
+                               opacity: 0.8; }
+      .mw .grid td.no { width: 22px; font-weight: bold; }
+      .mw .grid td.reg { text-align: left; padding-left: 6px; font-weight: bold;
+                         width: 78px; }
+      .mw .grid td.zero { color: #B9C0C4; }
+      .mw .grid td.tot { background: #EDF2F6; font-weight: bold; }
+      .mw .grid td.missing { text-align: center; color: #8A9298; font-style: italic;
+                             font-size: 8px; }
+      .mw .grid tr.totrow td { background: #1F4E79; color: #FFFFFF; font-weight: bold; }
+
+      /* ---- district cards ---- */
+      .mw .cards { width: 100%; }
+      .mw .cards td { width: 33.33%; vertical-align: top; padding: 0 5px 10px 0; }
+      .mw .card { border: 0.8px solid #C9D1D6; }
+      .mw .card .hd { color: #FFFFFF; font-weight: bold; font-size: 9px;
+                      padding: 3px 6px; }
+      .mw .card table { width: 100%; }
+      .mw .card td { padding: 2px 5px; border-top: 0.6px solid #E4E9EC; width: auto; }
+      .mw .card td.s { width: 22px; color: #8A9298; font-size: 8px; }
+      .mw .card td.v { width: 26px; text-align: center; font-weight: bold; }
+      .mw .card tr.tt td { background: #F1F4F6; font-weight: bold; }
+
+      /* ---- bars ---- */
+      .mw .bars td { padding: 2px 0; border: 0; }
+      .mw .bars td.lb { width: 80px; font-size: 8.5px; }
+      .mw .bars td.vv { width: 34px; text-align: right; font-weight: bold;
+                        font-size: 8.5px; padding-left: 5px; }
+      .mw .bar { height: 11px; background: #2E75B6; }
+      .mw .bar.prev { background: #C0392B; }
+      .mw .bar.cur { background: #1B2227; }
+      .mw .track { background: #F1F4F6; }
+
+      /* ---- tiles ---- */
+      .mw .tiles { width: 100%; }
+      .mw .tiles td { border: 0; padding: 0 4px 0 0; vertical-align: top; }
+      .mw .tile { border: 0.8px solid #DCE2E6; text-align: center; padding: 7px 3px; }
+      .mw .tile .k { font-size: 6.5px; font-weight: bold; letter-spacing: 0.4px;
+                     color: #6B7478; text-transform: uppercase; line-height: 1.25;
+                     min-height: 18px; }
+      .mw .tile .n { font-size: 21px; font-weight: bold; color: #1B2227;
+                     line-height: 1.15; }
+      .mw .tile .u { font-size: 7px; color: #8A9298; }
+      .mw .tile.a { background: #FBEBEB; border-color: #E9C4C4; }
+      .mw .tile.b { background: #EDF2F6; border-color: #C7D6E2; }
+
+      .mw .legend { font-size: 8px; }
+      .mw .swatch { display: inline-block; width: 8px; height: 8px;
+                    margin-right: 4px; }
+      .mw .note { font-size: 7.5px; color: #8A9298; font-style: italic;
+                  margin-top: 5px; }
+      .mw .pagefoot { border-top: 1.5px solid #1F4E79; margin-top: 14px; padding-top: 6px;
+                  text-align: center; font-size: 7.5px; color: #6B7478; }
+      .mw .brk { page-break-before: always; }
+    </style>
+
+    <t t-foreach="blocks" t-as="block">
+      <div class="page mw">
+
+        <!-- ============ masthead ============ -->
+        <table class="mast">
+          <tr>
+            <td class="logo">
+              <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"/>
+            </td>
+            <td>
+              <div class="ministry">Wasaaradda Horumarinta Haweenka<br/>iyo Arrimaha Qoyska Puntland</div>
+              <div class="ministry-en">Ministry of Women Development and Family Affairs in Puntland</div>
+            </td>
+          </tr>
+        </table>
+        <hr class="rule"/>
+        <div class="conf">XOG QARSOODI AH  (CONFIDENTIAL)</div>
+        <h1 class="title"><t t-esc="block['title']"/></h1>
+        <div class="subtitle"><t t-esc="block['subtitle']"/></div>
+
+        <!-- ============ 1. region x period matrix ============ -->
+        <table class="grid">
+          <thead>
+            <tr>
+              <th style="width:22px">NO</th>
+              <th style="width:78px">Gobolada</th>
+              <t t-foreach="block['columns']" t-as="column">
+                <th>
+                  <t t-esc="column['label']"/>
+                  <span class="yr" t-if="column['sub']">'<t t-esc="column['sub']"/></span>
+                </th>
+              </t>
+              <th style="width:46px">WADARTA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="block['rows']" t-as="row">
+              <tr>
+                <td class="no"><t t-esc="row['seq']"/>.</td>
+                <td class="reg"><t t-esc="row['name']"/></td>
+                <t t-if="row['no_data']">
+                  <td class="missing" t-att-colspan="len(block['columns'])">
+                    Wax xog ah kama aanu helin
+                  </td>
+                  <td class="tot">–</td>
+                </t>
+                <t t-else="">
+                  <t t-foreach="row['cells']" t-as="cell">
+                    <td t-att-class="'zero' if not cell else ''"><t t-esc="cell"/></td>
+                  </t>
+                  <td class="tot"><t t-esc="row['total']"/></td>
+                </t>
+              </tr>
+            </t>
+            <tr class="totrow">
+              <td colspan="2">Tirada Gobolka</td>
+              <t t-foreach="block['column_totals']" t-as="column_total">
+                <td><t t-esc="column_total"/></td>
+              </t>
+              <td><t t-esc="block['grand_total']"/> Kiis</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ============ 2. district breakdown ============ -->
+        <t t-if="block['cards']">
+          <div class="sect">Faahfaahinta Kiisaska ee Gobolada, Degmooyinka iyo Deegaanada</div>
+          <table class="cards">
+            <t t-foreach="block['card_rows']" t-as="card_row">
+              <tr>
+                <t t-foreach="card_row" t-as="card">
+                  <td>
+                    <div class="card" t-if="card">
+                      <div class="hd" t-attf-style="background:#{card['colour']}">
+                        Gobolka <t t-esc="card['region']"/>
+                      </div>
+                      <table>
+                        <t t-foreach="card['lines']" t-as="line">
+                          <tr>
+                            <td class="s"><t t-esc="line['seq']"/>:</td>
+                            <td><t t-esc="line['name']"/></td>
+                            <td class="v"><t t-esc="line['count']"/></td>
+                          </tr>
+                        </t>
+                        <tr class="tt">
+                          <td class="s"></td>
+                          <td>Wadarta Guud:</td>
+                          <td class="v"><t t-esc="card['total']"/></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                </t>
+              </tr>
+            </t>
+          </table>
+        </t>
+
+        <div class="pagefoot">
+          Waaxda Ka Hortagga Tacaddiyada ee Wasaaradda Horumarinta Haweenka iyo Arrimaha Qoyska Puntland.
+          &#9993; gbv.department@mowdafa.pl.so
+        </div>
+
+        <!-- ============ page 2 ============ -->
+        <div class="brk"></div>
+        <div class="sect">Jaantuska Kiisaska ee Gobolada · Jinsiga Dhibbanayaasha</div>
+        <table>
+          <tr>
+            <td style="width:58%; vertical-align:top; padding-right:12px">
+              <table class="bars">
+                <t t-foreach="block['bars']" t-as="bar">
+                  <tr>
+                    <td class="lb"><t t-esc="bar['label']"/></td>
+                    <td class="track">
+                      <div class="bar" t-attf-style="width:#{bar['pct']}%"></div>
+                    </td>
+                    <td class="vv">
+                      <t t-if="bar['no_data']">–</t>
+                      <t t-else=""><t t-esc="bar['value']"/></t>
+                    </td>
+                  </tr>
+                </t>
+              </table>
+              <div class="note">Kiisaska la diiwaangeliyay gobol kasta muddada la doortay.</div>
+            </td>
+            <td style="width:42%; vertical-align:top; text-align:center">
+              <svg viewBox="0 0 140 140" width="132" height="132">
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#EDF0F2" stroke-width="19"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#C0392B" stroke-width="19"
+                        t-att-stroke-dasharray="block['sex']['female_dash']"
+                        stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#2E75B6" stroke-width="19"
+                        t-att-stroke-dasharray="block['sex']['male_dash']"
+                        t-att-stroke-dashoffset="block['sex']['male_offset']"
+                        transform="rotate(-90 70 70)"/>
+                <circle cx="70" cy="70" r="60" fill="none" stroke="#E8B93B" stroke-width="19"
+                        t-att-stroke-dasharray="block['sex']['other_dash']"
+                        t-att-stroke-dashoffset="block['sex']['other_offset']"
+                        transform="rotate(-90 70 70)"/>
+                <text x="70" y="76" text-anchor="middle" font-size="20" font-weight="bold"
+                      fill="#1B2227"><t t-esc="block['sex']['total']"/></text>
+              </svg>
+              <div class="legend">
+                <span class="swatch" style="background:#C0392B"></span>Gabdho / Haween
+                <b><t t-esc="block['sex']['female']"/></b>
+                &#160;&#160;
+                <span class="swatch" style="background:#2E75B6"></span>Wiilal / Rag
+                <b><t t-esc="block['sex']['male']"/></b>
+                <t t-if="block['sex']['other']">
+                  &#160;&#160;
+                  <span class="swatch" style="background:#E8B93B"></span>Aan la cayimin
+                  <b><t t-esc="block['sex']['other']"/></b>
+                </t>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <div class="sect">Da'da Dhibbanayaasha — ka yar 18 iyo inta ka weyn</div>
+        <table class="tiles">
+          <tr>
+            <td style="width:20%"><div class="tile b">
+              <div class="k">Tirada Guud</div>
+              <div class="n"><t t-esc="block['age']['total']"/></div>
+              <div class="u">Dhibane</div></div></td>
+            <td style="width:20%"><div class="tile">
+              <div class="k">Ka yar 18 sanno</div>
+              <div class="n"><t t-esc="block['age']['under_18']"/></div>
+              <div class="u">Dhibane</div></div></td>
+            <td style="width:20%"><div class="tile">
+              <div class="k">Ka weyn 18 sanno</div>
+              <div class="n"><t t-esc="block['age']['over_18']"/></div>
+              <div class="u">Dhibane</div></div></td>
+            <td style="width:20%"><div class="tile a">
+              <div class="k">Dhibanaha ugu weyn</div>
+              <div class="n">
+                <t t-if="block['age']['oldest']"><t t-esc="block['age']['oldest']"/></t>
+                <t t-else="">–</t>
+              </div>
+              <div class="u">Sano jir</div></div></td>
+            <td style="width:20%"><div class="tile a">
+              <div class="k">Dhibanaha ugu yar</div>
+              <div class="n">
+                <t t-if="block['age']['youngest']"><t t-esc="block['age']['youngest']"/></t>
+                <t t-else="">–</t>
+              </div>
+              <div class="u">Sano jir</div></div></td>
+          </tr>
+        </table>
+        <div class="note" t-if="block['age']['unknown']">
+          <t t-esc="block['age']['unknown']"/> kiis oo aan da'doodu diiwaangashanayn
+          lagama tirinin qaybaha da'da.
+        </div>
+
+        <div class="sect">Xogta Eedaysanayaasha — Tirada Guud, Inta la qabtay iyo Inta Baxsad ah</div>
+        <table>
+          <tr>
+            <td style="width:62%; vertical-align:top; padding-right:12px">
+              <table class="tiles">
+                <tr>
+                  <td style="width:20%"><div class="tile b">
+                    <div class="k">Tirada Guud</div>
+                    <div class="n"><t t-esc="block['perp']['total']"/></div>
+                    <div class="u">Eedaysane</div></div></td>
+                  <td style="width:20%"><div class="tile">
+                    <div class="k">La qabtay</div>
+                    <div class="n"><t t-esc="block['perp']['caught']"/></div>
+                    <div class="u">Eedaysane</div></div></td>
+                  <td style="width:20%"><div class="tile">
+                    <div class="k">Baxsad</div>
+                    <div class="n"><t t-esc="block['perp']['at_large']"/></div>
+                    <div class="u">Eedaysane</div></div></td>
+                  <td style="width:20%"><div class="tile a">
+                    <div class="k">Eedaysanaha ugu weyn</div>
+                    <div class="n">
+                      <t t-if="block['perp']['oldest']"><t t-esc="block['perp']['oldest']"/></t>
+                      <t t-else="">–</t>
+                    </div>
+                    <div class="u">Sano jir</div></div></td>
+                  <td style="width:20%"><div class="tile a">
+                    <div class="k">Eedaysanaha ugu yar</div>
+                    <div class="n">
+                      <t t-if="block['perp']['youngest']"><t t-esc="block['perp']['youngest']"/></t>
+                      <t t-else="">–</t>
+                    </div>
+                    <div class="u">Sano jir</div></div></td>
+                </tr>
+              </table>
+            </td>
+            <td style="width:38%; vertical-align:top">
+              <table class="bars">
+                <tr>
+                  <td class="lb">La qabtay</td>
+                  <td class="track"><div class="bar" t-attf-style="width:#{block['perp']['caught_pct']}%"></div></td>
+                  <td class="vv"><t t-esc="block['perp']['caught']"/></td>
+                </tr>
+                <tr>
+                  <td class="lb">Baxsad</td>
+                  <td class="track"><div class="bar prev" t-attf-style="width:#{block['perp']['at_large_pct']}%"></div></td>
+                  <td class="vv"><t t-esc="block['perp']['at_large']"/></td>
+                </tr>
+              </table>
+              <div class="note">Eedaysane kasta oo la qabtay wuu ku jiraa tirada
+                "La qabtay" xitaa haddii kiiskiisu maxkamad marayo.</div>
+            </td>
+          </tr>
+        </table>
+
+        <div class="pagefoot">
+          Waaxda Ka Hortagga Tacaddiyada ee Wasaaradda Horumarinta Haweenka iyo Arrimaha Qoyska Puntland.
+          &#9993; gbv.department@mowdafa.pl.so
+        </div>
+
+        <!-- ============ page 3 — comparison ============ -->
+        <t t-if="block['compare']">
+          <div class="brk"></div>
+          <div class="sect">
+            Barbar Dhig — <t t-esc="block['compare']['label_previous']"/> iyo
+            <t t-esc="block['compare']['label_current']"/>
+          </div>
+          <table>
+            <tr>
+              <td style="width:48%; vertical-align:top; padding-right:12px">
+                <table class="grid">
+                  <thead>
+                    <tr>
+                      <th style="width:22px">NO</th>
+                      <th>Gobollada</th>
+                      <th style="width:52px"><t t-esc="block['compare']['label_previous']"/></th>
+                      <th style="width:52px"><t t-esc="block['compare']['label_current']"/></th>
+                      <th style="width:52px">Isbedel</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <t t-foreach="block['compare']['rows']" t-as="row">
+                      <tr>
+                        <td class="no"><t t-esc="row['seq']"/>.</td>
+                        <td class="reg"><t t-esc="row['name']"/></td>
+                        <td><t t-esc="row['previous']"/></td>
+                        <td t-att-class="'missing' if row['no_data'] else ''">
+                          <t t-if="row['no_data']">Xog kama helin</t>
+                          <t t-else=""><t t-esc="row['current']"/></t>
+                        </td>
+                        <td><t t-esc="row['change']"/></td>
+                      </tr>
+                    </t>
+                    <tr class="totrow">
+                      <td colspan="2">Wadarta</td>
+                      <td><t t-esc="block['compare']['total_previous']"/></td>
+                      <td><t t-esc="block['compare']['total_current']"/></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+              <td style="width:52%; vertical-align:top">
+                <table class="bars">
+                  <t t-foreach="block['compare']['rows']" t-as="row">
+                    <tr>
+                      <td class="lb" rowspan="2"><t t-esc="row['name']"/></td>
+                      <td class="track" style="padding-bottom:1px">
+                        <div class="bar prev" t-attf-style="width:#{row['previous_pct']}%"></div>
+                      </td>
+                      <td class="vv"><t t-esc="row['previous']"/></td>
+                    </tr>
+                    <tr>
+                      <td class="track" style="padding-bottom:4px">
+                        <div class="bar cur" t-attf-style="width:#{row['current_pct']}%"></div>
+                      </td>
+                      <td class="vv"><t t-esc="row['current']"/></td>
+                    </tr>
+                  </t>
+                </table>
+                <div class="legend">
+                  <span class="swatch" style="background:#C0392B"></span><t t-esc="block['compare']['label_previous']"/>
+                  &#160;&#160;
+                  <span class="swatch" style="background:#1B2227"></span><t t-esc="block['compare']['label_current']"/>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="pagefoot">
+            Waaxda Ka Hortagga Tacaddiyada ee Wasaaradda Horumarinta Haweenka iyo Arrimaha Qoyska Puntland.
+            &#9993; gbv.department@mowdafa.pl.so
+          </div>
+        </t>
+
+      </div>
+    </t>
+  </t>
+</template>
+
+</odoo>

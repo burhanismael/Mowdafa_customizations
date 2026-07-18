@@ -174,7 +174,12 @@ class AdmissionForm(models.Model):
             if vals.get('file_no', 'New') == 'New':
                 vals['file_no'] = self.env['ir.sequence'].next_by_code(
                     'admission.form') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        # creating the admission moves the case on to the Admission stage
+        records.case_id.filtered(
+            lambda c: c.service_stage in ('intake', 'consent')
+        ).service_stage = 'admission'
+        return records
 
     def action_admit(self):
         self.write({'state': 'admitted'})

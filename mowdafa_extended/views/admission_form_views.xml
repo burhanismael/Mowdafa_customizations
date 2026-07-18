@@ -195,6 +195,5 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_admission_form" name="Admission Form"
-              parent="menu_survivor_case_root" action="action_admission_form" sequence="15"/>
+    <!-- menu removed: created and reached from the case -->
 </odoo>

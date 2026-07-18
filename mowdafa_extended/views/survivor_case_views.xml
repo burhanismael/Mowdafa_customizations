@@ -63,6 +63,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="case_id" options="{'no_create': True}"/>
                             <field name="survivor_id" required="1"/>
                             <field name="survivor_age" invisible="not survivor_id"/>
                             <field name="is_minor" invisible="1"/>
@@ -151,6 +152,6 @@
     <!-- Menu -->
     <menuitem id="menu_survivor_case_root" name="GBV" sequence="60"
               web_icon="mowdafa_extended,static/description/icon.png"/>
-    <menuitem id="menu_survivor_case" name="Consent Form"
-              parent="menu_survivor_case_root" action="action_survivor_case" sequence="10"/>
+<!-- Consent Form menu removed: consents are created from the case
+     (Create Consent button) and reached via the case smart buttons. -->
 </odoo>

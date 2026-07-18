@@ -162,6 +162,5 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_followup_form" name="Follow-up Form"
-              parent="menu_survivor_case_root" action="action_followup_form" sequence="18"/>
+    <!-- menu removed: created and reached from the case -->
 </odoo>

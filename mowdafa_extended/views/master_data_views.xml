@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Region -->
+    <record id="view_gbv_region_tree" model="ir.ui.view">
+        <field name="name">gbv.region.tree</field>
+        <field name="model">gbv.region</field>
+        <field name="arch" type="xml">
+            <tree string="Regions" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_gbv_region" model="ir.actions.act_window">
+        <field name="name">Regions</field>
+        <field name="res_model">gbv.region</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first region</p>
+        </field>
+    </record>
+
+    <!-- District -->
+    <record id="view_gbv_district_tree" model="ir.ui.view">
+        <field name="name">gbv.district.tree</field>
+        <field name="model">gbv.district</field>
+        <field name="arch" type="xml">
+            <tree string="Districts" editable="bottom" default_order="region_id,sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="region_id" options="{'no_create': True}"/>
+                <field name="name"/>
+                <field name="somali_name"/>
+                <field name="level"/>
+                <field name="code" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_gbv_district" model="ir.actions.act_window">
+        <field name="name">Districts</field>
+        <field name="res_model">gbv.district</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first district</p>
+        </field>
+    </record>
+
+    <!-- Violence Type -->
+    <record id="view_gbv_violence_type_tree" model="ir.ui.view">
+        <field name="name">gbv.violence.type.tree</field>
+        <field name="model">gbv.violence.type</field>
+        <field name="arch" type="xml">
+            <tree string="Violence Types" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_gbv_violence_type" model="ir.actions.act_window">
+        <field name="name">Violence Types</field>
+        <field name="res_model">gbv.violence.type</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first violence type</p>
+        </field>
+    </record>
+
+    <!-- Risk Level -->
+    <record id="view_gbv_risk_level_tree" model="ir.ui.view">
+        <field name="name">gbv.risk.level.tree</field>
+        <field name="model">gbv.risk.level</field>
+        <field name="arch" type="xml">
+            <tree string="Risk Levels" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_gbv_risk_level" model="ir.actions.act_window">
+        <field name="name">Risk Levels</field>
+        <field name="res_model">gbv.risk.level</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first risk level</p>
+        </field>
+    </record>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_gbv_configuration" name="Configuration"
+              parent="menu_survivor_case_root" sequence="90"/>
+    <menuitem id="menu_gbv_region" name="Regions"
+              parent="menu_gbv_configuration" action="action_gbv_region" sequence="10"/>
+    <menuitem id="menu_gbv_district" name="Districts"
+              parent="menu_gbv_configuration" action="action_gbv_district" sequence="20"/>
+    <menuitem id="menu_gbv_violence_type" name="Violence Types"
+              parent="menu_gbv_configuration" action="action_gbv_violence_type" sequence="30"/>
+    <menuitem id="menu_gbv_risk_level" name="Risk Levels"
+              parent="menu_gbv_configuration" action="action_gbv_risk_level" sequence="40"/>
+</odoo>

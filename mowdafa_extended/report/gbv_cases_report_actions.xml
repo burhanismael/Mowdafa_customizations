@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="action_report_gbv_cases" model="ir.actions.report">
+    <field name="name">GBV Cases Statistical Report</field>
+    <field name="model">gbv.case.report.wizard</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">mowdafa_extended.report_gbv_cases_document</field>
+    <field name="report_file">mowdafa_extended.report_gbv_cases_document</field>
+    <field name="paperformat_id" ref="paperformat_gbv_cases"/>
+    <field name="print_report_name">'Xogta Kiisaska - %s' % (object.date_from and object.date_from.strftime('%Y-%m-%d') or '')</field>
+    <field name="binding_model_id" eval="False"/>
+  </record>
+</odoo>

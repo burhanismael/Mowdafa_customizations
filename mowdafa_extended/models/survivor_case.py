@@ -77,6 +77,14 @@ class SurvivorCase(models.Model):
     referral_count = fields.Integer(compute='_compute_related_counts')
     closure_count = fields.Integer(compute='_compute_related_counts')
 
+    @api.onchange('case_id')
+    def _onchange_case_id(self):
+        for record in self:
+            if record.case_id:
+                record.survivor_id = record.case_id.survivor_id
+                if record.case_id.case_worker_id:
+                    record.case_worker_id = record.case_id.case_worker_id
+
     @api.depends('survivor_id.birth_date')
     def _compute_survivor_age(self):
         today = fields.Date.context_today(self)
@@ -89,11 +97,17 @@ class SurvivorCase(models.Model):
                 record.survivor_age = 0
                 record.is_minor = False
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.admission_count = self.env['admission.form'].search_count(domain)
                 record.action_plan_count = self.env['action.plan'].search_count(domain)
                 record.followup_count = self.env['followup.form'].search_count(domain)
@@ -108,15 +122,18 @@ class SurvivorCase(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
-        records = self.env[res_model].search(
-            [('survivor_id', '=', self.survivor_id.id)])
+        domain = self._related_domain()
+        records = self.env[res_model].search(domain)
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         action = {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
         if len(records) == 1:
             action.update({'view_mode': 'form', 'res_id': records.id})
@@ -125,16 +142,19 @@ class SurvivorCase(models.Model):
     def action_open_admission(self):
         self.ensure_one()
         admission = self.env['admission.form'].search(
-            [('survivor_id', '=', self.survivor_id.id)], limit=1)
+            self._related_domain(), limit=1)
+        context = {
+            'default_survivor_id': self.survivor_id.id,
+            'default_consent_form_id': self.id,
+        }
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         action = {
             'type': 'ir.actions.act_window',
             'name': 'Admission Form',
             'res_model': 'admission.form',
             'view_mode': 'form',
-            'context': {
-                'default_survivor_id': self.survivor_id.id,
-                'default_consent_form_id': self.id,
-            },
+            'context': context,
         }
         if admission:
             action['res_id'] = admission.id
@@ -161,7 +181,11 @@ class SurvivorCase(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'survivor.case') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        # creating the consent form moves the case out of Intake
+        records.case_id.filtered(
+            lambda c: c.service_stage == 'intake').service_stage = 'consent'
+        return records
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})

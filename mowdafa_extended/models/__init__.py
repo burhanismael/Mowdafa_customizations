@@ -6,3 +6,5 @@ from . import action_plan
 from . import followup_form
 from . import referral_form
 from . import case_closure
+from . import master_data
+from . import gbv_case

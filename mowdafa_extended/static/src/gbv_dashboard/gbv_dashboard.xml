@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="mowdafa_extended.GbvDashboard">
+    <div class="o_gbv_dashboard">
+
+        <!-- Header: title + year / region filters -->
+        <div class="o_gbv_header">
+            <div>
+                <h2>GBV Case Management Dashboard</h2>
+                <span class="o_gbv_sub">
+                    Warbixinta Xogta &amp; Dashboard — source: gbv.case
+                </span>
+            </div>
+            <div class="o_gbv_filters" t-if="state.data">
+                <select class="form-select" t-on-change="onYearChange">
+                    <t t-foreach="state.data.filters.years" t-as="year"
+                       t-key="year">
+                        <option t-att-value="year"
+                                t-att-selected="year == state.year ? 'selected' : undefined">
+                            <t t-esc="year"/>
+                        </option>
+                    </t>
+                </select>
+                <select class="form-select" t-on-change="onRegionChange">
+                    <option value="">All 9 Regions</option>
+                    <t t-foreach="state.data.filters.regions" t-as="region"
+                       t-key="region.id">
+                        <option t-att-value="region.id"
+                                t-att-selected="region.id == state.regionId ? 'selected' : undefined">
+                            <t t-esc="region.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+        </div>
+
+        <div t-if="state.loading" class="o_gbv_loading">
+            <i class="fa fa-circle-o-notch fa-spin me-2"/>Loading…
+        </div>
+
+        <t t-elif="state.data">
+            <!-- Empty state -->
+            <div t-if="!totals.total" class="o_gbv_empty">
+                <p>No cases reported in <t t-esc="state.year"/>.</p>
+                <p class="text-muted">
+                    Register cases under GBV → Cases and the dashboard will
+                    fill itself in.
+                </p>
+            </div>
+
+            <t t-else="">
+                <!-- Section 1: KPI tiles -->
+                <div class="o_gbv_tiles">
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('All Cases')">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.total)"/>
+                        <div class="o_gbv_tile_label">Wadarta Kiisaska
+                            <em>total cases reported</em></div>
+                        <div class="o_gbv_tile_delta" t-esc="deltaText"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Open Cases', [['case_status', '=', 'open']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.open)"/>
+                        <div class="o_gbv_tile_label">Kiisas Furan
+                            <em>open cases</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.open, totals.total) + ' of total'"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Closed Cases', [['case_status', '=', 'closed']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.closed)"/>
+                        <div class="o_gbv_tile_label">La Xidhay
+                            <em>closed cases</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.closed, totals.total) + ' of total'"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Cases In Court', [['case_status', '=', 'court']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.court)"/>
+                        <div class="o_gbv_tile_label">Maxkamad
+                            <em>in court</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.court, totals.total) + ' of total'"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Female Survivors', [['sex', '=', 'female']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.female)"/>
+                        <div class="o_gbv_tile_label">Dumar
+                            <em>female survivors</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.female, totals.total)"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Male Survivors', [['sex', '=', 'male']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.male)"/>
+                        <div class="o_gbv_tile_label">Rag
+                            <em>male survivors</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.male, totals.total)"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Children (0-17)', [['is_child', '=', true]])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.children)"/>
+                        <div class="o_gbv_tile_label">Caruur 0–17
+                            <em>children</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_muted"
+                             t-esc="pct(totals.children, totals.total) + ' of total'"/>
+                    </div>
+                    <div class="o_gbv_tile o_gbv_clickable"
+                         t-on-click="() => this.openCases('Convictions', [['justice_stage', '=', 'convicted']])">
+                        <div class="o_gbv_tile_value"
+                             t-esc="fmt(totals.convicted)"/>
+                        <div class="o_gbv_tile_label">La Xukumay
+                            <em>convictions</em></div>
+                        <div class="o_gbv_tile_delta o_gbv_red"
+                             t-esc="pct(totals.convicted, totals.total) + ' of reported'"/>
+                    </div>
+                </div>
+
+                <!-- Section 3: cases by region -->
+                <div class="o_gbv_card">
+                    <h5>Kiisaska Gobolladda · Cases by Region
+                        <em>vs previous year</em></h5>
+                    <div t-foreach="regionRows" t-as="row" t-key="row.id"
+                         class="o_gbv_region_row">
+                        <span class="o_gbv_region_name" t-esc="row.name"/>
+                        <span class="o_gbv_region_track">
+                            <span class="o_gbv_region_bar"
+                                  t-attf-style="width: {{row.widthPct}}%">
+                                <b class="o_gbv_seg_open"
+                                   t-attf-style="flex: {{row.open}}"
+                                   t-att-title="'Open ' + row.open"/>
+                                <b class="o_gbv_seg_closed"
+                                   t-attf-style="flex: {{row.closed}}"
+                                   t-att-title="'Closed ' + row.closed"/>
+                                <b class="o_gbv_seg_court"
+                                   t-attf-style="flex: {{row.court}}"
+                                   t-att-title="'In court ' + row.court"/>
+                            </span>
+                        </span>
+                        <span class="o_gbv_region_total"
+                              t-esc="fmt(row.total)"/>
+                        <span t-attf-class="o_gbv_region_delta {{row.deltaUp ? 'o_gbv_up' : 'o_gbv_down'}}"
+                              t-esc="row.deltaText"/>
+                    </div>
+                    <div class="o_gbv_legend">
+                        <span><i class="o_gbv_seg_open"/>Furan · open</span>
+                        <span><i class="o_gbv_seg_closed"/>La Xidhay · closed</span>
+                        <span><i class="o_gbv_seg_court"/>Maxkamad · court</span>
+                    </div>
+                </div>
+
+                <!-- Section 4: status & gender donuts -->
+                <div class="o_gbv_grid2">
+                    <div class="o_gbv_card">
+                        <h5>Xaaladda Kiisaska · Case Status</h5>
+                        <svg viewBox="0 0 140 140" class="o_gbv_donut">
+                            <t t-foreach="statusDonut" t-as="segment"
+                               t-key="segment.label">
+                                <circle cx="70" cy="70" t-att-r="segment.radius"
+                                        fill="none" stroke-width="21"
+                                        t-att-stroke="segment.color"
+                                        t-att-stroke-dasharray="segment.dash"
+                                        t-att-stroke-dashoffset="segment.offset"
+                                        transform="rotate(-90 70 70)"/>
+                            </t>
+                            <text x="70" y="67" text-anchor="middle"
+                                  class="o_gbv_donut_total"
+                                  t-esc="fmt(totals.total)"/>
+                            <text x="70" y="81" text-anchor="middle"
+                                  class="o_gbv_donut_sub">KIIS</text>
+                        </svg>
+                        <div class="o_gbv_legend">
+                            <t t-foreach="statusDonut" t-as="segment"
+                               t-key="segment.label">
+                                <span>
+                                    <i t-attf-style="background: {{segment.color}}"/>
+                                    <t t-esc="segment.label"/> ·
+                                    <b t-esc="fmt(segment.value)"/>
+                                </span>
+                            </t>
+                        </div>
+                    </div>
+                    <div class="o_gbv_card">
+                        <h5>Jinsiga Dhibbaneyaasha · Gender</h5>
+                        <svg viewBox="0 0 140 140" class="o_gbv_donut">
+                            <t t-foreach="genderDonut" t-as="segment"
+                               t-key="segment.label">
+                                <circle cx="70" cy="70" t-att-r="segment.radius"
+                                        fill="none" stroke-width="21"
+                                        t-att-stroke="segment.color"
+                                        t-att-stroke-dasharray="segment.dash"
+                                        t-att-stroke-dashoffset="segment.offset"
+                                        transform="rotate(-90 70 70)"/>
+                            </t>
+                            <text x="70" y="67" text-anchor="middle"
+                                  class="o_gbv_donut_total"
+                                  t-esc="fmt(totals.total)"/>
+                            <text x="70" y="81" text-anchor="middle"
+                                  class="o_gbv_donut_sub">KIIS</text>
+                        </svg>
+                        <div class="o_gbv_legend">
+                            <t t-foreach="genderDonut" t-as="segment"
+                               t-key="segment.label">
+                                <span>
+                                    <i t-attf-style="background: {{segment.color}}"/>
+                                    <t t-esc="segment.label"/> ·
+                                    <b t-esc="fmt(segment.value)"/>
+                                </span>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: age bands -->
+                <div class="o_gbv_card">
+                    <h5>Da'da Dhibbaneyaasha · Survivor Age Bands
+                        <em>frozen at report date</em></h5>
+                    <svg t-attf-viewBox="0 0 {{ageChart.width}} {{ageChart.height}}"
+                         class="o_gbv_svg">
+                        <t t-foreach="ageChart.bars" t-as="bar" t-key="bar.key">
+                            <rect t-att-x="bar.x" t-att-y="bar.y"
+                                  t-att-width="bar.width"
+                                  t-att-height="bar.height" rx="2"
+                                  t-att-fill="bar.color"/>
+                            <text t-att-x="bar.labelX" t-att-y="bar.valueY"
+                                  text-anchor="middle" class="o_gbv_svg_value"
+                                  t-esc="bar.count"/>
+                            <text t-att-x="bar.labelX"
+                                  t-att-y="ageChart.height - 7"
+                                  text-anchor="middle" class="o_gbv_svg_label"
+                                  t-esc="bar.label"/>
+                        </t>
+                        <line t-att-x1="ageChart.dividerX" y1="8"
+                              t-att-x2="ageChart.dividerX"
+                              t-att-y2="ageChart.height - 20"
+                              class="o_gbv_divider"/>
+                        <text t-att-x="ageChart.dividerX - 5" y="14"
+                              text-anchor="end" class="o_gbv_svg_amber"
+                              t-esc="ageChart.childText"/>
+                        <text t-att-x="ageChart.dividerX + 5" y="14"
+                              class="o_gbv_svg_label"
+                              t-esc="ageChart.adultText"/>
+                    </svg>
+                </div>
+
+                <!-- Sections 6 & 7: violence types, service referrals -->
+                <div class="o_gbv_grid2">
+                    <div class="o_gbv_card">
+                        <h5>Nooca Xadgudubka · Violence Type</h5>
+                        <div t-foreach="typeRows" t-as="row" t-key="row.name"
+                             class="o_gbv_hbar_row">
+                            <span class="o_gbv_hbar_name" t-esc="row.name"/>
+                            <span class="o_gbv_hbar_track">
+                                <i class="o_gbv_hbar_fill o_gbv_fill_blue"
+                                   t-attf-style="width: {{row.widthPct}}%"/>
+                            </span>
+                            <span class="o_gbv_hbar_value">
+                                <t t-esc="fmt(row.count)"/>
+                                <em t-esc="row.pctText"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="o_gbv_card">
+                        <h5>Xiriirinta Adeegyada · Service Referrals</h5>
+                        <div t-foreach="serviceRows" t-as="row" t-key="row.name"
+                             class="o_gbv_hbar_row">
+                            <span class="o_gbv_hbar_name" t-esc="row.name"/>
+                            <span class="o_gbv_hbar_track">
+                                <i class="o_gbv_hbar_fill o_gbv_fill_teal"
+                                   t-attf-style="width: {{row.widthPct}}%"/>
+                            </span>
+                            <span class="o_gbv_hbar_value">
+                                <t t-esc="fmt(row.count)"/>
+                                <em t-esc="row.pctText"/>
+                            </span>
+                        </div>
+                        <p class="o_gbv_footnote">
+                            A survivor can receive several services — bars do
+                            not sum to the case total.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Sections 2 & 8: monthly trend, justice funnel -->
+                <div class="o_gbv_grid2">
+                    <div class="o_gbv_card">
+                        <h5>Kiisaska Bishii · Cases per Month</h5>
+                        <svg t-attf-viewBox="0 0 {{monthChart.width}} {{monthChart.height}}"
+                             class="o_gbv_svg">
+                            <polygon t-att-points="monthChart.area"
+                                     class="o_gbv_area"/>
+                            <polyline t-att-points="monthChart.line"
+                                      class="o_gbv_line"/>
+                            <t t-foreach="monthChart.dots" t-as="dot"
+                               t-key="dot.label">
+                                <circle t-att-cx="dot.x" t-att-cy="dot.y"
+                                        r="2.6" class="o_gbv_dot">
+                                    <title t-esc="dot.label + ': ' + dot.count"/>
+                                </circle>
+                                <text t-att-x="dot.x"
+                                      t-att-y="monthChart.height - 8"
+                                      text-anchor="middle"
+                                      class="o_gbv_svg_label"
+                                      t-esc="dot.label"/>
+                            </t>
+                        </svg>
+                    </div>
+                    <div class="o_gbv_card">
+                        <h5>Gaadhitaanka Cadaalad · Access to Justice</h5>
+                        <div t-foreach="funnelRows" t-as="row" t-key="row.key"
+                             class="o_gbv_funnel_row">
+                            <span class="o_gbv_funnel_label"
+                                  t-esc="row.label"/>
+                            <span class="o_gbv_funnel_track">
+                                <span class="o_gbv_funnel_bar"
+                                      t-attf-style="width: {{row.widthPct}}%; opacity: {{row.opacity}}">
+                                    <t t-esc="fmt(row.count)"/>
+                                </span>
+                            </span>
+                            <span t-attf-class="o_gbv_funnel_drop {{row.isDrop ? 'o_gbv_red' : 'o_gbv_muted'}}"
+                                  t-esc="row.dropText"/>
+                        </div>
+                        <p class="o_gbv_footnote o_gbv_red"
+                           t-esc="convictionText"/>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </div>
+</t>
+
+</templates>

@@ -153,6 +153,5 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_action_plan" name="Action Plan"
-              parent="menu_survivor_case_root" action="action_action_plan" sequence="17"/>
+    <!-- menu removed: created and reached from the case -->
 </odoo>

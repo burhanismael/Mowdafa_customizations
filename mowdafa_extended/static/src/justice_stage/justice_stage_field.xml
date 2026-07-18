@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="mowdafa_extended.JusticeStageField">
+    <t t-if="props.readonly">
+        <span class="badge rounded-pill text-bg-light border">
+            <i t-att-class="'fa me-1 ' + icon(currentValue)"/>
+            <t t-esc="currentLabel"/>
+        </span>
+    </t>
+    <t t-else="">
+        <Dropdown togglerClass="'btn btn-light rounded-pill border px-3'">
+            <t t-set-slot="toggler">
+                <span class="fw-bold" t-esc="currentLabel"/>
+            </t>
+            <t t-foreach="options" t-as="option" t-key="option[0]">
+                <DropdownItem onSelected="() => this.selectStage(option[0])">
+                    <i t-att-class="'fa me-2 ' + icon(option[0])"/>
+                    <t t-esc="option[1]"/>
+                </DropdownItem>
+            </t>
+        </Dropdown>
+    </t>
+</t>
+
+</templates>

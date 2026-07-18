@@ -261,6 +261,5 @@
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_referral_form" name="Referral Form"
-              parent="menu_survivor_case_root" action="action_referral_form" sequence="19"/>
+    <!-- menu removed: created and reached from the case -->
 </odoo>
