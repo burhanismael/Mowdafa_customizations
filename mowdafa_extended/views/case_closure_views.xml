@@ -69,21 +69,16 @@
                                    placeholder="Reasons, progress vs action plan, continued-service provisions..."/>
                         </page>
                         <page string="Closure Checklist" name="checklist">
-                            <group>
-                                <group>
-                                    <field name="safety_plan_reviewed"/>
-                                    <field name="safety_plan_note"
-                                           invisible="not safety_plan_reviewed"/>
-                                    <field name="client_informed_resume"/>
-                                    <field name="client_informed_note"
-                                           invisible="not client_informed_resume"/>
-                                </group>
-                                <group>
-                                    <field name="supervisor_reviewed"/>
-                                    <field name="supervisor_reviewed_note"
-                                           invisible="not supervisor_reviewed"/>
-                                </group>
-                            </group>
+                            <field name="checklist_line_ids">
+                                <tree editable="bottom">
+                                    <field name="question" width="450px"/>
+                                    <field name="answer" width="80px"/>
+                                    <field name="explain"
+                                           invisible="answer != 'no'"/>
+                                </tree>
+                            </field>
+                            <field name="explanation_notes" nolabel="1"
+                                   placeholder="Explanation notes here..."/>
                         </page>
                         <page string="Signatures" name="signatures">
                             <group>

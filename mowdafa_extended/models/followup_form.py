@@ -115,11 +115,17 @@ class FollowupForm(models.Model):
     action_plan_count = fields.Integer(compute='_compute_related_counts')
     closure_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.consent_count = self.env['survivor.case'].search_count(domain)
                 record.admission_count = self.env['admission.form'].search_count(domain)
                 record.action_plan_count = self.env['action.plan'].search_count(domain)
@@ -132,13 +138,17 @@ class FollowupForm(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
+        domain = self._related_domain()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         return {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
 
     def action_view_consent_forms(self):
@@ -159,7 +169,9 @@ class FollowupForm(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'followup.form') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records.case_id._advance_service_stage('followup')
+        return records
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})

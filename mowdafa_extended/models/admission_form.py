@@ -102,11 +102,17 @@ class AdmissionForm(models.Model):
     referral_count = fields.Integer(compute='_compute_related_counts')
     closure_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.consent_count = self.env['survivor.case'].search_count(domain)
                 record.action_plan_count = self.env['action.plan'].search_count(domain)
                 record.followup_count = self.env['followup.form'].search_count(domain)
@@ -121,13 +127,17 @@ class AdmissionForm(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
+        domain = self._related_domain()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         return {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
 
     def action_view_consent_forms(self):
@@ -176,10 +186,24 @@ class AdmissionForm(models.Model):
                     'admission.form') or 'New'
         records = super().create(vals_list)
         # creating the admission moves the case on to the Admission stage
-        records.case_id.filtered(
-            lambda c: c.service_stage in ('intake', 'consent')
-        ).service_stage = 'admission'
+        records.case_id._advance_service_stage('admission')
         return records
+
+    def action_create_action_plan(self):
+        self.ensure_one()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
+            if self.case_id.case_worker_id:
+                context['default_case_worker_id'] = self.case_id.case_worker_id.id
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Action Plan',
+            'res_model': 'action.plan',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': context,
+        }
 
     def action_admit(self):
         self.write({'state': 'admitted'})

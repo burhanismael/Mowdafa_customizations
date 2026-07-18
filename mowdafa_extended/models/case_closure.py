@@ -42,21 +42,22 @@ class CaseClosure(models.Model):
     )
 
     # Closure checklist
-    safety_plan_reviewed = fields.Boolean(
-        string='Safety Plan Reviewed?',
-        tracking=True,
+    checklist_line_ids = fields.One2many(
+        'case.closure.checklist.line',
+        'closure_id',
+        string='Closure Checklist',
+        copy=False,
+        default=lambda self: self._default_checklist_lines(),
     )
-    safety_plan_note = fields.Text(string='Safety Plan Note')
-    client_informed_resume = fields.Boolean(
-        string='Client Informed She/He May Resume Services?',
-        tracking=True,
-    )
-    client_informed_note = fields.Text(string='Client Informed Note')
-    supervisor_reviewed = fields.Boolean(
-        string='Supervisor Reviewed Exit Plan?',
-        tracking=True,
-    )
-    supervisor_reviewed_note = fields.Text(string='Supervisor Review Note')
+    explanation_notes = fields.Text(string='Explanation Notes')
+
+    @api.model
+    def _default_checklist_lines(self):
+        return [
+            (0, 0, {'question': 'Safety plan has been reviewed and is in place.'}),
+            (0, 0, {'question': 'Person has been informed she or he can resume services at anytime.'}),
+            (0, 0, {'question': 'Case supervisor has reviewed case closure/exit plan.'}),
+        ]
 
     case_opening_date = fields.Date(string='Case Opening Date', tracking=True)
     case_closure_date = fields.Date(string='Case Closure Date', tracking=True)
@@ -89,11 +90,17 @@ class CaseClosure(models.Model):
     followup_count = fields.Integer(compute='_compute_related_counts')
     referral_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.consent_count = self.env['survivor.case'].search_count(domain)
                 record.admission_count = self.env['admission.form'].search_count(domain)
                 record.action_plan_count = self.env['action.plan'].search_count(domain)
@@ -108,13 +115,17 @@ class CaseClosure(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
+        domain = self._related_domain()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         return {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
 
     def action_view_consent_forms(self):
@@ -138,17 +149,19 @@ class CaseClosure(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'case.closure') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records.case_id._advance_service_stage('closure')
+        return records
 
     def action_close(self):
         for record in self:
-            if not (record.safety_plan_reviewed
-                    and record.client_informed_resume
-                    and record.supervisor_reviewed):
+            if not record.checklist_line_ids or any(
+                    line.answer != 'yes' for line in record.checklist_line_ids):
                 raise UserError(_(
-                    'The case cannot be closed until the three-point checklist '
-                    'is satisfied: safety plan reviewed, client informed they '
-                    'may resume services, and supervisor reviewed the exit plan.'
+                    'The case cannot be closed until every point of the '
+                    'closure checklist is answered YES: safety plan reviewed, '
+                    'client informed they may resume services, and supervisor '
+                    'reviewed the exit plan.'
                 ))
             if not record.case_opening_date or not record.case_closure_date:
                 raise UserError(_(
@@ -167,3 +180,21 @@ class CaseClosure(models.Model):
             record.message_post(
                 body=_('Case re-opened: client may resume services at any time.'))
         self.write({'state': 'draft'})
+
+
+class CaseClosureChecklistLine(models.Model):
+    _name = 'case.closure.checklist.line'
+    _description = 'Case Closure Checklist Line'
+
+    closure_id = fields.Many2one(
+        'case.closure',
+        string='Case Closure',
+        required=True,
+        ondelete='cascade',
+    )
+    question = fields.Char(string='Checklist Point', required=True)
+    answer = fields.Selection([
+        ('yes', 'YES'),
+        ('no', 'NO'),
+    ], string='YES/NO')
+    explain = fields.Char(string='NO (explain)')

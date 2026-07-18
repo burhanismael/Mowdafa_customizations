@@ -27,7 +27,7 @@ class CaseWorker(models.Model):
         tracking=True,
     )
     id_no = fields.Char(
-        string='ID',
+        string='ID No.',
         required=True,
         tracking=True,
     )

@@ -48,14 +48,6 @@ class ActionPlan(models.Model):
         required=True,
         tracking=True,
     )
-    followup_datetime = fields.Datetime(
-        string='Follow-up Meeting (Date/Time)',
-        tracking=True,
-    )
-    followup_location = fields.Char(
-        string='Follow-up Location',
-        tracking=True,
-    )
     case_worker_signature = fields.Char(
         string='Caseworker Signature',
         related='case_worker_id.code',
@@ -81,11 +73,17 @@ class ActionPlan(models.Model):
     followup_count = fields.Integer(compute='_compute_related_counts')
     referral_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.consent_count = self.env['survivor.case'].search_count(domain)
                 record.admission_count = self.env['admission.form'].search_count(domain)
                 record.followup_count = self.env['followup.form'].search_count(domain)
@@ -98,13 +96,17 @@ class ActionPlan(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
+        domain = self._related_domain()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         return {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
 
     def action_view_consent_forms(self):
@@ -125,7 +127,9 @@ class ActionPlan(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'action.plan') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records.case_id._advance_service_stage('action_plan')
+        return records
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
@@ -174,3 +178,4 @@ class ActionPlanGoal(models.Model):
     goal = fields.Char(string='Goal', required=True)
     who = fields.Char(string='Who')
     by_when = fields.Date(string='By When')
+    remarks = fields.Char(string='Remarks')

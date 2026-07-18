@@ -17,6 +17,9 @@
                 <header>
                     <button name="action_admit" string="Admit" type="object"
                             class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_create_action_plan" string="Create Action Plan" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'admitted' or action_plan_count &gt; 0"/>
                     <button name="action_reset_draft" string="Reset to Draft" type="object"
                             invisible="state == 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,admitted"/>

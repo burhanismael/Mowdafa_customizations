@@ -182,9 +182,8 @@ class SurvivorCase(models.Model):
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'survivor.case') or 'New'
         records = super().create(vals_list)
-        # creating the consent form moves the case out of Intake
-        records.case_id.filtered(
-            lambda c: c.service_stage == 'intake').service_stage = 'consent'
+        # creating the consent form moves the case from Consent to Intake
+        records.case_id._advance_service_stage('intake')
         return records
 
     def action_confirm(self):

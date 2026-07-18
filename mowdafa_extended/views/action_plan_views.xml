@@ -60,10 +60,6 @@
                             <field name="date"/>
                             <field name="can_provide_services"/>
                         </group>
-                        <group>
-                            <field name="followup_datetime"/>
-                            <field name="followup_location"/>
-                        </group>
                     </group>
                     <notebook>
                         <page string="Action Points / Goals" name="goals">
@@ -72,6 +68,7 @@
                                     <field name="goal"/>
                                     <field name="who"/>
                                     <field name="by_when"/>
+                                    <field name="remarks"/>
                                 </tree>
                             </field>
                         </page>
@@ -111,7 +108,6 @@
                 <field name="survivor_id"/>
                 <field name="case_worker_id"/>
                 <field name="date"/>
-                <field name="followup_datetime"/>
                 <field name="state" widget="badge"
                        decoration-info="state == 'draft'"
                        decoration-success="state == 'confirmed'"/>

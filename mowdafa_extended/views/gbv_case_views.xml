@@ -18,43 +18,57 @@
             <form string="GBV Case">
                 <header>
                     <field name="consent_confirmed" invisible="1"/>
+                    <field name="action_plan_confirmed" invisible="1"/>
+                    <field name="closure_ready" invisible="1"/>
+                    <field name="closure_count" invisible="1"/>
                     <button name="action_create_consent" type="object"
                         string="Create Consent" class="btn-primary"
-                        invisible="service_stage != 'intake' or consent_count &gt; 0"/>
+                        invisible="service_stage != 'consent' or consent_count &gt; 0"/>
                     <button name="action_create_admission" type="object"
                         string="Create Admission Form" class="btn-primary"
-                        invisible="service_stage != 'consent' or not consent_confirmed or admission_count &gt; 0"/>
+                        invisible="service_stage != 'intake' or not consent_confirmed or admission_count &gt; 0"/>
+                    <button name="action_create_action_plan" type="object"
+                        string="Create Action Plan" class="btn-primary"
+                        invisible="service_stage != 'admission' or action_plan_count &gt; 0"/>
                     <button name="action_new_followup" type="object"
-                        string="New Follow-up" class="btn-primary"
-                        invisible="service_stage in ('intake', 'consent')"/>
-                    <button name="action_refer_out" type="object"
-                        string="Refer Out (Form 9)"/>
-                    <button name="action_close_case" type="object"
-                        string="Close Case" invisible="service_stage == 'closure'"/>
-                    <field name="service_stage" widget="statusbar"
-                        options="{'clickable': '1'}"/>
+                        string="Create Follow-up" class="btn-primary"
+                        invisible="service_stage != 'action_plan' or not action_plan_confirmed or followup_count &gt; 0"/>
+                    <button name="action_create_closure" type="object"
+                        string="Create Closure" class="btn-primary"
+                        invisible="service_stage not in ('followup', 'referral') or not closure_ready or closure_count &gt; 0"/>
+                    <field name="service_stage" widget="statusbar" readonly="1"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_consents" type="object"
-                                class="oe_stat_button" icon="fa-check-square-o">
+                                class="oe_stat_button" icon="fa-check-square-o"
+                                invisible="consent_count == 0">
                             <field name="consent_count" widget="statinfo" string="Consent"/>
                         </button>
                         <button name="action_view_admissions" type="object"
-                                class="oe_stat_button" icon="fa-file-text-o">
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="admission_count == 0">
                             <field name="admission_count" widget="statinfo" string="Admission"/>
                         </button>
                         <button name="action_view_action_plans" type="object"
-                                class="oe_stat_button" icon="fa-list-ol">
+                                class="oe_stat_button" icon="fa-list-ol"
+                                invisible="action_plan_count == 0">
                             <field name="action_plan_count" widget="statinfo" string="Action Plans"/>
                         </button>
                         <button name="action_view_followups" type="object"
-                                class="oe_stat_button" icon="fa-repeat">
+                                class="oe_stat_button" icon="fa-repeat"
+                                invisible="followup_count == 0">
                             <field name="followup_count" widget="statinfo" string="Follow-ups"/>
                         </button>
                         <button name="action_view_referrals" type="object"
-                                class="oe_stat_button" icon="fa-share">
+                                class="oe_stat_button" icon="fa-share"
+                                invisible="referral_count == 0">
                             <field name="referral_count" widget="statinfo" string="Referrals"/>
+                        </button>
+                        <button name="action_view_closures" type="object"
+                                class="oe_stat_button" icon="fa-archive"
+                                invisible="closure_count == 0">
+                            <field name="closure_count" widget="statinfo" string="Closures"/>
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Closed" bg_color="text-bg-danger"

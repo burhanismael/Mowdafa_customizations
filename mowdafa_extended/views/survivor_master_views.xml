@@ -9,7 +9,8 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_consent_forms" type="object"
-                                class="oe_stat_button" icon="fa-file-text-o">
+                                class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="consent_count == 0">
                             <field name="consent_count" widget="statinfo" string="Consent Form"/>
                         </button>
                     </div>

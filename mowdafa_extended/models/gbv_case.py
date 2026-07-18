@@ -95,16 +95,27 @@ class GbvCase(models.Model):
     # ── the two independent pipelines ────────────────────────────────────
     service_stage = fields.Selection(
         selection=[
-            ('intake', 'Intake'),
             ('consent', 'Consent'),
+            ('intake', 'Intake'),
             ('admission', 'Admission'),
             ('action_plan', 'Action Plan'),
             ('followup', 'Follow-up'),
+            ('referral', 'Referral'),
             ('closure', 'Closure'),
         ],
-        string='Service Stage', default='intake', tracking=True,
+        string='Service Stage', default='consent', tracking=True,
         group_expand='_group_expand_service_stage',
     )
+
+    SERVICE_STAGE_ORDER = ['consent', 'intake', 'admission', 'action_plan',
+                           'followup', 'referral', 'closure']
+
+    def _advance_service_stage(self, stage):
+        """Move cases forward to `stage`; never move a case backwards."""
+        order = self.SERVICE_STAGE_ORDER
+        for case in self:
+            if order.index(stage) > order.index(case.service_stage):
+                case.service_stage = stage
     justice_stage = fields.Selection(
         selection=[
             ('reported', 'Reported'),
@@ -258,12 +269,39 @@ class GbvCase(models.Model):
     consent_confirmed = fields.Boolean(
         compute='_compute_consent_confirmed',
         help='True once at least one consent form of this case is confirmed.')
+    action_plan_confirmed = fields.Boolean(
+        compute='_compute_action_plan_confirmed',
+        help='True once at least one action plan of this case is confirmed.')
 
     @api.depends('consent_ids.state')
     def _compute_consent_confirmed(self):
         for case in self:
             case.consent_confirmed = any(
                 consent.state == 'confirmed' for consent in case.consent_ids)
+
+    @api.depends('action_plan_ids.state')
+    def _compute_action_plan_confirmed(self):
+        for case in self:
+            case.action_plan_confirmed = any(
+                plan.state == 'confirmed' for plan in case.action_plan_ids)
+
+    closure_ready = fields.Boolean(
+        compute='_compute_closure_ready',
+        help='True once a follow-up or a referral of this case is confirmed.')
+
+    @api.depends('followup_ids.state', 'referral_ids.state')
+    def _compute_closure_ready(self):
+        for case in self:
+            case.closure_ready = any(
+                f.state == 'confirmed' for f in case.followup_ids
+            ) or any(
+                r.state == 'confirmed' for r in case.referral_ids)
+
+    def action_create_closure(self):
+        return self._open_satellite('case.closure', 'Case Closure')
+
+    def action_create_action_plan(self):
+        return self._open_satellite('action.plan', 'Action Plan')
 
     def action_create_admission(self):
         action = self._open_satellite('admission.form', 'Admission Form')
@@ -320,11 +358,10 @@ class GbvCase(models.Model):
         return self._view_satellite_records(
             'referral.form', 'Referral Forms', self.referral_ids)
 
-    def action_refer_out(self):
-        return self._open_satellite('referral.form', 'Refer Out (Form 9)')
+    def action_view_closures(self):
+        return self._view_satellite_records(
+            'case.closure', 'Case Closures', self.closure_ids)
 
-    def action_close_case(self):
-        return self._open_satellite('case.closure', 'Close Case')
 
     # ------------------------------------------------------------------
     # Dashboard data — one RPC, one source table

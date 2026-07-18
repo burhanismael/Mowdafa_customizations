@@ -105,20 +105,20 @@
                     </group>
                     <group>
                         <group string="Referred By (Referring Agency)">
-                            <field name="ref_sector"/>
-                            <field name="ref_agency"/>
-                            <field name="ref_location"/>
-                            <field name="ref_focal_point"/>
-                            <field name="ref_email"/>
-                            <field name="ref_phone"/>
+                            <field name="ref_sector" string="Sector"/>
+                            <field name="ref_agency" string="Agency"/>
+                            <field name="ref_location" string="Location"/>
+                            <field name="ref_focal_point" string="Focal Point Name"/>
+                            <field name="ref_email" string="Email"/>
+                            <field name="ref_phone" string="Phone"/>
                         </group>
                         <group string="Referred To (Receiving Agency)">
-                            <field name="recv_sector"/>
-                            <field name="recv_agency"/>
-                            <field name="recv_location"/>
-                            <field name="recv_focal_point"/>
-                            <field name="recv_email"/>
-                            <field name="recv_phone"/>
+                            <field name="recv_sector" string="Sector"/>
+                            <field name="recv_agency" string="Agency"/>
+                            <field name="recv_location" string="Location"/>
+                            <field name="recv_focal_point" string="Focal Point Name"/>
+                            <field name="recv_email" string="Email"/>
+                            <field name="recv_phone" string="Phone"/>
                         </group>
                     </group>
                     <group>
@@ -133,7 +133,7 @@
                                 <group>
                                     <field name="client_name"/>
                                     <field name="client_address"/>
-                                    <field name="client_phone"/>
+                                    <field name="client_phone" string="Phone"/>
                                 </group>
                                 <group>
                                     <field name="client_phone_owner"/>

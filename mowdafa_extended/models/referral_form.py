@@ -48,20 +48,20 @@ class ReferralForm(models.Model):
     )
 
     # Referred by (referring agency)
-    ref_sector = fields.Char(string='Sector')
-    ref_agency = fields.Char(string='Agency')
-    ref_location = fields.Char(string='Location')
-    ref_focal_point = fields.Char(string='Focal Point Name')
-    ref_email = fields.Char(string='Email')
-    ref_phone = fields.Char(string='Phone')
+    ref_sector = fields.Char(string='Referring Sector')
+    ref_agency = fields.Char(string='Referring Agency')
+    ref_location = fields.Char(string='Referring Location')
+    ref_focal_point = fields.Char(string='Referring Focal Point')
+    ref_email = fields.Char(string='Referring Email')
+    ref_phone = fields.Char(string='Referring Phone')
 
     # Referred to (receiving agency)
-    recv_sector = fields.Char(string='Sector')
-    recv_agency = fields.Char(string='Agency')
-    recv_location = fields.Char(string='Location')
-    recv_focal_point = fields.Char(string='Focal Point Name')
-    recv_email = fields.Char(string='Email')
-    recv_phone = fields.Char(string='Phone')
+    recv_sector = fields.Char(string='Receiving Sector')
+    recv_agency = fields.Char(string='Receiving Agency')
+    recv_location = fields.Char(string='Receiving Location')
+    recv_focal_point = fields.Char(string='Receiving Focal Point')
+    recv_email = fields.Char(string='Receiving Email')
+    recv_phone = fields.Char(string='Receiving Phone')
 
     # Consent / client information (data minimisation: only with consent)
     consent_obtained = fields.Boolean(
@@ -70,7 +70,7 @@ class ReferralForm(models.Model):
     )
     client_name = fields.Char(string='Client Name')
     client_address = fields.Char(string='Address')
-    client_phone = fields.Char(string='Phone')
+    client_phone = fields.Char(string='Client Phone')
     client_phone_owner = fields.Char(string='Phone Owner')
     contact_method = fields.Selection([
         ('phone', 'Phone'),
@@ -135,11 +135,17 @@ class ReferralForm(models.Model):
     action_plan_count = fields.Integer(compute='_compute_related_counts')
     closure_count = fields.Integer(compute='_compute_related_counts')
 
-    @api.depends('survivor_id')
+    def _related_domain(self):
+        self.ensure_one()
+        if self.case_id:
+            return [('case_id', '=', self.case_id.id)]
+        return [('survivor_id', '=', self.survivor_id.id)]
+
+    @api.depends('survivor_id', 'case_id')
     def _compute_related_counts(self):
         for record in self:
-            domain = [('survivor_id', '=', record.survivor_id.id)]
-            if record.survivor_id:
+            domain = record._related_domain()
+            if record.survivor_id or record.case_id:
                 record.consent_count = self.env['survivor.case'].search_count(domain)
                 record.admission_count = self.env['admission.form'].search_count(domain)
                 record.action_plan_count = self.env['action.plan'].search_count(domain)
@@ -152,13 +158,17 @@ class ReferralForm(models.Model):
 
     def _action_view_related(self, res_model, name):
         self.ensure_one()
+        domain = self._related_domain()
+        context = {'default_survivor_id': self.survivor_id.id}
+        if self.case_id:
+            context['default_case_id'] = self.case_id.id
         return {
             'type': 'ir.actions.act_window',
             'name': name,
             'res_model': res_model,
             'view_mode': 'tree,form',
-            'domain': [('survivor_id', '=', self.survivor_id.id)],
-            'context': {'default_survivor_id': self.survivor_id.id},
+            'domain': domain,
+            'context': context,
         }
 
     def action_view_consent_forms(self):
@@ -179,7 +189,9 @@ class ReferralForm(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'referral.form') or 'New'
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        records.case_id._advance_service_stage('referral')
+        return records
 
     def action_confirm(self):
         self.write({'state': 'confirmed'})
