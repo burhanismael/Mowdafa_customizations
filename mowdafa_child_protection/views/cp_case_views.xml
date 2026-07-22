@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence: CP/2026/0001 -->
+    <record id="seq_cp_case" model="ir.sequence">
+        <field name="name">Child Protection Case</field>
+        <field name="code">cp.case</field>
+        <field name="prefix">CP/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Form -->
+    <record id="view_cp_case_form" model="ir.ui.view">
+        <field name="name">cp.case.form</field>
+        <field name="model">cp.case</field>
+        <field name="arch" type="xml">
+            <form string="Child Protection Case">
+                <header>
+                    <field name="adult_verified" invisible="1"/>
+                    <field name="child_verified" invisible="1"/>
+                    <field name="verification_conflict" invisible="1"/>
+                    <button name="action_create_handover" type="object"
+                        string="Create Hand-over" class="btn-primary"
+                        invisible="record_type == 'partner' or stage != 'handover' or handover_count &gt; 0"/>
+                    <button name="action_create_registration" type="object"
+                        string="Create Registration" class="btn-primary"
+                        invisible="record_type == 'partner' or stage != 'registration' or registration_count &gt; 0"/>
+                    <button name="action_create_verification_adult" type="object"
+                        string="Adult Verification" class="btn-primary"
+                        invisible="record_type == 'partner' or stage != 'verification' or adult_verified"/>
+                    <button name="action_create_verification_child" type="object"
+                        string="Child Verification" class="btn-primary"
+                        invisible="record_type == 'partner' or stage != 'verification' or child_verified"/>
+                    <button name="action_create_reunification" type="object"
+                        string="Create Reunification" class="btn-primary"
+                        invisible="record_type == 'partner' or stage != 'in_care' or reunification_count &gt; 0 or recommendation not in ('reunification', 'reunification_support')"/>
+                    <button name="action_create_followup_visit" type="object"
+                        string="New Follow-up Visit" class="btn-primary"
+                        invisible="record_type == 'partner' or stage not in ('reunification', 'followup')"/>
+                    <field name="stage" widget="statusbar" readonly="1"
+                           invisible="record_type == 'partner'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-paperclip">
+                            <field name="attachment_count" widget="statinfo"
+                                   string="Documents"/>
+                        </button>
+                        <button name="action_view_handovers" type="object"
+                                class="oe_stat_button" icon="fa-exchange"
+                                invisible="record_type == 'partner' or handover_count == 0">
+                            <field name="handover_count" widget="statinfo" string="Hand-over"/>
+                        </button>
+                        <button name="action_view_registrations" type="object"
+                                class="oe_stat_button" icon="fa-id-card-o"
+                                invisible="record_type == 'partner' or registration_count == 0">
+                            <field name="registration_count" widget="statinfo" string="Registration"/>
+                        </button>
+                        <button name="action_view_verifications" type="object"
+                                class="oe_stat_button" icon="fa-check-square-o"
+                                invisible="record_type == 'partner' or verification_count == 0">
+                            <field name="verification_count" widget="statinfo" string="Verifications"/>
+                        </button>
+                        <button name="action_view_placements" type="object"
+                                class="oe_stat_button" icon="fa-home"
+                                invisible="record_type == 'partner' or placement_count == 0">
+                            <field name="placement_count" widget="statinfo" string="Placements"/>
+                        </button>
+                        <button name="action_view_psychosocial" type="object"
+                                class="oe_stat_button" icon="fa-heart-o"
+                                invisible="record_type == 'partner' or psychosocial_count == 0">
+                            <field name="psychosocial_count" widget="statinfo" string="Psychosocial"/>
+                        </button>
+                        <button name="action_view_reunifications" type="object"
+                                class="oe_stat_button" icon="fa-handshake-o"
+                                invisible="record_type == 'partner' or reunification_count == 0">
+                            <field name="reunification_count" widget="statinfo" string="Reunification"/>
+                        </button>
+                        <button name="action_view_followup_visits" type="object"
+                                class="oe_stat_button" icon="fa-calendar-check-o"
+                                invisible="record_type == 'partner' or followup_visit_count == 0">
+                            <field name="followup_visit_count" widget="statinfo" string="Follow-ups"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Partner Record"
+                            bg_color="text-bg-info"
+                            invisible="record_type != 'partner'"/>
+                    <field name="photo" widget="image" class="oe_avatar"
+                           invisible="record_type == 'partner'"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <field name="record_type" widget="radio"
+                               options="{'horizontal': true}"
+                               readonly="id"/>
+                    </div>
+                    <group string="Provenance — who sent it"
+                           invisible="record_type != 'partner'">
+                        <group>
+                            <field name="partner_agency_id"
+                                   required="record_type == 'partner'"/>
+                            <field name="partner_case_id"
+                                   required="record_type == 'partner'"/>
+                        </group>
+                        <group>
+                            <field name="date_received"
+                                   required="record_type == 'partner'"/>
+                            <field name="entered_by_id"/>
+                        </group>
+                    </group>
+                    <group string="1 · Child Identification">
+                        <group>
+                            <field name="child_name"
+                                   placeholder="Not yet named"
+                                   required="record_type == 'partner'"/>
+                            <field name="sex"
+                                   required="record_type == 'partner'"/>
+                            <field name="date_of_birth"/>
+                            <field name="dob_estimated"/>
+                            <field name="age_years"
+                                   required="record_type == 'partner'"/>
+                        </group>
+                        <group>
+                            <field name="nationality"/>
+                            <field name="population_group"
+                                   required="record_type == 'partner'"/>
+                            <field name="disability"/>
+                        </group>
+                    </group>
+                    <group string="2 · Parent / Caregiver"
+                           invisible="record_type != 'partner'">
+                        <group>
+                            <field name="caregiver_name"/>
+                            <field name="caregiver_relationship"/>
+                        </group>
+                        <group>
+                            <field name="caregiver_phone"/>
+                            <field name="living_arrangement"/>
+                        </group>
+                    </group>
+                    <group string="3 · Location — for the report">
+                        <group>
+                            <field name="region_id"
+                                   options="{'no_create_edit': True}"
+                                   required="record_type == 'partner'"/>
+                            <field name="district_id"
+                                   options="{'no_create_edit': True}"
+                                   required="record_type == 'partner'"/>
+                        </group>
+                        <group>
+                            <field name="date_identified"/>
+                            <field name="referral_source"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="4 · Protection Concern">
+                            <field name="protection_concern"
+                                   required="record_type == 'partner'"/>
+                            <field name="concern_description"/>
+                        </group>
+                        <group string="5 · Safety &amp; Risk">
+                            <field name="risk_level"
+                                   required="record_type == 'partner'"/>
+                            <field name="immediate_risk"/>
+                            <field name="risk_factors"/>
+                        </group>
+                    </group>
+                    <group string="Case Management — MOWDAFA"
+                           invisible="record_type == 'partner'">
+                        <group>
+                            <field name="case_worker_id"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="supervisor_id"
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="placement_type"/>
+                            <field name="recommendation"/>
+                        </group>
+                    </group>
+                    <group invisible="record_type != 'partner'">
+                        <group string="6 · Assessment of the Situation">
+                            <field name="child_views"/>
+                            <field name="health_status"/>
+                            <field name="education_status"/>
+                            <field name="basic_needs"/>
+                        </group>
+                        <group string="7 · Consent &amp; Assent (as the partner recorded)">
+                            <field name="consent_explained"/>
+                            <field name="caregiver_consent"/>
+                            <field name="child_assent"/>
+                            <field name="consent_date"/>
+                        </group>
+                    </group>
+                    <group invisible="record_type != 'partner'">
+                        <group string="8 · Best-Interest Summary">
+                            <field name="key_findings"/>
+                            <field name="interventions"/>
+                        </group>
+                        <group string="9 · Case Plan">
+                            <field name="plan_objective"/>
+                            <field name="plan_responsible"/>
+                            <field name="plan_target_date"/>
+                        </group>
+                    </group>
+                    <group invisible="record_type != 'partner'">
+                        <group string="10 · Referrals &amp; Services Provided">
+                            <field name="services_health"/>
+                            <field name="services_education"/>
+                            <field name="services_tracing"/>
+                            <field name="services_other"/>
+                        </group>
+                        <group string="11 &amp; 12 · Follow-up &amp; Closure">
+                            <field name="case_status"
+                                   required="record_type == 'partner'"/>
+                            <field name="last_followup_date"/>
+                            <field name="closure_notes"/>
+                        </group>
+                    </group>
+                    <group string="Status"
+                           invisible="record_type == 'partner'">
+                        <group>
+                            <field name="case_status"/>
+                            <field name="last_followup_date"/>
+                        </group>
+                        <group>
+                            <field name="verification_conflict"
+                                   invisible="not verification_conflict"/>
+                            <field name="supervisor_decision"
+                                   invisible="not verification_conflict and not supervisor_decision"/>
+                            <field name="supervisor_reason"
+                                   invisible="not verification_conflict and not supervisor_decision"
+                                   required="supervisor_decision != False"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes" nolabel="1" placeholder="Case notes…"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="view_cp_case_tree" model="ir.ui.view">
+        <field name="name">cp.case.tree</field>
+        <field name="model">cp.case</field>
+        <field name="arch" type="xml">
+            <tree string="Child Protection Cases"
+                  decoration-muted="case_status == 'closed'">
+                <field name="name"/>
+                <field name="child_name" string="Child"/>
+                <field name="record_type" widget="badge"
+                       decoration-info="record_type == 'partner'"/>
+                <field name="partner_agency_id" optional="show"/>
+                <field name="date_received" optional="show"/>
+                <field name="sex" optional="hide"/>
+                <field name="age_years" optional="hide"/>
+                <field name="region_id"/>
+                <field name="district_id" optional="show"/>
+                <field name="protection_concern"/>
+                <field name="risk_level" widget="badge"
+                       decoration-danger="risk_level in ('critical', 'high')"
+                       decoration-warning="risk_level == 'moderate'"
+                       decoration-success="risk_level == 'low'"/>
+                <field name="stage" widget="badge" optional="show"/>
+                <field name="case_status" widget="badge" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_cp_case_search" model="ir.ui.view">
+        <field name="name">cp.case.search</field>
+        <field name="model">cp.case</field>
+        <field name="arch" type="xml">
+            <search string="Child Protection Cases">
+                <field name="name"/>
+                <field name="child_name"/>
+                <field name="partner_agency_id"/>
+                <filter string="MOWDAFA Cares For" name="managed"
+                        domain="[('record_type', '=', 'managed')]"/>
+                <filter string="Partner Records" name="partner"
+                        domain="[('record_type', '=', 'partner')]"/>
+                <separator/>
+                <filter string="Critical / High Risk" name="high_risk"
+                        domain="[('risk_level', 'in', ('critical', 'high'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Stage" name="group_stage"
+                            context="{'group_by': 'stage'}"/>
+                    <filter string="Partner Agency" name="group_agency"
+                            context="{'group_by': 'partner_agency_id'}"/>
+                    <filter string="Region" name="group_region"
+                            context="{'group_by': 'region_id'}"/>
+                    <filter string="Concern" name="group_concern"
+                            context="{'group_by': 'protection_concern'}"/>
+                    <filter string="Risk Level" name="group_risk"
+                            context="{'group_by': 'risk_level'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_cp_case_managed" model="ir.actions.act_window">
+        <field name="name">Cases</field>
+        <field name="res_model">cp.case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('record_type', '=', 'managed')]</field>
+        <field name="context">{'default_record_type': 'managed'}</field>
+        <field name="search_view_id" ref="view_cp_case_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Open a child's file</p>
+            <p>Children MOWDAFA cares for directly — the full journey
+               from hand-over to reunification.</p>
+        </field>
+    </record>
+
+    <record id="action_cp_case_partner" model="ir.actions.act_window">
+        <field name="name">Partner Children</field>
+        <field name="res_model">cp.case</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('record_type', '=', 'partner')]</field>
+        <field name="context">{'default_record_type': 'partner'}</field>
+        <field name="search_view_id" ref="view_cp_case_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log a partner record</p>
+            <p>The partner keeps the child and does the work; MOWDAFA
+               holds the record — the 12-section form, keyed verbatim.</p>
+        </field>
+    </record>
+
+    <record id="action_cp_dashboard" model="ir.actions.client">
+        <field name="name">CP Dashboard</field>
+        <field name="tag">mowdafa_child_protection.cp_dashboard</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_cp_root" name="Child Protection" sequence="61"
+              web_icon="mowdafa_extended,static/description/icon.png"/>
+    <menuitem id="menu_cp_dashboard" name="Dashboard"
+              parent="menu_cp_root" action="action_cp_dashboard" sequence="1"/>
+    <menuitem id="menu_cp_case_managed" name="Cases"
+              parent="menu_cp_root" action="action_cp_case_managed" sequence="5"/>
+    <menuitem id="menu_cp_case_partner" name="Partner Children"
+              parent="menu_cp_root" action="action_cp_case_partner" sequence="10"/>
+</odoo>

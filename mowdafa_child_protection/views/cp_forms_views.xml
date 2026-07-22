@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_placement" model="ir.sequence">
+        <field name="name">cp.placement</field>
+        <field name="code">cp.placement</field>
+        <field name="prefix">PLC/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_placement_form" model="ir.ui.view">
+        <field name="name">cp.placement.form</field>
+        <field name="model">cp.placement</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="type"/>
+                            <field name="requires_daily"/>
+                            <field name="date_start"/>
+                        </group>
+                        <group>
+                            <field name="date_end"/>
+                            <field name="location"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_handover" model="ir.sequence">
+        <field name="name">cp.handover</field>
+        <field name="code">cp.handover</field>
+        <field name="prefix">HOV/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_handover_form" model="ir.ui.view">
+        <field name="name">cp.handover.form</field>
+        <field name="model">cp.handover</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="handover_datetime"/>
+                            <field name="by_organisation"/>
+                            <field name="by_name"/>
+                            <field name="by_position"/>
+                            <field name="by_location"/>
+                            <field name="by_contact"/>
+                            <field name="to_institution"/>
+                            <field name="received_by"/>
+                        </group>
+                        <group>
+                            <field name="received_role"/>
+                            <field name="received_contact"/>
+                            <field name="received_address"/>
+                            <field name="sign_handing_over"/>
+                            <field name="sign_child"/>
+                            <field name="sign_receiver"/>
+                            <field name="sign_witness"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_registration" model="ir.sequence">
+        <field name="name">cp.registration</field>
+        <field name="code">cp.registration</field>
+        <field name="prefix">REG/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_registration_form" model="ir.ui.view">
+        <field name="name">cp.registration.form</field>
+        <field name="model">cp.registration</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="place"/>
+                            <field name="date_of_arrival"/>
+                            <field name="registered_by"/>
+                            <field name="consent_registration"/>
+                            <field name="consent_registration_by"/>
+                            <field name="consent_data"/>
+                            <field name="consent_data_limits"/>
+                            <field name="child_assent"/>
+                            <field name="nickname"/>
+                            <field name="father_name"/>
+                            <field name="mother_name"/>
+                            <field name="other_relative"/>
+                        </group>
+                        <group>
+                            <field name="place_of_origin"/>
+                            <field name="current_address"/>
+                            <field name="schooling_history"/>
+                            <field name="literacy"/>
+                            <field name="wants_to_learn"/>
+                            <field name="found_at"/>
+                            <field name="referred_by"/>
+                            <field name="care_before"/>
+                            <field name="care_now"/>
+                            <field name="immediate_actions"/>
+                            <field name="withhold"/>
+                            <field name="withhold_what"/>
+                            <field name="withhold_from"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_verification" model="ir.sequence">
+        <field name="name">cp.verification</field>
+        <field name="code">cp.verification</field>
+        <field name="prefix">VER/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_verification_form" model="ir.ui.view">
+        <field name="name">cp.verification.form</field>
+        <field name="model">cp.verification</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="kind"/>
+                            <field name="interview_date"/>
+                            <field name="interview_place"/>
+                            <field name="interviewed_alone"/>
+                            <field name="adult_name"/>
+                            <field name="adult_relationship"/>
+                            <field name="adult_contact"/>
+                        </group>
+                        <group>
+                            <field name="adult_address"/>
+                            <field name="photo_recognised"/>
+                            <field name="account"/>
+                            <field name="accounts_match"/>
+                            <field name="child_wishes"/>
+                            <field name="recommendation"/>
+                            <field name="reasons"/>
+                            <field name="completed_by"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_daily_record" model="ir.sequence">
+        <field name="name">cp.daily.record</field>
+        <field name="code">cp.daily.record</field>
+        <field name="prefix">DAY/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_daily_record_form" model="ir.ui.view">
+        <field name="name">cp.daily.record.form</field>
+        <field name="model">cp.daily.record</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="placement_id"/>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="attendance"/>
+                            <field name="hours"/>
+                        </group>
+                        <group>
+                            <field name="performance"/>
+                            <field name="events"/>
+                            <field name="comment"/>
+                            <field name="filed_by"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_mentoring" model="ir.sequence">
+        <field name="name">cp.mentoring</field>
+        <field name="code">cp.mentoring</field>
+        <field name="prefix">MEN/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_mentoring_form" model="ir.ui.view">
+        <field name="name">cp.mentoring.form</field>
+        <field name="model">cp.mentoring</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="placement_id"/>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="mentor"/>
+                            <field name="hours"/>
+                            <field name="activities"/>
+                        </group>
+                        <group>
+                            <field name="attended"/>
+                            <field name="goal_last_week"/>
+                            <field name="progress"/>
+                            <field name="goal_next"/>
+                            <field name="obstacles"/>
+                            <field name="for_staff"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_psychosocial" model="ir.sequence">
+        <field name="name">cp.psychosocial</field>
+        <field name="code">cp.psychosocial</field>
+        <field name="prefix">PSS/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_psychosocial_form" model="ir.ui.view">
+        <field name="name">cp.psychosocial.form</field>
+        <field name="model">cp.psychosocial</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="session_number"/>
+                            <field name="counsellor"/>
+                            <field name="existing_illness"/>
+                            <field name="special_fears"/>
+                        </group>
+                        <group>
+                            <field name="problems"/>
+                            <field name="observation"/>
+                            <field name="services_provided"/>
+                            <field name="action_points"/>
+                            <field name="next_session"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_reunification" model="ir.sequence">
+        <field name="name">cp.reunification</field>
+        <field name="code">cp.reunification</field>
+        <field name="prefix">REU/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_reunification_form" model="ir.ui.view">
+        <field name="name">cp.reunification.form</field>
+        <field name="model">cp.reunification</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="verified_adult"/>
+                            <field name="with_verified_adult"/>
+                            <field name="not_verified_reason"/>
+                            <field name="tracing_type"/>
+                        </group>
+                        <group>
+                            <field name="additional_information"/>
+                            <field name="followup_needed"/>
+                            <field name="reintegration_priorities"/>
+                            <field name="completed_by"/>
+                            <field name="adult_signature"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="seq_cp_followup" model="ir.sequence">
+        <field name="name">cp.followup</field>
+        <field name="code">cp.followup</field>
+        <field name="prefix">FUV/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_followup_form" model="ir.ui.view">
+        <field name="name">cp.followup.form</field>
+        <field name="model">cp.followup</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="visit_number"/>
+                            <field name="due_date"/>
+                            <field name="status"/>
+                            <field name="visit_type"/>
+                            <field name="child_seen"/>
+                        </group>
+                        <group>
+                            <field name="same_caregiver"/>
+                            <field name="caregiver"/>
+                            <field name="in_school"/>
+                            <field name="school_detail"/>
+                            <field name="concerns"/>
+                            <field name="visited_by"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cp_case_user,cp.case.user,model_cp_case,base.group_user,1,1,1,0
+access_cp_case_manager,cp.case.manager,model_cp_case,base.group_system,1,1,1,1
+access_cp_placement_user,cp.placement.user,model_cp_placement,base.group_user,1,1,1,1
+access_cp_handover_user,cp.handover.user,model_cp_handover,base.group_user,1,1,1,0
+access_cp_registration_user,cp.registration.user,model_cp_registration,base.group_user,1,1,1,0
+access_cp_verification_user,cp.verification.user,model_cp_verification,base.group_user,1,1,1,0
+access_cp_daily_record_user,cp.daily.record.user,model_cp_daily_record,base.group_user,1,1,1,1
+access_cp_mentoring_user,cp.mentoring.user,model_cp_mentoring,base.group_user,1,1,1,1
+access_cp_psychosocial_user,cp.psychosocial.user,model_cp_psychosocial,base.group_user,1,1,1,0
+access_cp_reunification_user,cp.reunification.user,model_cp_reunification,base.group_user,1,1,1,0
+access_cp_followup_user,cp.followup.user,model_cp_followup,base.group_user,1,1,1,1
