@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cp_partner_agency_tree" model="ir.ui.view">
+        <field name="name">cp.partner.agency.tree</field>
+        <field name="model">cp.partner.agency</field>
+        <field name="arch" type="xml">
+            <tree string="Partner Agencies">
+                <field name="name"/>
+                <field name="short_name"/>
+                <field name="code" optional="hide"/>
+                <field name="sector"/>
+                <field name="focal_point_id"/>
+                <field name="supervisor_id"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cp_partner_agency_form" model="ir.ui.view">
+        <field name="name">cp.partner.agency.form</field>
+        <field name="model">cp.partner.agency</field>
+        <field name="arch" type="xml">
+            <form string="Partner Agency">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_title">
+                        <label for="name" string="Agency"/>
+                        <h1><field name="name" placeholder="e.g. UNICEF — Child Protection sub-cluster"/></h1>
+                    </div>
+                    <group>
+                        <group string="Identity">
+                            <field name="short_name"
+                                   placeholder="e.g. UNICEF"/>
+                            <field name="code"/>
+                            <field name="sector"/>
+                        </group>
+                        <group string="Contacts — filled onto new records">
+                            <field name="focal_point_id"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="supervisor_id"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="phone"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cp_partner_agency" model="ir.actions.act_window">
+        <field name="name">Partner Agencies</field>
+        <field name="res_model">cp.partner.agency</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add the first agency</p>
+            <p>The agencies whose children MOWDAFA holds records for —
+               the partner report breaks down by this list.</p>
+        </field>
+    </record>
+
+    <!-- Basic needs master (section 6 of the partner form) -->
+    <record id="view_cp_basic_need_tree" model="ir.ui.view">
+        <field name="name">cp.basic.need.tree</field>
+        <field name="model">cp.basic.need</field>
+        <field name="arch" type="xml">
+            <tree string="Basic Needs" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_basic_need" model="ir.actions.act_window">
+        <field name="name">Basic Needs</field>
+        <field name="res_model">cp.basic.need</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- seed: the values the partner form offers -->
+    <record id="basic_need_food" model="cp.basic.need">
+        <field name="name">Food</field><field name="sequence">10</field>
+    </record>
+    <record id="basic_need_education" model="cp.basic.need">
+        <field name="name">Education</field><field name="sequence">20</field>
+    </record>
+    <record id="basic_need_pss" model="cp.basic.need">
+        <field name="name">Psychosocial Support</field><field name="sequence">30</field>
+    </record>
+    <record id="basic_need_health" model="cp.basic.need">
+        <field name="name">Health Care</field><field name="sequence">40</field>
+    </record>
+    <record id="basic_need_legal" model="cp.basic.need">
+        <field name="name">Legal Support</field><field name="sequence">50</field>
+    </record>
+    <record id="basic_need_shelter" model="cp.basic.need">
+        <field name="name">Shelter</field><field name="sequence">60</field>
+    </record>
+    <record id="basic_need_other" model="cp.basic.need">
+        <field name="name">Other</field><field name="sequence">70</field>
+    </record>
+
+    <menuitem id="menu_cp_configuration" name="Configuration"
+              parent="menu_cp_root" sequence="90"/>
+    <menuitem id="menu_cp_partner_agency" name="Partner Agencies"
+              parent="menu_cp_configuration" action="action_cp_partner_agency"
+              sequence="10"/>
+    <menuitem id="menu_cp_basic_need" name="Basic Needs"
+              parent="menu_cp_configuration" action="action_cp_basic_need"
+              sequence="20"/>
+</odoo>

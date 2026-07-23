@@ -1,29 +1,216 @@
 .o_cp_dashboard {
+    // Roles, not raw hex — light and dark swap in one place.
+    --cp-surface: #ffffff;
+    --cp-page: #f6f6f4;
+    --cp-border: #dcdcd8;
+    --cp-ink: #0b0b0b;
+    --cp-ink-2: #52514e;
+    --cp-ink-3: #86857f;
+    --cp-track: rgba(11, 11, 11, 0.07);
+
+    // sequential blue — magnitude
+    --cp-seq: #2a78d6;
+    --cp-seq-soft: #cde2fb;
+    // status — reserved, never a series
+    --cp-good: #0ca30c;
+    --cp-warning: #fab219;
+    --cp-critical: #d03b3b;
+    --cp-neutral: #9b9a94;
+
+    background: var(--cp-page);
+    color: var(--cp-ink);
+
+    .o_cp_section_title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--cp-ink);
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .15rem;
+
+        i { color: var(--cp-seq); }
+    }
+
+    // ── KPI tiles ────────────────────────────────────────────────────
     .o_cp_tile {
-        background: var(--o-view-background-color, #fff);
-        .o_cp_tile_value {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.1;
-        }
+        background: var(--cp-surface);
+        border: 1px solid var(--cp-border) !important;
+        border-radius: 10px;
+        transition: box-shadow .15s ease, transform .15s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: .75rem;
+
         &.cursor-pointer:hover {
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 2px 10px rgba(11, 11, 11, .09);
+            transform: translateY(-1px);
         }
     }
-    .o_cp_bar_label {
-        width: 40%;
-        min-width: 120px;
-        font-size: 0.85rem;
+
+    .o_cp_tile_icon {
+        flex: 0 0 auto;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        background: var(--cp-seq-soft);
+        color: var(--cp-seq);
+
+        &.is-good    { background: rgba(12, 163, 12, .12);  color: var(--cp-good); }
+        &.is-neutral { background: rgba(155, 154, 148, .18); color: #6f6e69; }
+        &.is-critical{ background: rgba(208, 59, 59, .12);  color: var(--cp-critical); }
+        &.is-warning-chip { background: rgba(250, 178, 25, .16); color: #b07c00; }
     }
+
+    .o_cp_tile_label {
+        font-size: .7rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--cp-ink-3);
+        font-weight: 600;
+    }
+
+    .o_cp_tile_value {
+        font-size: 1.9rem;
+        font-weight: 700;
+        line-height: 1.15;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_cp_tile_sub {
+        font-size: .78rem;
+        color: var(--cp-ink-2);
+    }
+
+    // ── cards ─────────────────────────────────────────────────────────
+    .o_cp_card {
+        background: var(--cp-surface);
+        border: 1px solid var(--cp-border);
+        border-radius: 10px;
+    }
+
+    .o_cp_card_title {
+        font-size: .72rem;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--cp-ink-2);
+        margin-bottom: .85rem;
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+
+        i { color: var(--cp-ink-3); }
+    }
+
+    // ── bars ──────────────────────────────────────────────────────────
+    .o_cp_row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .18rem 0;
+    }
+
+    .o_cp_bar_label {
+        flex: 0 0 38%;
+        max-width: 38%;
+        font-size: .82rem;
+        color: var(--cp-ink-2);
+    }
+
     .o_cp_bar_track {
-        background: rgba(0, 0, 0, 0.06);
-        border-radius: 3px;
+        flex: 1 1 auto;
+        background: var(--cp-track);
+        border-radius: 4px;
         height: 10px;
         overflow: hidden;
     }
+
     .o_cp_bar {
-        background: #2e75b6;
         height: 100%;
-        border-radius: 3px;
+        background: var(--cp-seq);
+        border-radius: 0 4px 4px 0;   // rounded data-end, anchored to baseline
+        min-width: 2px;
+
+        &.is-good     { background: var(--cp-good); }
+        &.is-warning  { background: var(--cp-warning); }
+        &.is-neutral  { background: var(--cp-neutral); }
+        &.is-critical { background: var(--cp-critical); }
     }
+
+    .o_cp_bar_value {
+        flex: 0 0 auto;
+        min-width: 2.2rem;
+        text-align: right;
+        font-weight: 700;
+        font-size: .85rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--cp-ink);
+    }
+
+    // status rows pair the colour with an icon, never colour alone
+    .o_cp_status_icon {
+        flex: 0 0 auto;
+        width: 1rem;
+        text-align: center;
+        font-size: .75rem;
+
+        &.is-good     { color: var(--cp-good); }
+        &.is-warning  { color: #b07c00; }
+        &.is-neutral  { color: #6f6e69; }
+        &.is-critical { color: var(--cp-critical); }
+    }
+
+    // ── table ─────────────────────────────────────────────────────────
+    table {
+        th {
+            font-size: .68rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--cp-ink-3);
+            font-weight: 600;
+            border-bottom: 1px solid var(--cp-border);
+        }
+        td {
+            font-variant-numeric: tabular-nums;
+            border-color: rgba(11, 11, 11, .05);
+        }
+        tbody tr:hover td { background: rgba(42, 120, 214, .04); }
+        tr.o_cp_total td {
+            border-top: 2px solid var(--cp-border);
+            font-weight: 700;
+        }
+    }
+}
+
+// Dark mode: its own steps against the dark surface, not a flip.
+@media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .o_cp_dashboard {
+        --cp-surface: #1f1f1e;
+        --cp-page: #171716;
+        --cp-border: #3a3a37;
+        --cp-ink: #ffffff;
+        --cp-ink-2: #c3c2b7;
+        --cp-ink-3: #96958d;
+        --cp-track: rgba(255, 255, 255, .10);
+        --cp-seq: #3987e5;
+        --cp-seq-soft: rgba(57, 135, 229, .18);
+        --cp-neutral: #8a8983;
+    }
+}
+:root[data-theme="dark"] .o_cp_dashboard {
+    --cp-surface: #1f1f1e;
+    --cp-page: #171716;
+    --cp-border: #3a3a37;
+    --cp-ink: #ffffff;
+    --cp-ink-2: #c3c2b7;
+    --cp-ink-3: #96958d;
+    --cp-track: rgba(255, 255, 255, .10);
+    --cp-seq: #3987e5;
+    --cp-seq-soft: rgba(57, 135, 229, .18);
+    --cp-neutral: #8a8983;
 }

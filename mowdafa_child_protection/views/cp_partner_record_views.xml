@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence -->
+    <record id="seq_cp_partner_record" model="ir.sequence">
+        <field name="name">CP Partner Record</field>
+        <field name="code">cp.partner.record</field>
+        <field name="prefix">CPP/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Form -->
+    <record id="view_cp_partner_record_form" model="ir.ui.view">
+        <field name="name">cp.partner.record.form</field>
+        <field name="model">cp.partner.record</field>
+        <field name="arch" type="xml">
+            <form string="Partner Record">
+                <header>
+                    <button name="action_create_case" type="object"
+                            string="Create Case" class="btn-primary"
+                            invisible="case_id"
+                            help="The child has come into MOWDAFA's care: open a managed case from what the partner recorded."/>
+                    <field name="case_status" widget="statusbar"
+                           statusbar_visible="open,active,pending,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object"
+                                class="oe_stat_button" icon="fa-paperclip">
+                            <field name="attachment_count" widget="statinfo"
+                                   string="Documents"/>
+                        </button>
+                        <button name="action_open_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open-o"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                        <field name="case_id" invisible="1"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group string="Provenance — who sent it">
+                        <group>
+                            <field name="partner_agency_id"/>
+                            <field name="agency_sector"
+                                   invisible="not agency_sector"/>
+                            <field name="agency_phone"
+                                   invisible="not agency_phone"/>
+                            <field name="agency_email" widget="email"
+                                   invisible="not agency_email"/>
+                            <field name="partner_case_id"/>
+                        </group>
+                        <group>
+                            <field name="date_received"/>
+                            <field name="entered_by_id"/>
+                            <field name="partner_worker_id"
+                                   options="{'no_create_edit': True}"/>
+                            <field name="partner_supervisor_id"
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                    <group string="1 · Child Identification">
+                        <group>
+                            <field name="child_name" placeholder="Not yet named"/>
+                            <field name="preferred_name"/>
+                            <field name="sex"/>
+                            <field name="date_of_birth"/>
+                            <field name="dob_estimated"/>
+                            <field name="age_years"/>
+                        </group>
+                        <group>
+                            <field name="nationality"/>
+                            <field name="language"/>
+                            <field name="current_address" string="Address"/>
+                            <field name="population_group"/>
+                            <field name="disability"/>
+                            <field name="school_status"/>
+                            <field name="school_name"
+                                   invisible="school_status != 'yes'"/>
+                        </group>
+                    </group>
+                    <group string="2 · Parent / Caregiver">
+                        <group>
+                            <field name="caregiver_name"/>
+                            <field name="caregiver_relationship"/>
+                            <field name="caregiver_phone"/>
+                        </group>
+                        <group>
+                            <field name="caregiver_alt_contact"/>
+                            <field name="caregiver_address" string="Address"/>
+                            <field name="living_arrangement"/>
+                        </group>
+                    </group>
+                    <group string="3 · Case Identification &amp; Referral">
+                        <group>
+                            <field name="region_id" options="{'no_create_edit': True}"/>
+                            <field name="district_id" options="{'no_create_edit': True}"/>
+                            <field name="date_identified"/>
+                        </group>
+                        <group>
+                            <field name="referral_source"/>
+                            <field name="referral_reason"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="4 · Child Protection Concern">
+                            <field name="protection_concern"/>
+                            <field name="concern_description"/>
+                        </group>
+                        <group string="5 · Safety &amp; Risk Assessment">
+                            <field name="immediate_risk"/>
+                            <field name="risk_level"/>
+                            <field name="risk_factors"/>
+                            <field name="protective_factors"/>
+                            <field name="immediate_actions"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="6 · Assessment of the Child's Situation">
+                            <field name="child_views"/>
+                            <field name="family_situation"/>
+                            <field name="psychosocial_status"/>
+                            <field name="health_status"/>
+                            <field name="education_status"/>
+                            <field name="basic_need_ids" widget="many2many_tags"
+                                   options="{'no_create_edit': True}"/>
+                        </group>
+                        <group string="7 · Consent &amp; Assent (as the partner recorded)">
+                            <field name="consent_explained"/>
+                            <field name="confidentiality_explained"/>
+                            <field name="caregiver_consent"/>
+                            <field name="child_assent"/>
+                            <field name="consent_date"/>
+                        </group>
+                    </group>
+                    <group string="8 · Best-Interest Assessment Summary">
+                        <field name="key_findings"/>
+                        <field name="analysis"/>
+                        <field name="interventions"/>
+                    </group>
+                    <group string="9 · Case Plan">
+                        <group>
+                            <field name="plan_objective"/>
+                            <field name="plan_activities"/>
+                        </group>
+                        <group>
+                            <field name="plan_responsible"/>
+                            <field name="plan_target_date"/>
+                        </group>
+                    </group>
+                    <group string="10 · Referrals &amp; Services Provided">
+                        <group>
+                            <field name="services_health"/>
+                            <field name="services_psychosocial"/>
+                            <field name="services_education"/>
+                        </group>
+                        <group>
+                            <field name="services_legal"/>
+                            <field name="services_tracing"/>
+                            <field name="services_other"/>
+                        </group>
+                    </group>
+                    <group string="11 · Follow-up Record">
+                        <field name="followup_line_ids" nolabel="1" colspan="2">
+                            <tree editable="bottom">
+                                <field name="date"/>
+                                <field name="progress"/>
+                                <field name="remaining_concerns"/>
+                                <field name="next_actions"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group string="12 · Case Closure">
+                        <div colspan="2" class="text-muted fst-italic"
+                             invisible="case_status == 'closed'">
+                            Case still active — not closed by the partner.
+                        </div>
+                        <group>
+                            <field name="last_followup_date"/>
+                            <field name="closure_date"
+                                   invisible="case_status != 'closed'"/>
+                            <field name="closure_approved_date"
+                                   invisible="case_status != 'closed'"/>
+                        </group>
+                        <group>
+                            <field name="closure_reason"
+                                   invisible="case_status != 'closed'"/>
+                            <field name="closure_summary"
+                                   invisible="case_status != 'closed'"/>
+                            <field name="closure_situation"
+                                   invisible="case_status != 'closed'"/>
+                            <field name="closure_feedback"
+                                   invisible="case_status != 'closed'"/>
+                        </group>
+                    </group>
+                    <separator string="Notes"/>
+                    <field name="notes" nolabel="1" placeholder="Additional notes…"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List -->
+    <record id="view_cp_partner_record_tree" model="ir.ui.view">
+        <field name="name">cp.partner.record.tree</field>
+        <field name="model">cp.partner.record</field>
+        <field name="arch" type="xml">
+            <tree string="Partner Children" decoration-muted="case_status == 'closed'">
+                <field name="name" string="Case ID"/>
+                <field name="partner_short_name" string="Partner"/>
+                <field name="partner_agency_id" column_invisible="True"/>
+                <field name="date_received" string="Received"/>
+                <field name="child_name" optional="hide"/>
+                <field name="district_id" string="District"/>
+                <field name="protection_concern" string="Concern"/>
+                <field name="risk_level" widget="badge" string="Risk"
+                       decoration-danger="risk_level in ('critical', 'high')"
+                       decoration-warning="risk_level == 'moderate'"
+                       decoration-success="risk_level == 'low'"/>
+                <field name="case_status" widget="badge" string="Status"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_cp_partner_record_search" model="ir.ui.view">
+        <field name="name">cp.partner.record.search</field>
+        <field name="model">cp.partner.record</field>
+        <field name="arch" type="xml">
+            <search string="Partner Children">
+                <field name="name"/>
+                <field name="child_name"/>
+                <field name="partner_agency_id"/>
+                <filter string="Critical / High Risk" name="high_risk"
+                        domain="[('risk_level', 'in', ('critical', 'high'))]"/>
+                <filter string="Closed" name="closed"
+                        domain="[('case_status', '=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Partner Agency" name="group_agency"
+                            context="{'group_by': 'partner_agency_id'}"/>
+                    <filter string="Region" name="group_region"
+                            context="{'group_by': 'region_id'}"/>
+                    <filter string="Concern" name="group_concern"
+                            context="{'group_by': 'protection_concern'}"/>
+                    <filter string="Status" name="group_status"
+                            context="{'group_by': 'case_status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_cp_partner_record" model="ir.actions.act_window">
+        <field name="name">Partner Children</field>
+        <field name="res_model">cp.partner.record</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cp_partner_record_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Log a partner record</p>
+            <p>The partner keeps the child and does the work; MOWDAFA
+               holds the record — the 12-section form, keyed verbatim.</p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_cp_case_partner" name="Partner Children"
+              parent="menu_cp_root" action="action_cp_partner_record"
+              sequence="10"/>
+</odoo>

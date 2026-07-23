@@ -38,8 +38,7 @@ class CpPlacement(models.Model):
     _order = 'date_start desc, id desc'
 
     case_id = fields.Many2one(
-        'cp.case', string='Case', required=True, ondelete='cascade',
-        domain=[('record_type', '=', 'managed')])
+        'cp.case', string='Case', required=True, ondelete='cascade')
     type = fields.Selection([
         ('facility', 'Facility'),
         ('kinship', 'Kinship'),
@@ -85,13 +84,13 @@ class CpHandover(models.Model):
     by_name = fields.Char(string='Full Name', required=True)
     by_position = fields.Char(string='Position')
     by_location = fields.Char(string='Location')
-    by_contact = fields.Char(string='Contact')
+    by_contact = fields.Char(string='Handing-over Contact')
     # handed over to / received by
     to_institution = fields.Char(
         string='Institution', default='MOWDAFA rehabilitation centre')
     received_by = fields.Char(string='Staff Name', required=True)
     received_role = fields.Char(string='Role')
-    received_contact = fields.Char(string='Contact')
+    received_contact = fields.Char(string='Receiver Contact')
     received_address = fields.Char(string='Address')
     # signatures — all four required: the chain of custody
     sign_handing_over = fields.Char(
@@ -274,7 +273,7 @@ class CpMentoring(models.Model):
     mentor = fields.Char(string='Mentor')
     hours = fields.Float(string='Hours This Month')
     activities = fields.Char(
-        string='Activities',
+        string='Mentoring Activities',
         help='Study circles, goal setting, sports, field trips, videos…')
     attended = fields.Boolean(string='Attended', default=True)
     goal_last_week = fields.Char(

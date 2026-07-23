@@ -34,37 +34,21 @@ CONCERNS = [
 
 
 class CpCase(models.Model):
-    """One model holding two very different things (CP-16):
+    """A child MOWDAFA cares for directly (CP-16 managed track).
 
-    * record_type = managed — a child MOWDAFA cares for. Live case,
-      six stages, verification recommendation, restricted photo.
-    * record_type = partner — a record a partner agency deposited:
-      the 12-section Puntland CP form, keyed verbatim, read-only in
-      spirit — the ministry stores it, it does not work it.
-
-    Both share the reporting spine (region, district, age, sex,
-    concern, risk) so statistics can total or split without
-    special-casing.
+    Live case: CP/YYYY/NNNN reference, six stages, verification
+    recommendation, restricted photo. Partner-deposited records are a
+    separate model, cp.partner.record — they never live here.
     """
     _name = 'cp.case'
     _description = 'Child Protection Case'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
-    # ── the one field that decides everything ───────────────────────────
-    record_type = fields.Selection([
-        ('managed', 'MOWDAFA Cares For'),
-        ('partner', 'Partner Record'),
-    ], string='Record Type', required=True, default='managed',
-        tracking=True,
-        help='Set once at creation and locked: a deposited record never '
-             'becomes a case the ministry works, and vice versa.')
     name = fields.Char(
-        string='Case Reference', readonly=True, copy=False, default='New',
-        help='CP/YYYY/NNNN for managed cases; the partner\'s own Case ID, '
-             'kept verbatim, for partner records.')
+        string='Case Reference', readonly=True, copy=False, default='New')
 
-    # ── shared reporting spine ───────────────────────────────────────────
+    # ── reporting spine (shared with cp.partner.record) ──────────────────
     child_name = fields.Char(string='Full Name', tracking=True)
     sex = fields.Selection(
         [('female', 'Female'), ('male', 'Male')], string='Sex', tracking=True)
@@ -74,6 +58,7 @@ class CpCase(models.Model):
     nationality = fields.Char(string='Nationality', default='Somali')
     population_group = fields.Selection([
         ('resident', 'Resident'),
+        ('host', 'Host Community'),
         ('idp', 'IDP'),
         ('refugee', 'Refugee'),
         ('returnee', 'Returnee'),
@@ -125,58 +110,6 @@ class CpCase(models.Model):
         ('interim', 'Interim'),
         ('home', 'Home'),
     ], string='Placement', tracking=True)
-
-    # ── partner-record fields (the 12-section Puntland CP form) ─────────
-    # provenance
-    partner_agency_id = fields.Many2one(
-        'res.partner', string='Partner Agency', tracking=True)
-    partner_case_id = fields.Char(
-        string='Partner Case ID', copy=False,
-        help='The partner\'s own identifier, kept verbatim — it becomes '
-             'the record\'s reference.')
-    date_received = fields.Date(
-        string='Date Received', default=fields.Date.context_today)
-    entered_by_id = fields.Many2one(
-        'res.users', string='Entered By',
-        default=lambda self: self.env.user, readonly=True)
-    # 2 · parent / caregiver
-    caregiver_name = fields.Char(string='Caregiver')
-    caregiver_relationship = fields.Char(string='Relationship')
-    caregiver_phone = fields.Char(string='Telephone')
-    living_arrangement = fields.Char(string='Living Arrangement')
-    # 6 · assessment of the situation
-    child_views = fields.Text(string="Child's Views")
-    health_status = fields.Char(string='Health')
-    education_status = fields.Char(string='Education')
-    basic_needs = fields.Char(string='Basic Needs')
-    # 7 · consent & assent (as the partner recorded)
-    consent_explained = fields.Boolean(string='Process Explained')
-    caregiver_consent = fields.Boolean(string='Caregiver Consent')
-    child_assent = fields.Boolean(string='Child Assent')
-    consent_date = fields.Date(string='Consent Date')
-    # 8 · best-interest summary
-    key_findings = fields.Text(string='Key Findings')
-    interventions = fields.Text(string='Interventions')
-    # 9 · case plan
-    plan_objective = fields.Char(string='Objective')
-    plan_responsible = fields.Char(string='Responsible')
-    plan_target_date = fields.Date(string='Target Date')
-    # 10 · referrals & services provided
-    services_health = fields.Char(string='Health Service')
-    services_education = fields.Char(string='Education Service')
-    services_tracing = fields.Char(string='Tracing')
-    services_other = fields.Char(string='Other Services')
-    # 11 & 12 · follow-up & closure, as the partner reported
-    case_status = fields.Selection([
-        ('open', 'Open'),
-        ('active', 'Active'),
-        ('pending', 'Pending'),
-        ('closed', 'Closed'),
-    ], string='Reported Status', default='active', tracking=True,
-        help='Managed cases: maintained by MOWDAFA. Partner records: '
-             'whatever status the partner reported.')
-    last_followup_date = fields.Date(string='Last Follow-up')
-    closure_notes = fields.Char(string='Closure Notes')
 
     # ── the nine forms + placements (managed track) ─────────────────────
     placement_ids = fields.One2many(
@@ -249,11 +182,10 @@ class CpCase(models.Model):
                       'in_care', 'reunification', 'followup']
 
     def _advance_stage(self, stage):
-        """Move managed cases forward to `stage`; never backwards."""
+        """Move cases forward to `stage`; never backwards."""
         order = self.CP_STAGE_ORDER
         for case in self:
-            if (case.record_type == 'managed'
-                    and order.index(stage) > order.index(case.stage)):
+            if order.index(stage) > order.index(case.stage):
                 case.stage = stage
 
     # ── smart-button counts ──────────────────────────────────────────────
@@ -379,8 +311,6 @@ class CpCase(models.Model):
             case.attachment_count = counts.get(case.id, 0)
 
     def action_view_documents(self):
-        """Whatever the partner sent lives here — any file type. The
-        record itself is what the officer keyed; these are the source."""
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
@@ -427,49 +357,39 @@ class CpCase(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
-                if vals.get('record_type') == 'partner':
-                    # the partner's own Case ID, kept verbatim
-                    vals['name'] = vals.get('partner_case_id') or \
-                        self.env['ir.sequence'].next_by_code('cp.case') or 'New'
-                else:
-                    vals['name'] = self.env['ir.sequence'].next_by_code(
-                        'cp.case') or 'New'
+                vals['name'] = self.env['ir.sequence'].next_by_code(
+                    'cp.case') or 'New'
         return super().create(vals_list)
 
     def write(self, vals):
-        # record_type is set once, when the case is created, and locked:
-        # a deposited record never becomes a case the ministry works.
-        if 'record_type' in vals:
-            for case in self:
-                if case.record_type != vals['record_type']:
-                    raise UserError(_(
-                        'The record type is set once, at creation, and '
-                        'cannot be changed: a partner-deposited record '
-                        'never becomes a MOWDAFA-managed case, and vice '
-                        'versa. Create a new record instead.'))
         result = super().write(vals)
         if 'supervisor_decision' in vals:
             self._sync_verification()
         return result
 
-    # ── dashboard — one RPC, one source table ───────────────────────────
+    # ── dashboard — one RPC, two source tables (managed / partner) ──────
     @api.model
     def get_dashboard_data(self):
         Case = self
+        Partner = self.env['cp.partner.record']
 
-        def count_by(field, domain):
+        def count_by(model, field, domain):
             result = {}
-            for key, count in Case._read_group(
+            for key, count in model._read_group(
                     domain, groupby=[field], aggregates=['__count']):
                 result[key] = count
             return result
 
-        managed = [('record_type', '=', 'managed')]
-        partner = [('record_type', '=', 'partner')]
+        stage_counts = count_by(Case, 'stage', [])
+        reco_counts = count_by(Case, 'recommendation', [])
+        placement = count_by(Case, 'placement_type', [])
 
-        stage_counts = count_by('stage', managed)
-        reco_counts = count_by('recommendation', managed)
-        placement = count_by('placement_type', managed)
+        partner_total = Partner.search_count([])
+        partner_active = Partner.search_count(
+            [('case_status', 'in', ('open', 'active'))])
+        partner_closed = Partner.search_count([('case_status', '=', 'closed')])
+        partner_critical = Partner.search_count(
+            [('risk_level', 'in', ('critical', 'high'))])
 
         tiles = {
             'in_care': stage_counts.get('in_care', 0),
@@ -480,14 +400,11 @@ class CpCase(models.Model):
             'verification': stage_counts.get('verification', 0),
             'reunified': (stage_counts.get('reunification', 0)
                           + stage_counts.get('followup', 0)),
-            'managed_total': Case.search_count(managed),
-            'partner_total': Case.search_count(partner),
-            'partner_active': Case.search_count(
-                partner + [('case_status', 'in', ('open', 'active'))]),
-            'partner_closed': Case.search_count(
-                partner + [('case_status', '=', 'closed')]),
-            'partner_critical': Case.search_count(
-                partner + [('risk_level', 'in', ('critical', 'high'))]),
+            'managed_total': Case.search_count([]),
+            'partner_total': partner_total,
+            'partner_active': partner_active,
+            'partner_closed': partner_closed,
+            'partner_critical': partner_critical,
         }
 
         stages = [{'key': key, 'label': label,
@@ -499,8 +416,8 @@ class CpCase(models.Model):
 
         # partner report — by agency, with status and risk split
         agency_rows = {}
-        for agency, status, count in Case._read_group(
-                partner, groupby=['partner_agency_id', 'case_status'],
+        for agency, status, count in Partner._read_group(
+                [], groupby=['partner_agency_id', 'case_status'],
                 aggregates=['__count']):
             key = agency.id if agency else 0
             row = agency_rows.setdefault(key, {
@@ -512,8 +429,8 @@ class CpCase(models.Model):
                 row['active'] += count
             elif status == 'closed':
                 row['closed'] += count
-        for agency, count in Case._read_group(
-                partner + [('risk_level', 'in', ('critical', 'high'))],
+        for agency, count in Partner._read_group(
+                [('risk_level', 'in', ('critical', 'high'))],
                 groupby=['partner_agency_id'], aggregates=['__count']):
             key = agency.id if agency else 0
             if key in agency_rows:
@@ -521,9 +438,9 @@ class CpCase(models.Model):
         agencies = sorted(agency_rows.values(),
                           key=lambda r: r['children'], reverse=True)
 
-        def named_counts(field, domain, labels=None):
+        def named_counts(model, field, domain, labels=None):
             rows = []
-            for key, count in Case._read_group(
+            for key, count in model._read_group(
                     domain, groupby=[field], aggregates=['__count']):
                 if hasattr(key, 'name'):
                     label = key.name if key else _('Undefined')
@@ -534,7 +451,7 @@ class CpCase(models.Model):
             return rows
 
         concern_labels = dict(CONCERNS)
-        sex_counts = count_by('sex', partner)
+        sex_counts = count_by(Partner, 'sex', [])
         tiles['agency_count'] = len([a for a in agencies if a['children']])
 
         # age bands, as the mockup prints them: 0–4, 5–9, 10–14, 15–17
@@ -542,14 +459,14 @@ class CpCase(models.Model):
                      (10, 14, '10–14'), (15, 17, '15–17')]
         partner_ages = [{
             'name': label,
-            'count': Case.search_count(
-                partner + [('age_years', '>=', lo), ('age_years', '<=', hi)]),
+            'count': Partner.search_count(
+                [('age_years', '>=', lo), ('age_years', '<=', hi)]),
         } for lo, hi, label in age_bands]
-        over_17 = Case.search_count(partner + [('age_years', '>', 17)])
+        over_17 = Partner.search_count([('age_years', '>', 17)])
         if over_17:
             partner_ages.append({'name': '18+', 'count': over_17})
 
-        status_counts = count_by('case_status', partner)
+        status_counts = count_by(Partner, 'case_status', [])
         partner_status = [
             {'name': _('Active'), 'count': (status_counts.get('open', 0)
                                             + status_counts.get('active', 0))},
@@ -563,9 +480,9 @@ class CpCase(models.Model):
             'stages': stages,
             'recommendations': recommendations,
             'partner_agencies': agencies,
-            'partner_regions': named_counts('region_id', partner),
+            'partner_regions': named_counts(Partner, 'region_id', []),
             'partner_concerns': named_counts(
-                'protection_concern', partner, concern_labels),
+                Partner, 'protection_concern', [], concern_labels),
             'partner_sex': [
                 {'name': _('Female'), 'count': sex_counts.get('female', 0)},
                 {'name': _('Male'), 'count': sex_counts.get('male', 0)},

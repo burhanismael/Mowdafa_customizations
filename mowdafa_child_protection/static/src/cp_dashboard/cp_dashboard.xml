@@ -1,88 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
+<!-- one bar row: optional icon · label · track · value. The value is
+     always visible, so colour never carries the reading on its own. -->
+<t t-name="mowdafa_child_protection.CpBarRow">
+    <div class="o_cp_row">
+        <t t-if="icon">
+            <span t-attf-class="o_cp_status_icon {{tone}}">
+                <i t-attf-class="fa {{icon}}" role="img" t-att-title="row.name"/>
+            </span>
+        </t>
+        <div class="o_cp_bar_label text-truncate" t-att-title="row.name"
+             t-esc="row.label || row.name"/>
+        <div class="o_cp_bar_track">
+            <div t-attf-class="o_cp_bar {{tone}}"
+                 t-attf-style="width: {{row.widthPct}}%; {{barStyle || ''}}"/>
+        </div>
+        <div class="o_cp_bar_value" t-esc="row.count"/>
+    </div>
+</t>
+
 <t t-name="mowdafa_child_protection.CpDashboard">
-    <div class="o_cp_dashboard p-4 overflow-auto h-100 bg-view">
+    <div class="o_cp_dashboard p-4 overflow-auto h-100">
         <t t-if="state.loading">
             <div class="text-center p-5"><i class="fa fa-spinner fa-spin fa-2x"/></div>
         </t>
         <t t-else="">
-            <h2 class="mb-1">Child Protection</h2>
-            <div class="text-muted mb-4">
-                Are we keeping our promises to the children we are already holding?
-            </div>
-
-            <!-- managed tiles -->
+            <!-- ═══ MANAGED TRACK — the ministry's own caseload ═══ -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100 cursor-pointer"
-                         t-on-click="openManaged">
-                        <div class="o_cp_tile_value" t-esc="tiles.in_care"/>
-                        <div class="fw-bold">Children in care</div>
-                        <div class="text-muted small">
-                            <t t-esc="tiles.facility"/> facility ·
-                            <t t-esc="tiles.kinship"/> kinship or interim
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openManaged">
+                        <div class="o_cp_tile_icon">
+                            <i class="fa fa-home" role="img" title="Children in care"/>
                         </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100">
-                        <div class="o_cp_tile_value" t-esc="tiles.verification"/>
-                        <div class="fw-bold">Awaiting verification</div>
-                        <div class="text-muted small">target 3 days</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100">
-                        <div class="o_cp_tile_value" t-esc="tiles.reunified"/>
-                        <div class="fw-bold">Reunified / follow-up</div>
-                        <div class="text-muted small">
-                            of <t t-esc="tiles.managed_total"/> managed cases
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100 cursor-pointer"
-                         t-on-click="openPartner">
-                        <div class="o_cp_tile_value" t-esc="tiles.partner_total"/>
-                        <div class="fw-bold">Partner children</div>
-                        <div class="text-muted small">
-                            <t t-esc="tiles.partner_active"/> active ·
-                            <t t-esc="tiles.partner_critical"/> critical/high
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row g-3 mb-4">
-                <!-- managed pipeline -->
-                <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                        <h5>Care pipeline — managed track</h5>
-                        <t t-foreach="stageBars" t-as="row" t-key="row.key">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.label"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
+                        <div>
+                            <div class="o_cp_tile_label">Children in care</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.in_care"/>
+                            <div class="o_cp_tile_sub">
+                                <t t-esc="tiles.facility"/> facility ·
+                                <t t-esc="tiles.kinship"/> kinship or interim
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100">
+                        <div class="o_cp_tile_icon is-warning-chip">
+                            <i class="fa fa-hourglass-half" role="img" title="Awaiting verification"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Awaiting verification</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.verification"/>
+                            <div class="o_cp_tile_sub">target 3 days</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100">
+                        <div class="o_cp_tile_icon is-good">
+                            <i class="fa fa-check-circle" role="img" title="Reunified or in follow-up"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Reunified / follow-up</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.reunified"/>
+                            <div class="o_cp_tile_sub">
+                                of <t t-esc="tiles.managed_total"/> managed cases
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openPartner">
+                        <div class="o_cp_tile_icon is-neutral">
+                            <i class="fa fa-handshake-o" role="img" title="Partner children"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Partner children</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.partner_total"/>
+                            <div class="o_cp_tile_sub">
+                                <t t-esc="tiles.partner_active"/> active ·
+                                <t t-esc="tiles.partner_critical"/> critical/high
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title">
+                            <i class="fa fa-sitemap"/>Care pipeline — managed track
+                        </div>
+                        <t t-foreach="stageBars" t-as="row" t-key="row.key">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
                         </t>
                     </div>
                 </div>
-                <!-- recommendations -->
                 <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                        <h5>Recommendations — the verification fork</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title">
+                            <i class="fa fa-code-fork"/>Recommendations — the verification fork
+                        </div>
                         <t t-foreach="recoBars" t-as="row" t-key="row.key">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.label"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar"
-                                         t-attf-style="width: {{row.widthPct}}%; background: {{row.color}}"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                                <t t-set="barStyle" t-value="'background: ' + row.color"/>
+                            </t>
                         </t>
                         <div class="text-muted small mt-2">
                             The same four colours as the pipeline stripe — learn them
@@ -92,49 +120,71 @@
                 </div>
             </div>
 
-            <!-- partner report -->
-            <h4 class="mb-1">Partner children — a report of their own</h4>
-            <div class="text-muted mb-3">
-                In partners' care, not MOWDAFA's — kept clear of the ministry's own caseload.
+            <!-- ═══ PARTNER REPORT — records the ministry only holds ═══ -->
+            <div class="o_cp_section_title mt-2 mb-3">
+                <i class="fa fa-handshake-o"/>Partner children — a report of their own
             </div>
-            <div class="row g-3 mb-3">
+
+            <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100 cursor-pointer"
-                         t-on-click="openPartner">
-                        <div class="text-muted small text-uppercase">Partner children</div>
-                        <div class="o_cp_tile_value" t-esc="tiles.partner_total"/>
-                        <div class="text-muted small">
-                            held for <t t-esc="tiles.agency_count"/> agencies
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openPartner">
+                        <div class="o_cp_tile_icon">
+                            <i class="fa fa-child" role="img" title="Partner children"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Partner children</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.partner_total"/>
+                            <div class="o_cp_tile_sub">
+                                held for <t t-esc="tiles.agency_count"/> agencies
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100">
-                        <div class="text-muted small text-uppercase">Active</div>
-                        <div class="o_cp_tile_value" t-esc="tiles.partner_active"/>
-                        <div class="text-muted small">
-                            <t t-esc="pct(tiles.partner_active, tiles.partner_total)"/> of records
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openPartnerActive">
+                        <div class="o_cp_tile_icon is-good">
+                            <i class="fa fa-check-circle" role="img" title="Active"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Active</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.partner_active"/>
+                            <div class="o_cp_tile_sub">
+                                <t t-esc="pct(tiles.partner_active, tiles.partner_total)"/> of records
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100">
-                        <div class="text-muted small text-uppercase">Closed</div>
-                        <div class="o_cp_tile_value" t-esc="tiles.partner_closed"/>
-                        <div class="text-muted small">reported by partners</div>
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openPartnerClosed">
+                        <div class="o_cp_tile_icon is-neutral">
+                            <i class="fa fa-archive" role="img" title="Closed"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Closed</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.partner_closed"/>
+                            <div class="o_cp_tile_sub">reported by partners</div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="o_cp_tile border rounded p-3 h-100">
-                        <div class="text-muted small text-uppercase">Critical risk</div>
-                        <div class="o_cp_tile_value text-danger" t-esc="tiles.partner_critical"/>
-                        <div class="text-muted small">flagged on intake</div>
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openPartnerCritical">
+                        <div class="o_cp_tile_icon is-critical">
+                            <i class="fa fa-exclamation-triangle" role="img" title="Critical risk"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Critical risk</div>
+                            <div class="o_cp_tile_value text-danger" t-esc="tiles.partner_critical"/>
+                            <div class="o_cp_tile_sub">flagged on intake</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="border rounded p-3 mb-3">
-                <h5>By partner agency — who we're holding records for</h5>
-                <table class="table table-sm mb-0">
+
+            <div class="o_cp_card p-3 mb-3">
+                <div class="o_cp_card_title">
+                    <i class="fa fa-handshake-o"/>By partner agency — who we're holding records for
+                </div>
+                <table class="table table-sm mb-0 align-middle">
                     <thead>
                         <tr>
                             <th>Agency</th>
@@ -142,102 +192,106 @@
                             <th class="text-end">Active</th>
                             <th class="text-end">Closed</th>
                             <th class="text-end">Critical / High</th>
-                            <th class="text-end">Share</th>
+                            <th style="width: 22%;">Share</th>
                         </tr>
                     </thead>
                     <tbody>
                         <t t-foreach="agencyRows" t-as="row" t-key="row.name">
                             <tr>
-                                <td t-esc="row.name"/>
-                                <td class="text-end fw-bold" t-esc="row.children"/>
+                                <td class="fw-bold" t-esc="row.name"/>
+                                <td class="text-end" t-esc="row.children"/>
                                 <td class="text-end" t-esc="row.active"/>
                                 <td class="text-end" t-esc="row.closed"/>
                                 <td class="text-end" t-esc="row.critical"/>
-                                <td class="text-end" t-esc="row.sharePct"/>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="o_cp_bar_track">
+                                            <div class="o_cp_bar"
+                                                 t-attf-style="width: {{row.barPct}}%"/>
+                                        </div>
+                                        <span class="o_cp_bar_value" t-esc="row.sharePct"/>
+                                    </div>
+                                </td>
                             </tr>
                         </t>
+                        <tr t-if="agencyRows.length" class="o_cp_total">
+                            <td>Total</td>
+                            <td class="text-end" t-esc="agencyTotals.children"/>
+                            <td class="text-end" t-esc="agencyTotals.active"/>
+                            <td class="text-end" t-esc="agencyTotals.closed"/>
+                            <td class="text-end" t-esc="agencyTotals.critical"/>
+                            <td>100%</td>
+                        </tr>
                         <tr t-if="!agencyRows.length">
                             <td colspan="6" class="text-muted">No partner records yet.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                        <h5>By region</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-map-marker"/>By region</div>
                         <t t-foreach="regionBars" t-as="row" t-key="row_index">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.name"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
                         </t>
-                        <div t-if="!regionBars.length" class="text-muted">—</div>
+                        <div t-if="!regionBars.length" class="text-muted small">—</div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="border rounded p-3 h-100">
-                        <h5>By protection concern</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-shield"/>By protection concern</div>
                         <t t-foreach="concernBars" t-as="row" t-key="row_index">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.name"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
                         </t>
-                        <div t-if="!concernBars.length" class="text-muted">—</div>
+                        <div t-if="!concernBars.length" class="text-muted small">—</div>
                     </div>
                 </div>
             </div>
-            <div class="row g-3 mb-4">
+
+            <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <div class="border rounded p-3 h-100">
-                        <h5>By sex</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-venus-mars"/>By sex</div>
                         <t t-foreach="sexBars" t-as="row" t-key="row_index">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.name"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
                         </t>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="border rounded p-3 h-100">
-                        <h5>By age band</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-bar-chart"/>By age band</div>
                         <t t-foreach="ageBars" t-as="row" t-key="row_index">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.name"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
                         </t>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="border rounded p-3 h-100">
-                        <h5>By status &amp; risk</h5>
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-heartbeat"/>By status &amp; risk</div>
                         <t t-foreach="statusBars" t-as="row" t-key="row_index">
-                            <div class="d-flex align-items-center mb-1">
-                                <div class="o_cp_bar_label text-truncate" t-esc="row.name"/>
-                                <div class="flex-grow-1 mx-2 o_cp_bar_track">
-                                    <div class="o_cp_bar" t-attf-style="width: {{row.widthPct}}%"/>
-                                </div>
-                                <div class="fw-bold" t-esc="row.count"/>
-                            </div>
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="statusTone(row.name)"/>
+                                <t t-set="icon" t-value="statusIcon(row.name)"/>
+                            </t>
                         </t>
                     </div>
                 </div>
             </div>
+
         </t>
     </div>
 </t>

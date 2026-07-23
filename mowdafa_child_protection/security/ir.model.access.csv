@@ -10,3 +10,10 @@ access_cp_mentoring_user,cp.mentoring.user,model_cp_mentoring,base.group_user,1,
 access_cp_psychosocial_user,cp.psychosocial.user,model_cp_psychosocial,base.group_user,1,1,1,0
 access_cp_reunification_user,cp.reunification.user,model_cp_reunification,base.group_user,1,1,1,0
 access_cp_followup_user,cp.followup.user,model_cp_followup,base.group_user,1,1,1,1
+access_cp_partner_agency_user,cp.partner.agency.user,model_cp_partner_agency,base.group_user,1,1,1,0
+access_cp_partner_agency_manager,cp.partner.agency.manager,model_cp_partner_agency,base.group_system,1,1,1,1
+access_cp_partner_record_user,cp.partner.record.user,model_cp_partner_record,base.group_user,1,1,1,0
+access_cp_partner_record_manager,cp.partner.record.manager,model_cp_partner_record,base.group_system,1,1,1,1
+access_cp_partner_followup_user,cp.partner.followup.user,model_cp_partner_followup,base.group_user,1,1,1,1
+access_cp_basic_need_user,cp.basic.need.user,model_cp_basic_need,base.group_user,1,0,0,0
+access_cp_basic_need_manager,cp.basic.need.manager,model_cp_basic_need,base.group_system,1,1,1,1

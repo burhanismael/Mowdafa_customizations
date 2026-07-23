@@ -4,18 +4,19 @@ import { useService } from "@web/core/utils/hooks";
 import { Component, useState, onWillStart } from "@odoo/owl";
 
 /**
- * Child Protection dashboard.
+ * Child Protection dashboard — one screen, two halves.
  *
- * One RPC (cp.case.get_dashboard_data). Two halves, matching the two
- * tracks: the managed caseload (stages, recommendations) and the
- * partner report (by agency, region, concern, sex) — kept apart so
- * "cases we handle" never blurs into "records we hold".
+ * One RPC (cp.case.get_dashboard_data) returns both: the managed
+ * caseload (cp.case: stages, recommendations) and the partner report
+ * (cp.partner.record: by agency, region, concern, sex, age, status).
+ * They share a screen but never a number — "cases we handle" and
+ * "records we hold" stay clearly apart.
  */
 const RECO_COLORS = {
-    reunification: "#1E7A44",
-    reunification_support: "#2E75B6",
-    alt_care: "#8C560D",
-    tracing: "#C0392B",
+    reunification: "#0ca30c",
+    reunification_support: "#2a78d6",
+    alt_care: "#eda100",
+    tracing: "#d03b3b",
 };
 
 export class CpDashboard extends Component {
@@ -38,7 +39,11 @@ export class CpDashboard extends Component {
     }
 
     recoColor(key) {
-        return RECO_COLORS[key] || "#5B3A78";
+        return RECO_COLORS[key] || "#4a3aa7";
+    }
+
+    pct(value, total) {
+        return total ? ((value / total) * 100).toFixed(0) + "%" : "0%";
     }
 
     _bars(rows) {
@@ -49,6 +54,7 @@ export class CpDashboard extends Component {
         }));
     }
 
+    // ── managed track ────────────────────────────────────────────────
     get stageBars() {
         return this._bars(this.state.data.stages);
     }
@@ -60,21 +66,13 @@ export class CpDashboard extends Component {
         }));
     }
 
+    // ── partner report ───────────────────────────────────────────────
     get regionBars() {
         return this._bars(this.state.data.partner_regions);
     }
 
     get concernBars() {
         return this._bars(this.state.data.partner_concerns);
-    }
-
-    get agencyRows() {
-        const rows = this.state.data.partner_agencies;
-        const total = rows.reduce((s, r) => s + r.children, 0) || 1;
-        return rows.map((r) => ({
-            ...r,
-            sharePct: ((r.children / total) * 100).toFixed(0) + "%",
-        }));
     }
 
     get sexBars() {
@@ -89,27 +87,78 @@ export class CpDashboard extends Component {
         return this._bars(this.state.data.partner_status);
     }
 
-    pct(value, total) {
-        return total ? ((value / total) * 100).toFixed(0) + "%" : "0%";
+    get agencyRows() {
+        const rows = this.state.data.partner_agencies;
+        const total = rows.reduce((s, r) => s + r.children, 0) || 1;
+        return rows.map((r) => ({
+            ...r,
+            sharePct: ((r.children / total) * 100).toFixed(0) + "%",
+            barPct: ((r.children / total) * 100).toFixed(1),
+        }));
     }
 
-    openCases(domain, title) {
+    get agencyTotals() {
+        const rows = this.state.data.partner_agencies;
+        return {
+            children: rows.reduce((s, r) => s + r.children, 0),
+            active: rows.reduce((s, r) => s + r.active, 0),
+            closed: rows.reduce((s, r) => s + r.closed, 0),
+            critical: rows.reduce((s, r) => s + r.critical, 0),
+        };
+    }
+
+    // status colour never travels alone — it always ships with an icon
+    statusTone(name) {
+        return {
+            "Active": "is-good",
+            "Pending": "is-warning",
+            "Closed": "is-neutral",
+            "Critical/High": "is-critical",
+        }[name] || "";
+    }
+
+    statusIcon(name) {
+        return {
+            "Active": "fa-check-circle",
+            "Pending": "fa-clock-o",
+            "Closed": "fa-archive",
+            "Critical/High": "fa-exclamation-triangle",
+        }[name] || "fa-circle";
+    }
+
+    // ── drill-through ────────────────────────────────────────────────
+    openCases(resModel, domain, title) {
         this.action.doAction({
             type: "ir.actions.act_window",
             name: title,
-            res_model: "cp.case",
+            res_model: resModel,
             views: [[false, "list"], [false, "form"]],
-            domain,
+            domain: domain || [],
             target: "current",
         });
     }
 
     openManaged() {
-        this.openCases([["record_type", "=", "managed"]], "Cases");
+        this.openCases("cp.case", [], "Cases");
     }
 
     openPartner() {
-        this.openCases([["record_type", "=", "partner"]], "Partner Children");
+        this.openCases("cp.partner.record", [], "Partner Children");
+    }
+
+    openPartnerActive() {
+        this.openCases("cp.partner.record",
+            [["case_status", "in", ["open", "active"]]], "Active");
+    }
+
+    openPartnerClosed() {
+        this.openCases("cp.partner.record",
+            [["case_status", "=", "closed"]], "Closed");
+    }
+
+    openPartnerCritical() {
+        this.openCases("cp.partner.record",
+            [["risk_level", "in", ["critical", "high"]]], "Critical Risk");
     }
 }
 
