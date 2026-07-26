@@ -16,8 +16,8 @@ MONTH_SO = ['Janaayo', 'Febraayo', 'Maarso', 'Abriil', 'Maajo', 'Juun',
 
 # Card colours for the district breakdown, cycled per region. Taken from
 # the 2022 report, which uses a different header colour per region card.
-CARD_COLOURS = ['#C0392B', '#34495E', '#1F3A5F', '#B03A5B',
-                '#1E7A44', '#8C560D', '#5B3A78', '#0E4B47', '#7C878D']
+CARD_COLOURS = ['#F2382F', '#E9508E', '#8A4C20', '#19A8D8',
+                '#CCB821', '#BF6687', '#7F9C68', '#6A4C93', '#7C878D']
 
 # Perpetrator statuses that count as "La Qabtay" (apprehended). Anything
 # past arrest still means the man was caught, so the tile does not shrink

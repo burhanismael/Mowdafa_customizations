@@ -192,14 +192,15 @@
         <field name="name">gbv.case.kanban</field>
         <field name="model">gbv.case</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="service_stage" quick_create="false">
+            <kanban default_group_by="service_stage" quick_create="false"
+                    class="o_kanban_small_column">
                 <field name="name"/>
                 <field name="case_status"/>
                 <field name="risk_level_id"/>
                 <field name="justice_stage"/>
                 <templates>
                     <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click p-2">
+                        <div class="oe_kanban_global_click p-2 pb-1">
                             <div>
                                 <strong class="font-monospace text-primary">
                                     <field name="name"/>

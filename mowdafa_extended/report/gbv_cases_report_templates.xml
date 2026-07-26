@@ -5,55 +5,46 @@
   <t t-call="web.html_container">
     <style type="text/css">
       .mw { font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
-            color: #1B2227; font-size: 9.5px; line-height: 1.45; }
+            color: #0B0F14; font-size: 9.5px; line-height: 1.28; }
       .mw h1, .mw h2, .mw h3, .mw h4 { margin: 0; font-weight: normal; }
       .mw table { border-collapse: collapse; width: 100%; }
-      .mw .mast { width: 100%; margin-bottom: 10px; }
-      .mw .mast td { vertical-align: middle; padding: 0; }
-      .mw .mast .logo { width: 78px; }
-      .mw .mast .logo img { width: 72px; height: auto; }
-      .mw .ministry { font-size: 16px; font-weight: bold; color: #1F4E79;
-                      line-height: 1.25; }
-      .mw .ministry-en { font-size: 9px; font-weight: bold; color: #1F4E79; }
-      .mw .rule { border: 0; border-top: 2px solid #1F4E79; margin: 8px 0 12px; }
-      .mw .conf { text-align: center; font-size: 11px; font-weight: bold;
-                  letter-spacing: 1.2px; color: #C0392B; margin-bottom: 4px; }
-      .mw .title { text-align: center; font-size: 22px; font-weight: bold;
-                   letter-spacing: 0.6px; color: #1B2227; line-height: 1.2; }
+      .mw .conf { text-align: center; font-size: 12px; font-weight: bold;
+                  letter-spacing: 0.5px; color: #0051A8; margin: 4px 0 5px; }
+      .mw .title { text-align: center; font-size: 27px; font-weight: bold;
+                   letter-spacing: 0; color: #0B0F14; line-height: 0.92;
+                   max-width: 560px; margin: 0 auto; text-transform: uppercase; }
       .mw .subtitle { text-align: center; font-size: 9px; color: #6B7478;
-                      margin: 5px 0 14px; }
-      .mw .sect { font-size: 11px; font-weight: bold; color: #1F4E79;
-                  border-bottom: 1.5px solid #1F4E79; padding-bottom: 3px;
-                  margin: 16px 0 8px; text-transform: uppercase;
-                  letter-spacing: 0.4px; }
+                      margin: 7px 0 12px; }
+      .mw .sect { font-size: 13px; font-weight: bold; color: #0B0F14;
+                  text-align: center; padding-bottom: 4px; margin: 16px 0 9px;
+                  letter-spacing: 0.3px; }
 
-      /* ---- matrix ---- */
-      .mw .grid th, .mw .grid td { border: 0.8px solid #34495E; padding: 3px 2px;
-                                   text-align: center; }
-      .mw .grid thead th { background: #1F4E79; color: #FFFFFF; font-size: 8.5px;
-                           letter-spacing: 0.3px; }
+      /* ---- matrix (white header, pink WADARTA column) ---- */
+      .mw .grid th, .mw .grid td { border: 0.9px solid #4F5962; padding: 2px 2px;
+                                   text-align: center; font-weight: bold; }
+      .mw .grid thead th { background: #FFFFFF; color: #0B0F14; font-size: 7.7px;
+                           font-weight: bold; letter-spacing: 0.2px; }
       .mw .grid thead th .yr { display: block; font-size: 6.5px; font-weight: normal;
-                               opacity: 0.8; }
-      .mw .grid td.no { width: 22px; font-weight: bold; }
-      .mw .grid td.reg { text-align: left; padding-left: 6px; font-weight: bold;
-                         width: 78px; }
-      .mw .grid td.zero { color: #B9C0C4; }
-      .mw .grid td.tot { background: #EDF2F6; font-weight: bold; }
-      .mw .grid td.missing { text-align: center; color: #8A9298; font-style: italic;
-                             font-size: 8px; }
-      .mw .grid tr.totrow td { background: #1F4E79; color: #FFFFFF; font-weight: bold; }
+                               color: #6B7478; }
+      .mw .grid td.no { width: 22px; text-align: left; padding-left: 5px; }
+      .mw .grid td.reg { text-align: left; padding-left: 6px; width: 82px; }
+      .mw .grid td.zero { color: #0B0F14; }
+      .mw .grid td.tot, .mw .grid th.tot { background: #F7D9D9; font-weight: bold; }
+      .mw .grid td.missing { text-align: center; color: #4A4A4A; font-size: 8.5px; }
+      .mw .grid tr.totrow td { background: #F7D9D9; color: #0B0F14; font-weight: bold; }
 
       /* ---- district cards ---- */
       .mw .cards { width: 100%; }
-      .mw .cards td { width: 33.33%; vertical-align: top; padding: 0 5px 10px 0; }
-      .mw .card { border: 0.8px solid #C9D1D6; }
+      .mw .cards td { width: 33.33%; vertical-align: top; padding: 0 11px 14px 0; }
+      .mw .card { border: 1px solid #2C3338; background: #FFFFFF; }
       .mw .card .hd { color: #FFFFFF; font-weight: bold; font-size: 9px;
-                      padding: 3px 6px; }
+                      padding: 5px 7px; }
       .mw .card table { width: 100%; }
-      .mw .card td { padding: 2px 5px; border-top: 0.6px solid #E4E9EC; width: auto; }
-      .mw .card td.s { width: 22px; color: #8A9298; font-size: 8px; }
+      .mw .card td { padding: 2px 5px; border-top: 0.8px solid #515B63; width: auto;
+                     font-weight: bold; font-size: 8.5px; }
+      .mw .card td.s { width: 24px; color: #44515A; font-size: 7.5px; }
       .mw .card td.v { width: 26px; text-align: center; font-weight: bold; }
-      .mw .card tr.tt td { background: #F1F4F6; font-weight: bold; }
+      .mw .card tr.tt td { font-weight: bold; }
 
       /* ---- bars ---- */
       .mw .bars td { padding: 2px 0; border: 0; }
@@ -75,35 +66,23 @@
       .mw .tile .n { font-size: 21px; font-weight: bold; color: #1B2227;
                      line-height: 1.15; }
       .mw .tile .u { font-size: 7px; color: #8A9298; }
-      .mw .tile.a { background: #FBEBEB; border-color: #E9C4C4; }
-      .mw .tile.b { background: #EDF2F6; border-color: #C7D6E2; }
+      .mw .tile.a { background: #FBEBEE; border-color: #E9C4CF; }
+      .mw .tile.b { background: #F4ECEF; border-color: #DBC7CF; }
 
       .mw .legend { font-size: 8px; }
       .mw .swatch { display: inline-block; width: 8px; height: 8px;
                     margin-right: 4px; }
       .mw .note { font-size: 7.5px; color: #8A9298; font-style: italic;
                   margin-top: 5px; }
-      .mw .pagefoot { border-top: 1.5px solid #1F4E79; margin-top: 14px; padding-top: 6px;
-                  text-align: center; font-size: 7.5px; color: #6B7478; }
+      .mw .pagefoot { border-top: 1.5px solid #16305C; margin-top: 14px; padding-top: 7px;
+                  text-align: center; font-size: 6.6px; color: #6B7478; }
       .mw .brk { page-break-before: always; }
     </style>
 
     <t t-foreach="blocks" t-as="block">
+     <t t-call="web.external_layout">
       <div class="page mw">
 
-        <!-- ============ masthead ============ -->
-        <table class="mast">
-          <tr>
-            <td class="logo">
-              <img t-if="company.logo" t-att-src="image_data_uri(company.logo)"/>
-            </td>
-            <td>
-              <div class="ministry">Wasaaradda Horumarinta Haweenka<br/>iyo Arrimaha Qoyska Puntland</div>
-              <div class="ministry-en">Ministry of Women Development and Family Affairs in Puntland</div>
-            </td>
-          </tr>
-        </table>
-        <hr class="rule"/>
         <div class="conf">XOG QARSOODI AH  (CONFIDENTIAL)</div>
         <h1 class="title"><t t-esc="block['title']"/></h1>
         <div class="subtitle"><t t-esc="block['subtitle']"/></div>
@@ -120,7 +99,7 @@
                   <span class="yr" t-if="column['sub']">'<t t-esc="column['sub']"/></span>
                 </th>
               </t>
-              <th style="width:46px">WADARTA</th>
+              <th class="tot" style="width:46px">WADARTA</th>
             </tr>
           </thead>
           <tbody>
@@ -173,9 +152,9 @@
                           </tr>
                         </t>
                         <tr class="tt">
-                          <td class="s"></td>
-                          <td>Wadarta Guud:</td>
-                          <td class="v"><t t-esc="card['total']"/></td>
+                          <td class="s" t-attf-style="background:#{card['colour']};color:#FFFFFF"></td>
+                          <td t-attf-style="background:#{card['colour']};color:#FFFFFF">Wadarta Guud:</td>
+                          <td class="v" t-attf-style="background:#{card['colour']};color:#FFFFFF"><t t-esc="card['total']"/></td>
                         </tr>
                       </table>
                     </div>
@@ -185,11 +164,6 @@
             </t>
           </table>
         </t>
-
-        <div class="pagefoot">
-          Waaxda Ka Hortagga Tacaddiyada ee Wasaaradda Horumarinta Haweenka iyo Arrimaha Qoyska Puntland.
-          &#9993; gbv.department@mowdafa.pl.so
-        </div>
 
         <!-- ============ page 2 ============ -->
         <div class="brk"></div>
@@ -409,13 +383,10 @@
               </td>
             </tr>
           </table>
-          <div class="pagefoot">
-            Waaxda Ka Hortagga Tacaddiyada ee Wasaaradda Horumarinta Haweenka iyo Arrimaha Qoyska Puntland.
-            &#9993; gbv.department@mowdafa.pl.so
-          </div>
         </t>
 
       </div>
+     </t>
     </t>
   </t>
 </template>

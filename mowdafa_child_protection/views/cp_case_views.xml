@@ -281,7 +281,7 @@
 
     <!-- Menus -->
     <menuitem id="menu_cp_root" name="Child Protection" sequence="61"
-              web_icon="mowdafa_extended,static/description/icon.png"/>
+              web_icon="mowdafa_child_protection,static/src/icon.png"/>
     <menuitem id="menu_cp_dashboard" name="Dashboard"
               parent="menu_cp_root" action="action_cp_dashboard" sequence="1"/>
     <menuitem id="menu_cp_case_managed" name="Cases"

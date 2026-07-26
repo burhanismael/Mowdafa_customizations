@@ -152,7 +152,7 @@
 
     <!-- Menu -->
     <menuitem id="menu_survivor_case_root" name="GBV" sequence="60"
-              web_icon="mowdafa_extended,static/description/icon.png"/>
+              web_icon="mowdafa_extended,static/icon.png"/>
 <!-- Consent Form menu removed: consents are created from the case
      (Create Consent button) and reached via the case smart buttons. -->
 </odoo>
