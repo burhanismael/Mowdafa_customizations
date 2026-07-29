@@ -54,6 +54,7 @@
                 <div class="o_gbv_tiles">
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('All Cases')">
+                        <div class="o_gbv_tile_icon "><i class="fa fa-folder-open" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.total)"/>
                         <div class="o_gbv_tile_label">Wadarta Kiisaska
@@ -62,6 +63,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Open Cases', [['case_status', '=', 'open']])">
+                        <div class="o_gbv_tile_icon is-open"><i class="fa fa-folder-open-o" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.open)"/>
                         <div class="o_gbv_tile_label">Kiisas Furan
@@ -71,6 +73,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Closed Cases', [['case_status', '=', 'closed']])">
+                        <div class="o_gbv_tile_icon is-closed"><i class="fa fa-check-circle" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.closed)"/>
                         <div class="o_gbv_tile_label">La Xidhay
@@ -80,6 +83,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Cases In Court', [['case_status', '=', 'court']])">
+                        <div class="o_gbv_tile_icon is-court"><i class="fa fa-gavel" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.court)"/>
                         <div class="o_gbv_tile_label">Maxkamad
@@ -89,6 +93,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Female Survivors', [['sex', '=', 'female']])">
+                        <div class="o_gbv_tile_icon is-female"><i class="fa fa-venus" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.female)"/>
                         <div class="o_gbv_tile_label">Dumar
@@ -98,6 +103,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Male Survivors', [['sex', '=', 'male']])">
+                        <div class="o_gbv_tile_icon is-male"><i class="fa fa-mars" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.male)"/>
                         <div class="o_gbv_tile_label">Rag
@@ -107,6 +113,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Children (0-17)', [['is_child', '=', true]])">
+                        <div class="o_gbv_tile_icon is-child"><i class="fa fa-child" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.children)"/>
                         <div class="o_gbv_tile_label">Caruur 0–17
@@ -116,6 +123,7 @@
                     </div>
                     <div class="o_gbv_tile o_gbv_clickable"
                          t-on-click="() => this.openCases('Convictions', [['justice_stage', '=', 'convicted']])">
+                        <div class="o_gbv_tile_icon is-conv"><i class="fa fa-balance-scale" role="img"/></div>
                         <div class="o_gbv_tile_value"
                              t-esc="fmt(totals.convicted)"/>
                         <div class="o_gbv_tile_label">La Xukumay

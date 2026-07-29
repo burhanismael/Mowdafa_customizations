@@ -7,6 +7,8 @@ access_cp_registration_user,cp.registration.user,model_cp_registration,base.grou
 access_cp_verification_user,cp.verification.user,model_cp_verification,base.group_user,1,1,1,0
 access_cp_daily_record_user,cp.daily.record.user,model_cp_daily_record,base.group_user,1,1,1,1
 access_cp_mentoring_user,cp.mentoring.user,model_cp_mentoring,base.group_user,1,1,1,1
+access_cp_mentoring_line_user,cp.mentoring.line.user,model_cp_mentoring_line,base.group_user,1,1,1,1
+access_cp_mentoring_motivation_user,cp.mentoring.motivation.user,model_cp_mentoring_motivation,base.group_user,1,1,1,1
 access_cp_psychosocial_user,cp.psychosocial.user,model_cp_psychosocial,base.group_user,1,1,1,0
 access_cp_reunification_user,cp.reunification.user,model_cp_reunification,base.group_user,1,1,1,0
 access_cp_followup_user,cp.followup.user,model_cp_followup,base.group_user,1,1,1,1
@@ -17,3 +19,7 @@ access_cp_partner_record_manager,cp.partner.record.manager,model_cp_partner_reco
 access_cp_partner_followup_user,cp.partner.followup.user,model_cp_partner_followup,base.group_user,1,1,1,1
 access_cp_basic_need_user,cp.basic.need.user,model_cp_basic_need,base.group_user,1,0,0,0
 access_cp_basic_need_manager,cp.basic.need.manager,model_cp_basic_need,base.group_system,1,1,1,1
+access_cp_event_type_user,cp.event.type.user,model_cp_event_type,base.group_user,1,0,0,0
+access_cp_event_type_manager,cp.event.type.manager,model_cp_event_type,base.group_system,1,1,1,1
+access_cp_performance_rating_user,cp.performance.rating.user,model_cp_performance_rating,base.group_user,1,0,0,0
+access_cp_performance_rating_manager,cp.performance.rating.manager,model_cp_performance_rating,base.group_system,1,1,1,1

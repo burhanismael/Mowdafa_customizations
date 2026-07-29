@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class SurvivorMaster(models.Model):
@@ -15,6 +16,31 @@ class SurvivorMaster(models.Model):
         required=True,
         tracking=True,
     )
+    photo = fields.Binary(string='Photo', attachment=True)
+
+    @api.constrains('survivor_name', 'mother_first_name', 'birth_date')
+    def _check_unique_survivor(self):
+        """A survivor is identified by name + mother's first name + birth
+        date. The same three together means it's the same person already
+        on file."""
+        for record in self:
+            if not (record.survivor_name and record.mother_first_name
+                    and record.birth_date):
+                continue
+            duplicate = self.search([
+                ('id', '!=', record.id),
+                ('survivor_name', '=ilike', record.survivor_name.strip()),
+                ('mother_first_name', '=ilike',
+                 record.mother_first_name.strip()),
+                ('birth_date', '=', record.birth_date),
+            ], limit=1)
+            if duplicate:
+                raise ValidationError(_(
+                    'A survivor with the same Name, Mother\'s First Name '
+                    'and Birth Date already exists (%s). This looks like '
+                    'the same person — open that record instead of '
+                    'creating a duplicate.', duplicate.generated_code
+                    or duplicate.survivor_name))
     mother_first_name = fields.Char(
         string="Mother's First Name",
         required=True,

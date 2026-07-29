@@ -32,6 +32,7 @@ dashboard. The nine managed-track satellite forms follow.
     'assets': {
         'web.assets_backend': [
             'mowdafa_child_protection/static/src/cp_dashboard/**/*',
+            'mowdafa_child_protection/static/src/cp_forms.css',
         ],
     },
     'installable': True,

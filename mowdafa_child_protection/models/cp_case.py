@@ -47,6 +47,10 @@ class CpCase(models.Model):
 
     name = fields.Char(
         string='Case Reference', readonly=True, copy=False, default='New')
+    case_type = fields.Selection([
+        ('street', 'Street Children Cases'),
+        ('caafag', 'CAAFAG'),
+    ], string='Case Type', tracking=True)
 
     # ── reporting spine (shared with cp.partner.record) ──────────────────
     child_name = fields.Char(string='Full Name', tracking=True)
@@ -122,6 +126,10 @@ class CpCase(models.Model):
         'cp.verification', 'case_id', string='Verifications')
     psychosocial_ids = fields.One2many(
         'cp.psychosocial', 'case_id', string='Psychosocial Sessions')
+    daily_record_ids = fields.One2many(
+        'cp.daily.record', 'case_id', string='Performance Records')
+    mentoring_ids = fields.One2many(
+        'cp.mentoring', 'case_id', string='Mentoring Reports')
     reunification_ids = fields.One2many(
         'cp.reunification', 'case_id', string='Reunifications')
     cp_followup_ids = fields.One2many(
@@ -194,6 +202,8 @@ class CpCase(models.Model):
     verification_count = fields.Integer(compute='_compute_form_counts')
     placement_count = fields.Integer(compute='_compute_form_counts')
     psychosocial_count = fields.Integer(compute='_compute_form_counts')
+    daily_record_count = fields.Integer(compute='_compute_form_counts')
+    mentoring_count = fields.Integer(compute='_compute_form_counts')
     reunification_count = fields.Integer(compute='_compute_form_counts')
     followup_visit_count = fields.Integer(compute='_compute_form_counts')
     adult_verified = fields.Boolean(compute='_compute_form_counts')
@@ -201,7 +211,8 @@ class CpCase(models.Model):
 
     @api.depends('handover_ids', 'registration_ids', 'verification_ids',
                  'placement_ids', 'psychosocial_ids', 'reunification_ids',
-                 'cp_followup_ids', 'verification_ids.kind')
+                 'cp_followup_ids', 'verification_ids.kind',
+                 'daily_record_ids', 'mentoring_ids')
     def _compute_form_counts(self):
         for case in self:
             case.handover_count = len(case.handover_ids)
@@ -209,6 +220,8 @@ class CpCase(models.Model):
             case.verification_count = len(case.verification_ids)
             case.placement_count = len(case.placement_ids)
             case.psychosocial_count = len(case.psychosocial_ids)
+            case.daily_record_count = len(case.daily_record_ids)
+            case.mentoring_count = len(case.mentoring_ids)
             case.reunification_count = len(case.reunification_ids)
             case.followup_visit_count = len(case.cp_followup_ids)
             kinds = case.verification_ids.mapped('kind')
@@ -244,6 +257,24 @@ class CpCase(models.Model):
         return self._open_cp_form(
             'cp.verification', _('Child Verification'),
             {'default_kind': 'child'})
+
+    def action_create_psychosocial(self):
+        return self._open_cp_form('cp.psychosocial', _('Psychosocial Support'))
+
+    def action_create_daily_record(self):
+        return self._open_cp_form(
+            'cp.daily.record', _('Performance and Progress Record'))
+
+    def action_view_daily_records(self):
+        return self._view_cp_records(
+            'cp.daily.record', _('Performance Records'), self.daily_record_ids)
+
+    def action_create_mentoring(self):
+        return self._open_cp_form('cp.mentoring', _('Mentoring Activity Report'))
+
+    def action_view_mentoring(self):
+        return self._view_cp_records(
+            'cp.mentoring', _('Mentoring Reports'), self.mentoring_ids)
 
     def action_create_reunification(self):
         return self._open_cp_form('cp.reunification', _('Reunification'))
@@ -369,9 +400,12 @@ class CpCase(models.Model):
 
     # ── dashboard — one RPC, two source tables (managed / partner) ──────
     @api.model
-    def get_dashboard_data(self):
+    def get_dashboard_data(self, case_type=None):
         Case = self
         Partner = self.env['cp.partner.record']
+
+        # managed cases can be filtered to a single case type
+        case_domain = [('case_type', '=', case_type)] if case_type else []
 
         def count_by(model, field, domain):
             result = {}
@@ -380,9 +414,9 @@ class CpCase(models.Model):
                 result[key] = count
             return result
 
-        stage_counts = count_by(Case, 'stage', [])
-        reco_counts = count_by(Case, 'recommendation', [])
-        placement = count_by(Case, 'placement_type', [])
+        stage_counts = count_by(Case, 'stage', case_domain)
+        reco_counts = count_by(Case, 'recommendation', case_domain)
+        placement = count_by(Case, 'placement_type', case_domain)
 
         partner_total = Partner.search_count([])
         partner_active = Partner.search_count(
@@ -400,7 +434,7 @@ class CpCase(models.Model):
             'verification': stage_counts.get('verification', 0),
             'reunified': (stage_counts.get('reunification', 0)
                           + stage_counts.get('followup', 0)),
-            'managed_total': Case.search_count([]),
+            'managed_total': Case.search_count(case_domain),
             'partner_total': partner_total,
             'partner_active': partner_active,
             'partner_closed': partner_closed,
@@ -476,6 +510,7 @@ class CpCase(models.Model):
         ]
 
         return {
+            'case_type': case_type,
             'tiles': tiles,
             'stages': stages,
             'recommendations': recommendations,

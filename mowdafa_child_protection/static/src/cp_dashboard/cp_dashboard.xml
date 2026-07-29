@@ -26,6 +26,17 @@
             <div class="text-center p-5"><i class="fa fa-spinner fa-spin fa-2x"/></div>
         </t>
         <t t-else="">
+            <!-- header: title left · case-type filter right -->
+            <div class="o_cp_toolbar d-flex align-items-center justify-content-between flex-wrap mb-3">
+                <h4 class="o_cp_toolbar_title m-0">Child Protection Overview</h4>
+                <select class="o_cp_filter form-select form-select-sm"
+                        t-on-change="(ev) => this.setCaseType(ev.target.value || null)">
+                    <option value="" t-att-selected="!state.caseType">All Cases</option>
+                    <option value="street" t-att-selected="state.caseType === 'street'">Street Children Cases</option>
+                    <option value="caafag" t-att-selected="state.caseType === 'caafag'">CAAFAG</option>
+                </select>
+            </div>
+
             <!-- ═══ MANAGED TRACK — the ministry's own caseload ═══ -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-md-3">

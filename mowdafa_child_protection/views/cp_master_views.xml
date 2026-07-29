@@ -111,11 +111,98 @@
         <field name="name">Other</field><field name="sequence">70</field>
     </record>
 
+    <!-- Event types (Number of Events Participated) -->
+    <record id="view_cp_event_type_tree" model="ir.ui.view">
+        <field name="name">cp.event.type.tree</field>
+        <field name="model">cp.event.type</field>
+        <field name="arch" type="xml">
+            <tree string="Event Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_event_type" model="ir.actions.act_window">
+        <field name="name">Event Types</field>
+        <field name="res_model">cp.event.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="event_sports" model="cp.event.type">
+        <field name="name">Sports</field><field name="sequence">10</field>
+    </record>
+    <record id="event_trip" model="cp.event.type">
+        <field name="name">Trip or tourism</field><field name="sequence">20</field>
+    </record>
+    <record id="event_comp_learning" model="cp.event.type">
+        <field name="name">Competitive learning session</field><field name="sequence">30</field>
+    </record>
+    <record id="event_competitions" model="cp.event.type">
+        <field name="name">Competitions</field><field name="sequence">40</field>
+    </record>
+    <record id="event_lsbe" model="cp.event.type">
+        <field name="name">LSBE Sessions</field><field name="sequence">50</field>
+    </record>
+    <record id="event_study_circles" model="cp.event.type">
+        <field name="name">Study circles sessions</field><field name="sequence">60</field>
+    </record>
+    <record id="event_mentorship" model="cp.event.type">
+        <field name="name">Mentorship Club</field><field name="sequence">70</field>
+    </record>
+    <record id="event_nfe" model="cp.event.type">
+        <field name="name">NFE Sessions</field><field name="sequence">80</field>
+    </record>
+    <record id="event_skill" model="cp.event.type">
+        <field name="name">Skill Training</field><field name="sequence">90</field>
+    </record>
+
+    <record id="view_cp_performance_rating_tree" model="ir.ui.view">
+        <field name="name">cp.performance.rating.tree</field>
+        <field name="model">cp.performance.rating</field>
+        <field name="arch" type="xml">
+            <tree string="Performance Ratings" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_performance_rating" model="ir.actions.act_window">
+        <field name="name">Performance Ratings</field>
+        <field name="res_model">cp.performance.rating</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="rating_unsatisfactory" model="cp.performance.rating">
+        <field name="name">Unsatisfactory</field><field name="sequence">10</field>
+    </record>
+    <record id="rating_less_satisfactory" model="cp.performance.rating">
+        <field name="name">Less than Satisfactory</field><field name="sequence">20</field>
+    </record>
+    <record id="rating_fully_satisfactory" model="cp.performance.rating">
+        <field name="name">Fully Satisfactory</field><field name="sequence">30</field>
+    </record>
+    <record id="rating_excellent" model="cp.performance.rating">
+        <field name="name">Excellent</field><field name="sequence">40</field>
+    </record>
+    <record id="rating_outstanding" model="cp.performance.rating">
+        <field name="name">Outstanding</field><field name="sequence">50</field>
+    </record>
+
     <menuitem id="menu_cp_configuration" name="Configuration"
               parent="menu_cp_root" sequence="90"/>
     <menuitem id="menu_cp_partner_agency" name="Partner Agencies"
               parent="menu_cp_configuration" action="action_cp_partner_agency"
               sequence="10"/>
+    <menuitem id="menu_cp_event_type" name="Event Types"
+              parent="menu_cp_configuration" action="action_cp_event_type"
+              sequence="25"/>
+    <menuitem id="menu_cp_performance_rating" name="Performance Ratings"
+              parent="menu_cp_configuration" action="action_cp_performance_rating"
+              sequence="30"/>
     <menuitem id="menu_cp_basic_need" name="Basic Needs"
               parent="menu_cp_configuration" action="action_cp_basic_need"
               sequence="20"/>

@@ -193,7 +193,7 @@
         <field name="model">gbv.case</field>
         <field name="arch" type="xml">
             <kanban default_group_by="service_stage" quick_create="false"
-                    class="o_kanban_small_column">
+                    class="o_kanban_small_column o_gbv_case_compact_kanban">
                 <field name="name"/>
                 <field name="case_status"/>
                 <field name="risk_level_id"/>

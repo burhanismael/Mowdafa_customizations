@@ -10,9 +10,54 @@ $gbv-red: #A81E22;
 $gbv-grey: #A6AEB2;
 $gbv-line: #E4E7E8;
 
+// GBV case pipeline: compact kanban columns, headers, and cards.
+.o_gbv_case_compact_kanban {
+    .o_kanban_group {
+        flex: 0 0 180px !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        padding: 0 5px !important;
+    }
+
+    .o_kanban_header,
+    .o_kanban_header_title {
+        min-height: 30px !important;
+        padding: 3px 0 !important;
+    }
+
+    .o_column_title {
+        font-size: 12px !important;
+        line-height: 17px !important;
+    }
+
+    .o_kanban_record {
+        width: 100% !important;
+        margin: 3px 0 !important;
+        font-size: 11px;
+    }
+
+    .oe_kanban_global_click {
+        padding: 6px 7px 5px !important;
+    }
+
+    .fw-bold {
+        line-height: 15px;
+    }
+
+    .small {
+        font-size: 10px !important;
+        line-height: 14px;
+    }
+
+    .badge {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+}
+
 .o_gbv_dashboard {
-    padding: 16px 20px 40px;
-    background: #F9F9F9;
+    padding: 18px 22px 44px;
+    background: #F1F4F8;
     height: 100%;
     overflow-y: auto;
 
@@ -27,7 +72,8 @@ $gbv-line: #E4E7E8;
         h2 {
             margin: 0;
             font-weight: 700;
-            color: #14191C;
+            color: $gbv-navy;
+            letter-spacing: 0.2px;
         }
         .o_gbv_sub {
             font-size: 11px;
@@ -63,10 +109,36 @@ $gbv-line: #E4E7E8;
         }
     }
     .o_gbv_tile {
+        position: relative;
         background: #fff;
-        border: 1px solid $gbv-line;
-        border-radius: 4px;
-        padding: 12px 14px;
+        border: 1px solid #E9EDF2;
+        border-radius: 10px;
+        padding: 14px 58px 14px 16px;
+        box-shadow: 0 1px 2px rgba(16, 42, 76, 0.06);
+        transition: box-shadow .15s, transform .15s;
+
+        .o_gbv_tile_icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: #EAF2FB;
+            color: $gbv-blue;
+
+            &.is-open    { background: #EAF2FB; color: #2E75B6; }
+            &.is-closed  { background: #E6F4EC; color: #1E7A44; }
+            &.is-court   { background: #FBEFD9; color: #B7791F; }
+            &.is-female  { background: #E5F3F0; color: #157F76; }
+            &.is-male    { background: #EEF0F2; color: #6B7478; }
+            &.is-child   { background: #FBEFD9; color: #B7791F; }
+            &.is-conv    { background: #FBE9E9; color: #C0392B; }
+        }
 
         .o_gbv_tile_value {
             font-size: 26px;
@@ -96,24 +168,29 @@ $gbv-line: #E4E7E8;
         cursor: pointer;
 
         &:hover {
-            border-color: $gbv-blue;
-            box-shadow: 0 2px 6px rgba(46, 117, 182, 0.15);
+            border-color: #C6D4E4;
+            box-shadow: 0 6px 16px rgba(16, 42, 76, 0.12);
+            transform: translateY(-1px);
         }
     }
 
     // ------------------------------------------------------- cards
     .o_gbv_card {
         background: #fff;
-        border: 1px solid $gbv-line;
-        border-radius: 4px;
-        padding: 14px 16px;
-        margin-bottom: 12px;
+        border: 1px solid #E9EDF2;
+        border-radius: 10px;
+        padding: 15px 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 1px 2px rgba(16, 42, 76, 0.06);
 
         h5 {
             font-size: 13px;
             font-weight: 700;
             color: #14191C;
-            margin-bottom: 12px;
+            margin-bottom: 13px;
+            padding-left: 10px;
+            border-left: 3px solid $gbv-blue;
+            line-height: 1.15;
 
             em {
                 font-style: normal;

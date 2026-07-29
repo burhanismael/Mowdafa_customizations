@@ -26,12 +26,29 @@ export class CpDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
-        this.state = useState({ loading: true, data: null });
+        this.state = useState({ loading: true, data: null, caseType: null });
         onWillStart(async () => {
-            this.state.data = await this.orm.call(
-                "cp.case", "get_dashboard_data", []);
-            this.state.loading = false;
+            await this.load();
         });
+    }
+
+    async load() {
+        this.state.loading = true;
+        this.state.data = await this.orm.call(
+            "cp.case", "get_dashboard_data", [this.state.caseType]);
+        this.state.loading = false;
+    }
+
+    async setCaseType(caseType) {
+        this.state.caseType = caseType;
+        await this.load();
+    }
+
+    // domain fragment that carries the active filter into drill-throughs
+    get caseDomain() {
+        return this.state.caseType
+            ? [["case_type", "=", this.state.caseType]]
+            : [];
     }
 
     get tiles() {
@@ -139,7 +156,7 @@ export class CpDashboard extends Component {
     }
 
     openManaged() {
-        this.openCases("cp.case", [], "Cases");
+        this.openCases("cp.case", this.caseDomain, "Cases");
     }
 
     openPartner() {

@@ -31,6 +31,15 @@
                     <button name="action_create_verification_child" type="object"
                         string="Child Verification" class="btn-primary"
                         invisible="stage != 'verification' or child_verified"/>
+                    <button name="action_create_psychosocial" type="object"
+                        string="Create Psychosocial"
+                        invisible="stage != 'in_care'"/>
+                    <button name="action_create_daily_record" type="object"
+                        string="Create Performance Record"
+                        invisible="stage != 'in_care'"/>
+                    <button name="action_create_mentoring" type="object"
+                        string="Create Mentoring Report"
+                        invisible="stage != 'in_care'"/>
                     <button name="action_create_reunification" type="object"
                         string="Create Reunification" class="btn-primary"
                         invisible="stage != 'in_care' or reunification_count &gt; 0 or recommendation not in ('reunification', 'reunification_support')"/>
@@ -71,6 +80,16 @@
                                 invisible="psychosocial_count == 0">
                             <field name="psychosocial_count" widget="statinfo" string="Psychosocial"/>
                         </button>
+                        <button name="action_view_daily_records" type="object"
+                                class="oe_stat_button" icon="fa-line-chart"
+                                invisible="daily_record_count == 0">
+                            <field name="daily_record_count" widget="statinfo" string="Performance"/>
+                        </button>
+                        <button name="action_view_mentoring" type="object"
+                                class="oe_stat_button" icon="fa-users"
+                                invisible="mentoring_count == 0">
+                            <field name="mentoring_count" widget="statinfo" string="Mentoring"/>
+                        </button>
                         <button name="action_view_reunifications" type="object"
                                 class="oe_stat_button" icon="fa-handshake-o"
                                 invisible="reunification_count == 0">
@@ -88,6 +107,7 @@
                     </div>
                     <group string="1 · Child Identification">
                         <group>
+                            <field name="case_type" invisible="1"/>
                             <field name="child_name" placeholder="Not yet named"/>
                             <field name="sex"/>
                             <field name="date_of_birth"/>
@@ -183,7 +203,8 @@
         <field name="name">cp.case.kanban</field>
         <field name="model">cp.case</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage" quick_create="false">
+            <kanban default_group_by="stage" quick_create="false"
+                    class="o_kanban_small_column o_cp_case_compact_kanban">
                 <field name="name"/>
                 <field name="stage"/>
                 <field name="risk_level"/>
@@ -243,9 +264,16 @@
             <search string="Child Protection Cases">
                 <field name="name"/>
                 <field name="child_name"/>
+                <filter string="Street Children Cases" name="type_street"
+                        domain="[('case_type', '=', 'street')]"/>
+                <filter string="CAAFAG" name="type_caafag"
+                        domain="[('case_type', '=', 'caafag')]"/>
+                <separator/>
                 <filter string="Critical / High Risk" name="high_risk"
                         domain="[('risk_level', 'in', ('critical', 'high'))]"/>
                 <group expand="0" string="Group By">
+                    <filter string="Case Type" name="group_case_type"
+                            context="{'group_by': 'case_type'}"/>
                     <filter string="Stage" name="group_stage"
                             context="{'group_by': 'stage'}"/>
                     <filter string="Region" name="group_region"
@@ -259,7 +287,7 @@
         </field>
     </record>
 
-    <!-- Action -->
+    <!-- Actions -->
     <record id="action_cp_case_managed" model="ir.actions.act_window">
         <field name="name">Cases</field>
         <field name="res_model">cp.case</field>
@@ -274,6 +302,30 @@
         </field>
     </record>
 
+    <record id="action_cp_case_street" model="ir.actions.act_window">
+        <field name="name">Street Children Cases</field>
+        <field name="res_model">cp.case</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('case_type', '=', 'street')]</field>
+        <field name="context">{'default_case_type': 'street'}</field>
+        <field name="search_view_id" ref="view_cp_case_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Open a street child's file</p>
+        </field>
+    </record>
+
+    <record id="action_cp_case_caafag" model="ir.actions.act_window">
+        <field name="name">CAAFAG</field>
+        <field name="res_model">cp.case</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="domain">[('case_type', '=', 'caafag')]</field>
+        <field name="context">{'default_case_type': 'caafag'}</field>
+        <field name="search_view_id" ref="view_cp_case_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Open a CAAFAG file</p>
+        </field>
+    </record>
+
     <record id="action_cp_dashboard" model="ir.actions.client">
         <field name="name">CP Dashboard</field>
         <field name="tag">mowdafa_child_protection.cp_dashboard</field>
@@ -285,5 +337,11 @@
     <menuitem id="menu_cp_dashboard" name="Dashboard"
               parent="menu_cp_root" action="action_cp_dashboard" sequence="1"/>
     <menuitem id="menu_cp_case_managed" name="Cases"
-              parent="menu_cp_root" action="action_cp_case_managed" sequence="5"/>
+              parent="menu_cp_root" sequence="5"/>
+    <menuitem id="menu_cp_case_street" name="Street Children Cases"
+              parent="menu_cp_case_managed" action="action_cp_case_street"
+              sequence="10"/>
+    <menuitem id="menu_cp_case_caafag" name="CAAFAG"
+              parent="menu_cp_case_managed" action="action_cp_case_caafag"
+              sequence="20"/>
 </odoo>

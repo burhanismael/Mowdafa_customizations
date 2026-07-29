@@ -214,89 +214,172 @@ class CpVerification(models.Model):
 
 
 class CpDailyRecord(models.Model):
-    """CP-11 — one per child per day, facility placements only.
-    Fifteen seconds, or it won't happen."""
+    """CP-11 — Performance and Progress Record."""
     _name = 'cp.daily.record'
-    _description = 'CP Daily Record (CP-11)'
+    _description = 'CP Performance and Progress Record (CP-11)'
     _inherit = ['cp.form.mixin']
     _sequence_code = 'cp.daily.record'
     _order = 'date desc, id desc'
 
-    placement_id = fields.Many2one(
-        'cp.placement', string='Placement', required=True,
-        ondelete='cascade', domain=[('requires_daily', '=', True)])
     case_id = fields.Many2one(
-        related='placement_id.case_id', store=True, string='Case')
+        'cp.case', string='Case', required=True, ondelete='cascade')
+    placement_id = fields.Many2one(
+        'cp.placement', string='Placement', ondelete='set null',
+        domain="[('case_id', '=', case_id)]")
     date = fields.Date(
         string='Date', required=True, default=fields.Date.context_today)
-    attendance = fields.Selection([
-        ('present', 'Present'),
-        ('absent', 'Absent'),
-    ], string='Attendance', default='present')
-    hours = fields.Float(string='Hours')
-    performance = fields.Selection([
-        ('unsatisfactory', 'Unsatisfactory'),
-        ('fair', 'Fair'),
-        ('good', 'Good'),
-        ('very_good', 'Very good'),
-        ('outstanding', 'Outstanding'),
-    ], string='Performance')
-    events = fields.Char(
-        string='Events',
-        help='Sports, study circles, trips, LSBE, NFE, skill training…')
-    comment = fields.Char(string="Supervisor's Comment")
-    filed_by = fields.Many2one(
-        'res.users', string='Filed By', default=lambda self: self.env.user)
+    week = fields.Selection([
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+    ], string='Week')
+    month = fields.Selection([
+        ('1', 'January'),
+        ('2', 'February'),
+        ('3', 'March'),
+        ('4', 'April'),
+        ('5', 'May'),
+        ('6', 'June'),
+        ('7', 'July'),
+        ('8', 'August'),
+        ('9', 'September'),
+        ('10', 'October'),
+        ('11', 'November'),
+        ('12', 'December'),
+    ], string='Month')
+    hours_attended = fields.Selection([
+        ('36', '36 hrs./week'),
+        ('42', '42 hrs./week'),
+        ('49', '49 hrs./week'),
+        ('56', '56 hrs./week'),
+        ('63', '63 hrs./week'),
+    ], string='Number of Hours Attended')
+    event_ids = fields.Many2many(
+        'cp.event.type', string='Number of Events Participated')
+    performance_id = fields.Many2one(
+        'cp.performance.rating', string='Overall Performance Rating',
+        ondelete='restrict')
+    comment = fields.Text(string="Supervisor's Comments")
 
-    _sql_constraints = [
-        ('placement_date_uniq', 'unique(placement_id, date)',
-         'One daily record per child per day.'),
-    ]
+
+MOTIVATION = [
+    ('increased', 'Increased'),
+    ('no_change', 'No Change'),
+    ('decreased', 'Decreased'),
+]
+
+MOTIVATION_AREAS = [
+    'Grades performance',
+    'Session attendance',
+    'Time management skills',
+    'General attitude and outlook',
+    'Self-esteem',
+    'Confidence',
+    'Communication with instructors/supervisors',
+    'Willingness to accept responsibility',
+]
 
 
 class CpMentoring(models.Model):
-    """CP-12 — weekly, facility placements only. Last week's goals
-    appear on this week's form: goals carry forward on their own."""
+    """CP-12 — the monthly Mentoring Activity Report: weekly attendance
+    grid, hours, the activities the mentor and mentee did together and a
+    motivation read across eight areas."""
     _name = 'cp.mentoring'
-    _description = 'CP Mentoring (CP-12)'
+    _description = 'CP Mentoring Activity Report (CP-12)'
     _inherit = ['cp.form.mixin']
     _sequence_code = 'cp.mentoring'
     _order = 'date desc, id desc'
 
-    placement_id = fields.Many2one(
-        'cp.placement', string='Placement', required=True,
-        ondelete='cascade', domain=[('requires_daily', '=', True)])
     case_id = fields.Many2one(
-        related='placement_id.case_id', store=True, string='Case')
+        'cp.case', string='Case', required=True, ondelete='cascade')
+    placement_id = fields.Many2one(
+        'cp.placement', string='Placement', ondelete='set null',
+        domain="[('case_id', '=', case_id)]")
     date = fields.Date(
-        string='Week Of', required=True, default=fields.Date.context_today)
-    mentor = fields.Char(string='Mentor')
-    hours = fields.Float(string='Hours This Month')
-    activities = fields.Char(
-        string='Mentoring Activities',
-        help='Study circles, goal setting, sports, field trips, videos…')
-    attended = fields.Boolean(string='Attended', default=True)
-    goal_last_week = fields.Char(
-        string='Goal Set Last Week',
-        help='Carried forward from the previous session.')
-    progress = fields.Selection([
-        ('met', 'Met'),
-        ('partly', 'Partly met'),
-        ('carried', 'Carried over'),
-    ], string='Progress')
-    goal_next = fields.Char(string='Goal for Next Week')
-    obstacles = fields.Text(string='Obstacles')
-    for_staff = fields.Text(string='For Staff')
+        string='Date', required=True, default=fields.Date.context_today)
+    mentor = fields.Char(string='Mentor Name')
+    mentor_phone = fields.Char(string='Phone')
 
-    @api.onchange('placement_id')
-    def _onchange_placement_id(self):
-        for session in self:
-            if session.placement_id:
-                last = self.search(
-                    [('placement_id', '=', session.placement_id.id)],
-                    order='date desc', limit=1)
-                if last and last.goal_next:
-                    session.goal_last_week = last.goal_next
+    # 1 · weekly attendance / activity grid
+    line_ids = fields.One2many(
+        'cp.mentoring.line', 'mentoring_id', string='Weekly Activities')
+
+    # 1 · total hours this month
+    total_hours = fields.Selection([
+        ('5', '5 hrs.'),
+        ('7', '7 hrs.'),
+        ('10', '10 hrs.'),
+        ('15', '15 hrs.'),
+    ], string='Total Hours This Month')
+
+    # 2 · activities involved in this month (check all that apply)
+    act_study_circles = fields.Boolean(string='Study circles')
+    act_sports = fields.Boolean(string='Sports')
+    act_field_trips = fields.Boolean(string='Field trips')
+    act_watching_videos = fields.Boolean(string='Watching videos')
+    act_goal_setting = fields.Boolean(string='Goal setting')
+    act_pss = fields.Boolean(string='PSS')
+    act_social = fields.Boolean(string='Social activities')
+    act_other = fields.Boolean(string='Other')
+    act_other_text = fields.Char(string='Other (describe)')
+
+    # 3 · motivation this month (one row per area, pre-loaded)
+    motivation_ids = fields.One2many(
+        'cp.mentoring.motivation', 'mentoring_id', string='Motivation',
+        default=lambda self: self._default_motivation())
+
+    @api.model
+    def _default_motivation(self):
+        return [
+            (0, 0, {'sequence': (i + 1) * 10, 'area': area})
+            for i, area in enumerate(MOTIVATION_AREAS)
+        ]
+
+    # 4 & 5 · narrative
+    obstacles = fields.Text(
+        string='Major Obstacles',
+        help='Describe any major obstacles in the relationship and how '
+             'they were handled.')
+    additional_comments = fields.Text(
+        string='Additional Comments',
+        help='Any additional comments, suggestions or questions for staff.')
+
+
+class CpMentoringLine(models.Model):
+    """One activity row of the mentoring report's weekly grid."""
+    _name = 'cp.mentoring.line'
+    _description = 'CP Mentoring Weekly Activity'
+    _order = 'sequence, id'
+
+    mentoring_id = fields.Many2one(
+        'cp.mentoring', string='Mentoring Report', required=True,
+        ondelete='cascade')
+    sequence = fields.Integer(string='No', default=10)
+    activity = fields.Char(string='Activity')
+    week_1 = fields.Char(string='Week 1')
+    week_2 = fields.Char(string='Week 2')
+    week_3 = fields.Char(string='Week 3')
+    week_4 = fields.Char(string='Week 4')
+    week_5 = fields.Char(string='Week 5')
+
+
+class CpMentoringMotivation(models.Model):
+    """One motivation area of the mentoring report — pre-loaded with the
+    eight standard areas so the mentor only picks the rating."""
+    _name = 'cp.mentoring.motivation'
+    _description = 'CP Mentoring Motivation'
+    _order = 'sequence, id'
+
+    mentoring_id = fields.Many2one(
+        'cp.mentoring', string='Mentoring Report', required=True,
+        ondelete='cascade')
+    sequence = fields.Integer(string='Sequence', default=10)
+    area = fields.Char(string='Activity')
+    increased = fields.Char(string='Increased')
+    no_change = fields.Char(string='No Change')
+    decreased = fields.Char(string='Decreased')
 
 
 class CpPsychosocial(models.Model):
@@ -312,24 +395,65 @@ class CpPsychosocial(models.Model):
     case_id = fields.Many2one(
         'cp.case', string='Case', required=True, ondelete='cascade')
     date = fields.Date(
-        string='Session Date', required=True,
-        default=fields.Date.context_today)
-    session_number = fields.Integer(string='Session #', default=1)
-    counsellor = fields.Char(string='Counsellor')
-    # restricted content — counsellor and supervisor only
-    existing_illness = fields.Text(
-        string='Existing Illness', groups='base.group_system')
-    special_fears = fields.Text(
-        string='Special Fears', groups='base.group_system')
-    problems = fields.Text(
-        string='Psychosocial Problems', groups='base.group_system')
-    observation = fields.Text(
-        string='Observation', groups='base.group_system')
+        string='Date', required=True, default=fields.Date.context_today)
+
+    # person identification
+    person_name = fields.Char(string='Person Name')
+    gender = fields.Selection(
+        [('female', 'Female'), ('male', 'Male')], string='Gender')
+    age = fields.Integer(string='Age')
+    class_group = fields.Char(string='Class')
+
+    # health & wellbeing — each a Yes/No with a describe box
+    existing_illness = fields.Boolean(
+        string='Existing Illness?', groups='base.group_system')
+    existing_illness_desc = fields.Text(
+        string='Describe (existing illness)', groups='base.group_system')
+    previous_illness = fields.Boolean(
+        string='Previous Serious Illness / Injury?',
+        groups='base.group_system')
+    previous_illness_desc = fields.Text(
+        string='Describe (previous illness/injury)',
+        groups='base.group_system')
+    special_fears = fields.Boolean(
+        string='Special Fears?', groups='base.group_system')
+    special_fears_desc = fields.Text(
+        string='Describe (special fears)', groups='base.group_system')
+    psychosocial_problems = fields.Boolean(
+        string='Psychosocial Problems?', groups='base.group_system')
+    psychosocial_problems_desc = fields.Text(
+        string='Describe (psychosocial problems)',
+        groups='base.group_system')
+
+    # observation
+    play_with_others = fields.Text(
+        string='Likes to do when playing with others',
+        groups='base.group_system')
+    play_alone = fields.Text(
+        string='Likes to do when playing alone',
+        groups='base.group_system')
+    family_description = fields.Text(
+        string='Family of the Person',
+        help='Parents, siblings, grandparents and other extended family.',
+        groups='base.group_system')
+
+    # response
+    additional_comments = fields.Text(
+        string='Additional Comments', groups='base.group_system')
     services_provided = fields.Text(
-        string='Services Provided', groups='base.group_system')
+        string='Services Provided (Area you advice)',
+        groups='base.group_system')
     action_points = fields.Text(
-        string='Action Points', groups='base.group_system')
-    next_session = fields.Char(string='Next Session')
+        string='Action Points (Agreed points)', groups='base.group_system')
+
+    @api.onchange('case_id')
+    def _onchange_case_id_person(self):
+        for record in self:
+            case = record.case_id
+            if case:
+                record.person_name = case.child_name
+                record.gender = case.sex
+                record.age = case.age_years
 
 
 class CpReunification(models.Model):

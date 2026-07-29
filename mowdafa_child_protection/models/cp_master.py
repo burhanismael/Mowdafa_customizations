@@ -55,3 +55,36 @@ class CpBasicNeed(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'That basic need already exists.'),
     ]
+
+
+class CpEventType(models.Model):
+    """The events a child can take part in — Section 'Number of Events
+    Participated' of the performance record. Master data, so the record
+    ticks them as a multi-select and the report can total each."""
+    _name = 'cp.event.type'
+    _description = 'CP Event Type'
+    _order = 'sequence, id'
+
+    name = fields.Char(string='Event', required=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    active = fields.Boolean(string='Active', default=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'That event already exists.'),
+    ]
+
+
+class CpPerformanceRating(models.Model):
+    """The Overall Performance Rating scale of the performance record —
+    master data so the scale can be edited and the report can group by it."""
+    _name = 'cp.performance.rating'
+    _description = 'CP Performance Rating'
+    _order = 'sequence, id'
+
+    name = fields.Char(string='Rating', required=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    active = fields.Boolean(string='Active', default=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'That rating already exists.'),
+    ]
