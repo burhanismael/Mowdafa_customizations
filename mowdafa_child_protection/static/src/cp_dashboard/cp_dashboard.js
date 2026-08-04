@@ -26,8 +26,25 @@ export class CpDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
-        this.state = useState({ loading: true, data: null, caseType: null });
+        this.user = useService("user");
+        this.state = useState({
+            loading: true, data: null, caseType: null,
+            canStreet: false, canCaafag: false, canAll: false,
+        });
         onWillStart(async () => {
+            const [street, caafag] = await Promise.all([
+                this.user.hasGroup("mowdafa_child_protection.group_cp_street"),
+                this.user.hasGroup("mowdafa_child_protection.group_cp_caafag"),
+            ]);
+            this.state.canStreet = street;
+            this.state.canCaafag = caafag;
+            // "All" only makes sense when a user may see both types
+            this.state.canAll = street && caafag;
+            // a single-type user is locked to their type from the start
+            if (!this.state.canAll) {
+                this.state.caseType = street ? "street"
+                    : caafag ? "caafag" : null;
+            }
             await this.load();
         });
     }

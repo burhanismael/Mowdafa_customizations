@@ -154,6 +154,11 @@ class CaseClosure(models.Model):
         return records
 
     def action_close(self):
+        if not self.env.user.has_group(
+                'mowdafa_extended.group_gbv_case_closure'):
+            raise UserError(_(
+                'You are not allowed to close GBV cases. This action is '
+                'restricted to members of the "GBV Case Closure" group.'))
         for record in self:
             if not record.checklist_line_ids or any(
                     line.answer != 'yes' for line in record.checklist_line_ids):

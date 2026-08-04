@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Visible category so the group is assignable on the user form. -->
+    <record id="module_category_gbv" model="ir.module.category">
+        <field name="name">GBV</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Users allowed to close a GBV case. -->
+    <record id="group_gbv_case_closure" model="res.groups">
+        <field name="name">GBV Case Closure</field>
+        <field name="category_id" ref="module_category_gbv"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <!--
+        Extend Documents' own document rules so a user listed on a
+        workspace's Read/Write Users can access it, on top of the
+        existing group-based access. Branches are OR-ed, so nothing that
+        already worked is taken away.
+    -->
+
+    <!-- READ: also readable by workspace read/write users -->
+    <record id="documents.documents_document_readonly_rule" model="ir.rule">
+        <field name="domain_force">[
+            '|',
+                '|',
+                    ('folder_id.read_user_ids', 'in', [user.id]),
+                    ('folder_id.write_user_ids', 'in', [user.id]),
+                '&amp;',
+                    ('folder_id.read_group_ids', 'in', user.groups_id.ids),
+                    '|',
+                        ('folder_id.user_specific', '=', False),
+                        ('owner_id', '=', user.id)
+            ]</field>
+    </record>
+
+    <!-- WRITE/CREATE: also writable by workspace write users -->
+    <record id="documents.documents_document_write_rule" model="ir.rule">
+        <field name="domain_force">[
+            '|',
+                ('folder_id.write_user_ids', 'in', [user.id]),
+                '|',
+                    '&amp;',
+                        ('folder_id.group_ids', 'in', user.groups_id.ids),
+                        '|',
+                            ('folder_id.user_specific_write', '=', False),
+                            ('owner_id', '=', user.id),
+                    '&amp;',
+                        ('folder_id.read_group_ids', '=', False),
+                        ('folder_id.group_ids', '=', False)]
+            </field>
+    </record>
+
+</odoo>

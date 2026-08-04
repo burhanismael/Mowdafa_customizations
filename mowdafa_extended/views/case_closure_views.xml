@@ -16,7 +16,8 @@
             <form string="Case Closure">
                 <header>
                     <button name="action_close" string="Close Case" type="object"
-                            class="oe_highlight" invisible="state != 'draft'"/>
+                            class="oe_highlight" invisible="state != 'draft'"
+                            groups="mowdafa_extended.group_gbv_case_closure"/>
                     <button name="action_reopen" string="Re-open Case" type="object"
                             invisible="state != 'closed'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,closed"/>

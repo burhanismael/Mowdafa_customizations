@@ -23,6 +23,7 @@ dashboard. The nine managed-track satellite forms follow.
     'license': 'LGPL-3',
     'depends': ['mowdafa_extended'],
     'data': [
+        'security/cp_groups.xml',
         'security/ir.model.access.csv',
         'views/cp_case_views.xml',
         'views/cp_partner_record_views.xml',

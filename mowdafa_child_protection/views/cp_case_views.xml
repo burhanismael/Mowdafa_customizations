@@ -337,11 +337,12 @@
     <menuitem id="menu_cp_dashboard" name="Dashboard"
               parent="menu_cp_root" action="action_cp_dashboard" sequence="1"/>
     <menuitem id="menu_cp_case_managed" name="Cases"
-              parent="menu_cp_root" sequence="5"/>
+              parent="menu_cp_root" sequence="5"
+              groups="group_cp_street,group_cp_caafag"/>
     <menuitem id="menu_cp_case_street" name="Street Children Cases"
               parent="menu_cp_case_managed" action="action_cp_case_street"
-              sequence="10"/>
+              sequence="10" groups="group_cp_street"/>
     <menuitem id="menu_cp_case_caafag" name="CAAFAG"
               parent="menu_cp_case_managed" action="action_cp_case_caafag"
-              sequence="20"/>
+              sequence="20" groups="group_cp_caafag"/>
 </odoo>

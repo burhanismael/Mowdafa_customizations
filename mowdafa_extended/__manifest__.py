@@ -13,6 +13,7 @@ signatures of the guardian, case worker and survivor.
     'author': 'Yugal Vyas',
     'depends': ['base', 'mail', 'hr'],
     'data': [
+        'security/gbv_security.xml',
         'security/ir.model.access.csv',
         'report/consent_for_services_report.xml',
         'report/gbv_cases_paperformat.xml',
