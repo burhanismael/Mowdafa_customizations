@@ -258,6 +258,31 @@ class CpCase(models.Model):
             'cp.verification', _('Child Verification'),
             {'default_kind': 'child'})
 
+    def action_move_in_care(self):
+        """Manual push from Verification to In Care. Advances when the two
+        accounts agree or the supervisor has opened the gate; otherwise
+        explains exactly what is missing."""
+        self.ensure_one()
+        self._sync_verification()
+        if self.stage == 'verification':
+            adult = self.verification_ids.filtered(
+                lambda v: v.kind == 'adult')[:1]
+            child = self.verification_ids.filtered(
+                lambda v: v.kind == 'child')[:1]
+            if not (adult and child):
+                raise UserError(_(
+                    'Add both an Adult Verification and a Child Verification '
+                    '(each with a recommendation) before moving to In Care.'))
+            if self.verification_conflict and not self.supervisor_decision:
+                raise UserError(_(
+                    'The adult and child verifications recommend different '
+                    'things. Fill in the Verification Gate below — Supervisor '
+                    'Decision and Reason — then press Move to In Care again.'))
+            raise UserError(_(
+                'Each verification needs a recommendation before the case '
+                'can move to In Care.'))
+        return True
+
     def action_create_psychosocial(self):
         return self._open_cp_form('cp.psychosocial', _('Psychosocial Support'))
 

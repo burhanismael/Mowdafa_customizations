@@ -31,6 +31,9 @@
                     <button name="action_create_verification_child" type="object"
                         string="Child Verification" class="btn-primary"
                         invisible="stage != 'verification' or child_verified"/>
+                    <button name="action_move_in_care" type="object"
+                        string="Move to In Care" class="btn-primary"
+                        invisible="stage != 'verification' or not adult_verified or not child_verified"/>
                     <button name="action_create_psychosocial" type="object"
                         string="Create Psychosocial"
                         invisible="stage != 'in_care'"/>
