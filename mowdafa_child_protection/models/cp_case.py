@@ -53,13 +53,20 @@ class CpCase(models.Model):
     ], string='Case Type', tracking=True)
 
     # ── reporting spine (shared with cp.partner.record) ──────────────────
-    child_name = fields.Char(string='Full Name', tracking=True)
+    first_name = fields.Char(string='First Name', tracking=True)
+    middle_name = fields.Char(string="Middle / Father's Name", tracking=True)
+    last_name = fields.Char(string="Last / Grandfather's Name", tracking=True)
+    other_names = fields.Char(string='Other Name(s)')
+    child_name = fields.Char(
+        string='Full Name', compute='_compute_child_name',
+        store=True, readonly=False, tracking=True)
+    nickname = fields.Char(string='Nickname')
     sex = fields.Selection(
         [('female', 'Female'), ('male', 'Male')], string='Sex', tracking=True)
     date_of_birth = fields.Date(string='Date of Birth')
     dob_estimated = fields.Boolean(string='DOB Estimated?')
     age_years = fields.Integer(string='Age (years)', tracking=True)
-    nationality = fields.Char(string='Nationality', default='Somali')
+    nationality = fields.Char(string='Nationality')
     population_group = fields.Selection([
         ('resident', 'Resident'),
         ('host', 'Host Community'),
@@ -69,15 +76,33 @@ class CpCase(models.Model):
         ('other', 'Other'),
     ], string='Population Group', tracking=True)
     disability = fields.Boolean(string='Disability')
+    country_id = fields.Many2one(
+        'res.country', string='Country',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
     region_id = fields.Many2one(
         'gbv.region', string='Region', tracking=True)
     district_id = fields.Many2one(
         'gbv.district', string='District', tracking=True,
         domain="[('region_id', '=?', region_id)]")
+    village = fields.Char(string='Village / Section')
+    camp = fields.Char(string='Camp / Settlement')
     date_identified = fields.Date(string='Date Identified')
     referral_source = fields.Char(string='Referral Source')
-    protection_concern = fields.Selection(
-        CONCERNS, string='Primary Concern', tracking=True)
+
+    @api.depends('first_name', 'middle_name', 'last_name', 'other_names')
+    def _compute_child_name(self):
+        for case in self:
+            parts = [case.first_name, case.middle_name,
+                     case.last_name, case.other_names]
+            composed = ' '.join(p.strip() for p in parts if p and p.strip())
+            # only overwrite while name parts drive it; keep any manual
+            # value if no parts are set yet
+            if composed:
+                case.child_name = composed
+            elif not case.child_name:
+                case.child_name = False
+    protection_concern_id = fields.Many2one(
+        'cp.protection.concern', string='Primary Concern', tracking=True)
     concern_description = fields.Text(string='Concern Description')
     risk_level = fields.Selection([
         ('critical', 'Critical'),
@@ -123,7 +148,9 @@ class CpCase(models.Model):
     registration_ids = fields.One2many(
         'cp.registration', 'case_id', string='Registrations')
     verification_ids = fields.One2many(
-        'cp.verification', 'case_id', string='Verifications')
+        'cp.verification', 'case_id', string='Child Verifications')
+    adult_verification_ids = fields.One2many(
+        'cp.verification.adult', 'case_id', string='Adult Verifications')
     psychosocial_ids = fields.One2many(
         'cp.psychosocial', 'case_id', string='Psychosocial Sessions')
     daily_record_ids = fields.One2many(
@@ -151,11 +178,11 @@ class CpCase(models.Model):
         help='Required to open the gate. Both original records are '
              'kept untouched — the disagreement is evidence.')
 
-    @api.depends('verification_ids.kind', 'verification_ids.recommendation')
+    @api.depends('adult_verification_ids.recommendation',
+                 'verification_ids.kind', 'verification_ids.recommendation')
     def _compute_verification(self):
         for case in self:
-            adult = case.verification_ids.filtered(
-                lambda v: v.kind == 'adult')[:1]
+            adult = case.adult_verification_ids[:1]
             child = case.verification_ids.filtered(
                 lambda v: v.kind == 'child')[:1]
             case.verification_conflict = bool(
@@ -165,8 +192,7 @@ class CpCase(models.Model):
     def _sync_verification(self):
         """Where the two accounts agree, the case moves on its own."""
         for case in self:
-            adult = case.verification_ids.filtered(
-                lambda v: v.kind == 'adult')[:1]
+            adult = case.adult_verification_ids[:1]
             child = case.verification_ids.filtered(
                 lambda v: v.kind == 'child')[:1]
             if adult and child and adult.recommendation == child.recommendation:
@@ -200,6 +226,7 @@ class CpCase(models.Model):
     handover_count = fields.Integer(compute='_compute_form_counts')
     registration_count = fields.Integer(compute='_compute_form_counts')
     verification_count = fields.Integer(compute='_compute_form_counts')
+    adult_verification_count = fields.Integer(compute='_compute_form_counts')
     placement_count = fields.Integer(compute='_compute_form_counts')
     psychosocial_count = fields.Integer(compute='_compute_form_counts')
     daily_record_count = fields.Integer(compute='_compute_form_counts')
@@ -212,21 +239,22 @@ class CpCase(models.Model):
     @api.depends('handover_ids', 'registration_ids', 'verification_ids',
                  'placement_ids', 'psychosocial_ids', 'reunification_ids',
                  'cp_followup_ids', 'verification_ids.kind',
-                 'daily_record_ids', 'mentoring_ids')
+                 'adult_verification_ids', 'daily_record_ids', 'mentoring_ids')
     def _compute_form_counts(self):
         for case in self:
             case.handover_count = len(case.handover_ids)
             case.registration_count = len(case.registration_ids)
             case.verification_count = len(case.verification_ids)
+            case.adult_verification_count = len(case.adult_verification_ids)
             case.placement_count = len(case.placement_ids)
             case.psychosocial_count = len(case.psychosocial_ids)
             case.daily_record_count = len(case.daily_record_ids)
             case.mentoring_count = len(case.mentoring_ids)
             case.reunification_count = len(case.reunification_ids)
             case.followup_visit_count = len(case.cp_followup_ids)
-            kinds = case.verification_ids.mapped('kind')
-            case.adult_verified = 'adult' in kinds
-            case.child_verified = 'child' in kinds
+            child_kinds = case.verification_ids.mapped('kind')
+            case.adult_verified = bool(case.adult_verification_ids)
+            case.child_verified = 'child' in child_kinds
 
     # ── header buttons: open the next form pre-linked to this case ──────
     def _open_cp_form(self, model, name, extra_context=None):
@@ -250,8 +278,7 @@ class CpCase(models.Model):
 
     def action_create_verification_adult(self):
         return self._open_cp_form(
-            'cp.verification', _('Adult Verification'),
-            {'default_kind': 'adult'})
+            'cp.verification.adult', _('Adult Verification'))
 
     def action_create_verification_child(self):
         return self._open_cp_form(
@@ -265,8 +292,7 @@ class CpCase(models.Model):
         self.ensure_one()
         self._sync_verification()
         if self.stage == 'verification':
-            adult = self.verification_ids.filtered(
-                lambda v: v.kind == 'adult')[:1]
+            adult = self.adult_verification_ids[:1]
             child = self.verification_ids.filtered(
                 lambda v: v.kind == 'child')[:1]
             if not (adult and child):
@@ -334,7 +360,12 @@ class CpCase(models.Model):
 
     def action_view_verifications(self):
         return self._view_cp_records(
-            'cp.verification', _('Verifications'), self.verification_ids)
+            'cp.verification', _('Child Verifications'), self.verification_ids)
+
+    def action_view_adult_verifications(self):
+        return self._view_cp_records(
+            'cp.verification.adult', _('Adult Verifications'),
+            self.adult_verification_ids)
 
     def action_view_placements(self):
         return self._view_cp_records(

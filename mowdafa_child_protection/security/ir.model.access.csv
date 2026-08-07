@@ -5,6 +5,7 @@ access_cp_placement_user,cp.placement.user,model_cp_placement,base.group_user,1,
 access_cp_handover_user,cp.handover.user,model_cp_handover,base.group_user,1,1,1,0
 access_cp_registration_user,cp.registration.user,model_cp_registration,base.group_user,1,1,1,0
 access_cp_verification_user,cp.verification.user,model_cp_verification,base.group_user,1,1,1,0
+access_cp_verification_adult_user,cp.verification.adult.user,model_cp_verification_adult,base.group_user,1,1,1,0
 access_cp_daily_record_user,cp.daily.record.user,model_cp_daily_record,base.group_user,1,1,1,1
 access_cp_mentoring_user,cp.mentoring.user,model_cp_mentoring,base.group_user,1,1,1,1
 access_cp_mentoring_line_user,cp.mentoring.line.user,model_cp_mentoring_line,base.group_user,1,1,1,1
@@ -29,3 +30,6 @@ access_cp_supervisor_user,cp.supervisor.user,model_cp_supervisor,base.group_user
 access_cp_supervisor_manager,cp.supervisor.manager,model_cp_supervisor,base.group_system,1,1,1,1
 access_cp_child_user,cp.child.user,model_cp_child,base.group_user,1,1,1,1
 access_cp_child_manager,cp.child.manager,model_cp_child,base.group_system,1,1,1,1
+access_cp_protection_concern_user,cp.protection.concern.user,model_cp_protection_concern,base.group_user,1,0,0,0
+access_cp_protection_concern_manager,cp.protection.concern.manager,model_cp_protection_concern,base.group_system,1,1,1,1
+access_cp_registration_action_user,cp.registration.action.user,model_cp_registration_action,base.group_user,1,1,1,1

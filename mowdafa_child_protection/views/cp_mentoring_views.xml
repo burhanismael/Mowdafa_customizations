@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_mentoring" model="ir.sequence">
+        <field name="name">cp.mentoring</field>
+        <field name="code">cp.mentoring</field>
+        <field name="prefix">MEN/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_mentoring_form" model="ir.ui.view">
+        <field name="name">cp.mentoring.form</field>
+        <field name="model">cp.mentoring</field>
+        <field name="arch" type="xml">
+            <form string="Mentoring Activity Report">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group string="Report Details">
+                        <group>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="mentor"/>
+                            <field name="mentor_phone"/>
+                        </group>
+                    </group>
+
+                    <separator string="1 · Weekly Activities"/>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="activity"/>
+                            <field name="week_1"/>
+                            <field name="week_2"/>
+                            <field name="week_3"/>
+                            <field name="week_4"/>
+                            <field name="week_5"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <field name="total_hours" widget="radio"
+                               options="{'horizontal': true}"/>
+                    </group>
+
+                    <separator string="2 · Activities This Month (check all that apply)"/>
+                    <group>
+                        <group>
+                            <field name="act_study_circles"/>
+                            <field name="act_sports"/>
+                            <field name="act_field_trips"/>
+                            <field name="act_watching_videos"/>
+                        </group>
+                        <group>
+                            <field name="act_goal_setting"/>
+                            <field name="act_pss"/>
+                            <field name="act_social"/>
+                            <field name="act_other"/>
+                            <field name="act_other_text" string="Other"
+                                   invisible="not act_other"/>
+                        </group>
+                    </group>
+
+                    <separator string="3 · Mentee's Motivation This Month"/>
+                    <p class="text-muted">Check the box that best describes your
+                        mentee's motivation in each area this month.</p>
+                    <field name="motivation_ids">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="sequence" widget="handle"/>
+                            <field name="area" readonly="1" force_save="1"/>
+                            <field name="increased"/>
+                            <field name="no_change"/>
+                            <field name="decreased"/>
+                        </tree>
+                    </field>
+
+                    <separator string="4 · Major Obstacles"/>
+                    <field name="obstacles" nolabel="1" class="col-12"
+                           placeholder="Describe any major obstacles and how they were handled…"/>
+                    <separator string="5 · Additional Comments"/>
+                    <field name="additional_comments" nolabel="1" class="col-12"
+                           placeholder="Comments, suggestions or questions for staff…"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

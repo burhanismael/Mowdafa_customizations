@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_registration" model="ir.sequence">
+        <field name="name">cp.registration</field>
+        <field name="code">cp.registration</field>
+        <field name="prefix">REG/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_registration_form" model="ir.ui.view">
+        <field name="name">cp.registration.form</field>
+        <field name="model">cp.registration</field>
+        <field name="arch" type="xml">
+            <form string="Registration Form">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- child summary card, read from the case -->
+                    <group col="4">
+                        <field name="case_id"/>
+                        <field name="child_full_name" string="Full Name"/>
+                        <field name="child_sex"/>
+                        <field name="child_dob"/>
+                        <field name="child_nationality"/>
+                    </group>
+
+                    <separator string="Registration Details"/>
+                    <group>
+                        <group>
+                            <field name="name" string="Ref. Number" readonly="1"/>
+                            <field name="date" string="Date of registration"/>
+                            <field name="population_group"/>
+                        </group>
+                        <group>
+                            <field name="country_id" options="{'no_create_edit': True}"/>
+                            <field name="region_id" options="{'no_create_edit': True}"/>
+                            <field name="district_id" options="{'no_create_edit': True}"/>
+                        </group>
+                        <group>
+                            <field name="village"/>
+                            <field name="date_of_arrival"/>
+                        </group>
+                    </group>
+
+                    <separator string="Consent"/>
+                    <group>
+                        <group>
+                            <field name="consent_registration" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="consent_registration_by" string="Given By"/>
+                            <field name="child_assent" string="Child's Assent"/>
+                        </group>
+                        <group>
+                            <field name="consent_data" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="consent_data_limits" string="Limits"/>
+                        </group>
+                    </group>
+
+                    <separator string="Child's Personal Details (Rapid Registration Assessment)"/>
+                    <group>
+                        <group>
+                            <field name="child_full_name" string="Full name" readonly="1"/>
+                            <field name="nickname" string="Also known as (nickname)"/>
+                            <field name="father_name" string="Father — full name"/>
+                            <field name="father_tel" string="Father — Tel"/>
+                            <field name="mother_name" string="Mother — full name"/>
+                            <field name="mother_tel" string="Mother — Tel"/>
+                        </group>
+                        <group>
+                            <field name="relative_name" string="Relative — full name"/>
+                            <field name="relative_tel" string="Relative — Tel"/>
+                            <field name="household_tel" string="Telephone (child / household)"/>
+                            <field name="nationality_origin" string="Nationality / Country of Origin"/>
+                        </group>
+                    </group>
+
+                    <separator string="A9 · Schooling"/>
+                    <group>
+                        <group>
+                            <field name="prev_schooling" string="Previous schooling?"
+                                   widget="radio" options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <field name="highest_grade" string="Highest grade completed"/>
+                        </group>
+                        <group>
+                            <field name="literacy_level" string="Current literacy level"
+                                   widget="radio" options="{'horizontal': true}"/>
+                        </group>
+                    </group>
+                    <label for="wants_to_learn"
+                           string="Interest in learning or vocational training"/>
+                    <field name="wants_to_learn" nolabel="1" class="col-12"/>
+
+                    <separator string="Place of Birth / Origin"/>
+                    <group>
+                        <group>
+                            <field name="pob_region" string="Region"/>
+                        </group>
+                        <group>
+                            <field name="pob_district" string="District / Town"/>
+                        </group>
+                        <group>
+                            <field name="pob_village" string="Village / Camp"/>
+                        </group>
+                    </group>
+
+                    <separator string="Current Address"/>
+                    <group>
+                        <group>
+                            <field name="addr_region" string="Region"/>
+                        </group>
+                        <group>
+                            <field name="addr_district" string="District / Town"/>
+                        </group>
+                        <group>
+                            <field name="addr_village" string="Village / Camp"/>
+                        </group>
+                    </group>
+
+                    <separator string="Identification and Referral Details"/>
+                    <group>
+                        <group>
+                            <field name="found_at"/>
+                            <field name="referrer_type" widget="radio"/>
+                        </group>
+                        <group>
+                            <field name="referrer_name"/>
+                            <field name="referrer_contact"/>
+                            <field name="referral_reason"/>
+                        </group>
+                    </group>
+
+                    <separator string="Current Care Arrangements of the Child"/>
+                    <group>
+                        <group>
+                            <field name="care_type" widget="radio"/>
+                            <field name="care_before"/>
+                            <field name="care_adequate" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="care_action_needed" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <field name="caregiver_name"/>
+                            <field name="caregiver_tel"/>
+                            <field name="care_institution"/>
+                            <field name="care_location"/>
+                        </group>
+                    </group>
+
+                    <separator string="Protection Concerns Related to the Child (tick all that apply)"/>
+                    <field name="concern_ids" nolabel="1"
+                           class="o_cp_events_horizontal"
+                           widget="many2many_checkboxes"
+                           options="{'no_create_edit': True}"/>
+
+                    <separator string="What Action Needs to be Taken Immediately?"/>
+                    <field name="action_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="action"/>
+                            <field name="agency"/>
+                            <field name="other_specify"/>
+                            <field name="status"/>
+                        </tree>
+                    </field>
+                    <label for="rehab_action"
+                           string="Action for the rehabilitation centre based on protection concerns"/>
+                    <field name="rehab_action" nolabel="1" class="col-12"
+                           placeholder="…"/>
+
+                    <separator string="D · Data Confidentiality"/>
+                    <group>
+                        <group>
+                            <field name="withhold" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <label for="withhold_family"
+                                   string="Who do they want to withhold it from?"
+                                   invisible="withhold != 'yes'"/>
+                            <div invisible="withhold != 'yes'">
+                                <field name="withhold_family"/>
+                                <field name="withhold_government"/>
+                                <field name="withhold_nonstate"/>
+                                <field name="withhold_agencies"/>
+                                <field name="withhold_other"/>
+                            </div>
+                            <field name="next_followup_date"/>
+                        </group>
+                        <group>
+                            <field name="withhold_what"
+                                   invisible="withhold != 'yes'"/>
+                            <field name="withhold_reason"
+                                   invisible="withhold != 'yes'"/>
+                            <field name="care_plan_date"/>
+                        </group>
+                    </group>
+
+                    <separator string="E · Details of Child Protection / Social Worker Officer"/>
+                    <group>
+                        <group>
+                            <field name="officer_name"/>
+                            <field name="officer_position"/>
+                            <field name="officer_agency"/>
+                        </group>
+                        <group>
+                            <field name="officer_date"/>
+                            <field name="officer_location"/>
+                            <field name="officer_sign"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

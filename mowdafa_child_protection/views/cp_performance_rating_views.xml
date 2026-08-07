@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_performance_rating_tree" model="ir.ui.view">
+        <field name="name">cp.performance.rating.tree</field>
+        <field name="model">cp.performance.rating</field>
+        <field name="arch" type="xml">
+            <tree string="Performance Ratings" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_performance_rating" model="ir.actions.act_window">
+        <field name="name">Performance Ratings</field>
+        <field name="res_model">cp.performance.rating</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="rating_unsatisfactory" model="cp.performance.rating">
+        <field name="name">Unsatisfactory</field><field name="sequence">10</field>
+    </record>
+
+    <record id="rating_less_satisfactory" model="cp.performance.rating">
+        <field name="name">Less than Satisfactory</field><field name="sequence">20</field>
+    </record>
+
+    <record id="rating_fully_satisfactory" model="cp.performance.rating">
+        <field name="name">Fully Satisfactory</field><field name="sequence">30</field>
+    </record>
+
+    <record id="rating_excellent" model="cp.performance.rating">
+        <field name="name">Excellent</field><field name="sequence">40</field>
+    </record>
+
+    <record id="rating_outstanding" model="cp.performance.rating">
+        <field name="name">Outstanding</field><field name="sequence">50</field>
+    </record>
+
+    <!-- Case Workers -->
+
+</odoo>

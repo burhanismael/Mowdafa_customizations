@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_protection_concern_tree" model="ir.ui.view">
+        <field name="name">cp.protection.concern.tree</field>
+        <field name="model">cp.protection.concern</field>
+        <field name="arch" type="xml">
+            <tree string="Primary Concerns" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_protection_concern" model="ir.actions.act_window">
+        <field name="name">Primary Concerns</field>
+        <field name="res_model">cp.protection.concern</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="concern_separated" model="cp.protection.concern">
+        <field name="name">Separated child</field><field name="sequence">10</field>
+    </record>
+
+    <record id="concern_unaccompanied" model="cp.protection.concern">
+        <field name="name">Unaccompanied</field><field name="sequence">20</field>
+    </record>
+
+    <record id="concern_street" model="cp.protection.concern">
+        <field name="name">On the street</field><field name="sequence">30</field>
+    </record>
+
+    <record id="concern_labour" model="cp.protection.concern">
+        <field name="name">Child labour</field><field name="sequence">40</field>
+    </record>
+
+    <record id="concern_trafficked" model="cp.protection.concern">
+        <field name="name">Trafficked</field><field name="sequence">50</field>
+    </record>
+
+    <record id="concern_orphan" model="cp.protection.concern">
+        <field name="name">Orphan</field><field name="sequence">60</field>
+    </record>
+
+    <record id="concern_disabled" model="cp.protection.concern">
+        <field name="name">Disabled</field><field name="sequence">70</field>
+    </record>
+
+    <record id="concern_abuse" model="cp.protection.concern">
+        <field name="name">Physical abuse</field><field name="sequence">80</field>
+    </record>
+
+    <record id="concern_neglect" model="cp.protection.concern">
+        <field name="name">Neglect</field><field name="sequence">90</field>
+    </record>
+
+    <record id="concern_risk_separation" model="cp.protection.concern">
+        <field name="name">Risk of separation</field><field name="sequence">100</field>
+    </record>
+
+    <record id="concern_orphan_head" model="cp.protection.concern">
+        <field name="name">Orphan Head of Household</field><field name="sequence">62</field>
+    </record>
+
+    <record id="concern_sleeping_street" model="cp.protection.concern">
+        <field name="name">Living / Sleeping on the street</field><field name="sequence">64</field>
+    </record>
+
+    <record id="concern_worst_labour" model="cp.protection.concern">
+        <field name="name">Worst forms of Child labour</field><field name="sequence">66</field>
+    </record>
+
+    <record id="concern_not_school" model="cp.protection.concern">
+        <field name="name">Not attending school</field><field name="sequence">68</field>
+    </record>
+
+    <record id="concern_unwell" model="cp.protection.concern">
+        <field name="name">Seriously unwell</field><field name="sequence">72</field>
+    </record>
+
+    <record id="concern_substance" model="cp.protection.concern">
+        <field name="name">Substance abuse</field><field name="sequence">74</field>
+    </record>
+
+    <record id="concern_injured" model="cp.protection.concern">
+        <field name="name">Seriously injured</field><field name="sequence">76</field>
+    </record>
+
+    <record id="concern_hiv" model="cp.protection.concern">
+        <field name="name">HIV/AIDS</field><field name="sequence">78</field>
+    </record>
+
+    <record id="concern_sexual" model="cp.protection.concern">
+        <field name="name">Sexual abuse</field><field name="sequence">82</field>
+    </record>
+
+    <record id="concern_other" model="cp.protection.concern">
+        <field name="name">Other</field><field name="sequence">110</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_verification" model="ir.sequence">
+        <field name="name">cp.verification</field>
+        <field name="code">cp.verification</field>
+        <field name="prefix">VER/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_verification_adult_form" model="ir.ui.view">
+        <field name="name">cp.verification.adult.form</field>
+        <field name="model">cp.verification.adult</field>
+        <field name="arch" type="xml">
+            <form string="Adult Verification Form">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
+                    <field name="case_id" invisible="1"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <separator string="Section 1 — Information About the Adult"/>
+                    <group>
+                        <group>
+                            <field name="adult_name" string="Full Name"/>
+                            <field name="adult_nickname" string="Nick Name"/>
+                            <field name="adult_sex" string="Sex"/>
+                            <field name="adult_dob" string="Date of Birth"/>
+                            <field name="adult_dob_estimated"/>
+                            <field name="interview_date"/>
+                        </group>
+                        <group>
+                            <field name="relationship"/>
+                            <field name="adult_contact"/>
+                            <field name="adult_location"/>
+                            <field name="interview_place"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 2 — Child's Personal Details, as stated by the Adult"/>
+                    <p class="text-muted">These are the adult's answers from
+                        memory, kept deliberately separate from the child's
+                        file. The comparison is the point of the form.</p>
+                    <group>
+                        <group>
+                            <field name="recognize" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="recognize_reason"
+                                   invisible="recognize != 'no'"/>
+                            <field name="father_name"/>
+                            <field name="father_alive" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="father_address"/>
+                            <field name="other_children_missing" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="other_children_names"/>
+                        </group>
+                        <group>
+                            <field name="mother_name"/>
+                            <field name="mother_alive" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="mother_address"/>
+                            <field name="other_family"/>
+                        </group>
+                    </group>
+                    <label for="lived_before"
+                           string="Where did the child live before living on the streets? (Country / Region / District / Town-Village / Camp)"/>
+                    <field name="lived_before" nolabel="1" class="col-12"/>
+                    <label for="identifying_info"
+                           string="What information do you have about the child's life that would help to identify the child? (favourite activities, friends, pets, special relationships, neighbours, name of last school attended)"/>
+                    <field name="identifying_info" nolabel="1" class="col-12"/>
+                    <label for="memorable_events"
+                           string="What important and unique events do you think the child might remember?"/>
+                    <field name="memorable_events" nolabel="1" class="col-12"/>
+
+                    <separator string="Section 3 — Circumstances of Separation"/>
+                    <group>
+                        <group>
+                            <field name="sep_date"/>
+                            <field name="sep_place"/>
+                        </group>
+                        <group>
+                            <field name="sep_circumstances"/>
+                            <field name="sep_caregiver_address"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 5 — Agreement to Take the Child"/>
+                    <group>
+                        <group>
+                            <field name="agreement_name" string="Name"/>
+                        </group>
+                        <group>
+                            <field name="agreement_sign" string="Signature"/>
+                        </group>
+                    </group>
+                    <label for="reunification_info"
+                           string="Information that will help the child make an informed decision about reunification (changes in the family or community since separation: deaths, births, the family's situation, friends, educational opportunities)"/>
+                    <field name="reunification_info" nolabel="1" class="col-12"/>
+                    <group>
+                        <group>
+                            <field name="want_child_live" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <field name="able_to_care" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="other_caregiver_available" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 6 — Form Completed By"/>
+                    <group>
+                        <group>
+                            <field name="completed_by" string="Name"/>
+                            <field name="completed_position" string="Position"/>
+                            <field name="interviewed_alone"/>
+                        </group>
+                        <group>
+                            <field name="completed_agency" string="Agency"/>
+                            <field name="completed_place" string="Place"/>
+                            <field name="completed_date" string="Date"/>
+                            <field name="completed_sign" string="Signature"/>
+                        </group>
+                    </group>
+
+                    <separator string="Verification Decision"/>
+                    <group>
+                        <group>
+                            <field name="recommendation"/>
+                        </group>
+                        <group>
+                            <field name="reasons"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cp_verification_form" model="ir.ui.view">
+        <field name="name">cp.verification.form</field>
+        <field name="model">cp.verification</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="kind"/>
+                            <field name="interview_date"/>
+                            <field name="interview_place"/>
+                            <field name="interviewed_alone"/>
+                            <field name="adult_name"/>
+                            <field name="adult_relationship"/>
+                            <field name="adult_contact"/>
+                        </group>
+                        <group>
+                            <field name="adult_address"/>
+                            <field name="photo_recognised"/>
+                            <field name="account"/>
+                            <field name="accounts_match"/>
+                            <field name="child_wishes"/>
+                            <field name="recommendation"/>
+                            <field name="reasons"/>
+                            <field name="completed_by"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_psychosocial" model="ir.sequence">
+        <field name="name">cp.psychosocial</field>
+        <field name="code">cp.psychosocial</field>
+        <field name="prefix">PSS/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_psychosocial_form" model="ir.ui.view">
+        <field name="name">cp.psychosocial.form</field>
+        <field name="model">cp.psychosocial</field>
+        <field name="arch" type="xml">
+            <form string="Psychosocial Support Form">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group string="Person Details">
+                        <group>
+                            <field name="case_id"/>
+                            <field name="person_name"/>
+                            <field name="gender"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="age"/>
+                            <field name="class_group"/>
+                        </group>
+                    </group>
+
+                    <separator string="Health &amp; Wellbeing"/>
+                    <group>
+                        <label for="existing_illness"
+                               string="Does the Person have an existing illness?"/>
+                        <div>
+                            <field name="existing_illness" widget="boolean_toggle"/>
+                        </div>
+                    </group>
+                    <field name="existing_illness_desc" nolabel="1" class="col-12"
+                           placeholder="If YES, describe below…"
+                           invisible="not existing_illness"/>
+
+                    <group>
+                        <label for="previous_illness"
+                               string="Has the Person had a previous serious illness or injury?"/>
+                        <div>
+                            <field name="previous_illness" widget="boolean_toggle"/>
+                        </div>
+                    </group>
+                    <field name="previous_illness_desc" nolabel="1" class="col-12"
+                           placeholder="If YES, describe below…"
+                           invisible="not previous_illness"/>
+
+                    <group>
+                        <label for="special_fears"
+                               string="Does the Person have any special fears?"/>
+                        <div>
+                            <field name="special_fears" widget="boolean_toggle"/>
+                        </div>
+                    </group>
+                    <field name="special_fears_desc" nolabel="1" class="col-12"
+                           placeholder="If YES, describe below…"
+                           invisible="not special_fears"/>
+
+                    <group>
+                        <label for="psychosocial_problems"
+                               string="Does the Person have Psychosocial Problems?"/>
+                        <div>
+                            <field name="psychosocial_problems" widget="boolean_toggle"/>
+                        </div>
+                    </group>
+                    <field name="psychosocial_problems_desc" nolabel="1" class="col-12"
+                           placeholder="If YES, describe below…"
+                           invisible="not psychosocial_problems"/>
+
+                    <separator string="Play &amp; Family"/>
+                    <label for="play_with_others"
+                           string="What activities does the Person like to do when playing with other Persons?"/>
+                    <field name="play_with_others" nolabel="1" class="col-12"
+                           placeholder="Activities with others…"/>
+                    <label for="play_alone"
+                           string="What does the Person like to do when playing alone?"/>
+                    <field name="play_alone" nolabel="1" class="col-12"
+                           placeholder="Activities alone…"/>
+                    <label for="family_description"
+                           string="Family of the Person (parents, siblings, grandparents and other extended family)"/>
+                    <field name="family_description" nolabel="1" class="col-12"
+                           placeholder="Describe the family…"/>
+
+                    <separator string="Advice &amp; Action"/>
+                    <label for="additional_comments" string="Additional Comments"/>
+                    <field name="additional_comments" nolabel="1" class="col-12"
+                           placeholder="Additional comments…"/>
+                    <label for="services_provided"
+                           string="Services you provide (area you advise)"/>
+                    <field name="services_provided" nolabel="1" class="col-12"
+                           placeholder="Services provided…"/>
+                    <label for="action_points" string="Action Points (agreed points)"/>
+                    <field name="action_points" nolabel="1" class="col-12"
+                           placeholder="Action points…"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

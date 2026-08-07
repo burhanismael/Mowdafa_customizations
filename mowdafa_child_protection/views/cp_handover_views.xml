@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_handover" model="ir.sequence">
+        <field name="name">cp.handover</field>
+        <field name="code">cp.handover</field>
+        <field name="prefix">HOV/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_handover_form" model="ir.ui.view">
+        <field name="name">cp.handover.form</field>
+        <field name="model">cp.handover</field>
+        <field name="arch" type="xml">
+            <form string="Hand Over Form">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- child summary card, read from the case -->
+                    <group col="4" class="o_cp_hov_card">
+                        <field name="case_id"/>
+                        <field name="child_full_name" string="Full Name"/>
+                        <field name="child_sex"/>
+                        <field name="child_dob"/>
+                        <field name="child_father"/>
+                        <field name="child_dob_estimated"/>
+                        <field name="child_nationality"/>
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="handover_datetime"/>
+                        </group>
+                        <group>
+                            <field name="direction" widget="radio"/>
+                        </group>
+                    </group>
+
+                    <separator string="From — Handed Over By"/>
+                    <group>
+                        <group>
+                            <field name="by_name"/>
+                            <field name="by_organisation"/>
+                        </group>
+                        <group>
+                            <field name="by_position"/>
+                            <field name="by_location"/>
+                            <field name="by_contact" string="Contact"/>
+                        </group>
+                    </group>
+
+                    <separator string="To — Received By"/>
+                    <group>
+                        <group>
+                            <field name="to_institution"/>
+                            <field name="handed_to_type" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="handed_to_other"
+                                   invisible="handed_to_type != 'other'"/>
+                        </group>
+                        <group>
+                            <field name="received_by"/>
+                            <field name="received_role" string="Role"/>
+                            <field name="received_contact" string="Contact"/>
+                            <field name="received_address"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Handing Over">
+                            <field name="by_name" string="Name"/>
+                            <field name="by_position" string="Title"/>
+                            <field name="sign_handing_over" string="Signature"/>
+                        </group>
+                        <group string="Child">
+                            <field name="child_full_name" string="Name"/>
+                            <field name="child_title" string="Title"/>
+                            <field name="sign_child" string="Signature"/>
+                        </group>
+                        <group string="Receiver">
+                            <field name="received_by" string="Name"/>
+                            <field name="received_role" string="Title"/>
+                            <field name="sign_receiver" string="Signature"/>
+                        </group>
+                        <group string="Witness">
+                            <field name="witness_name" string="Name"/>
+                            <field name="witness_role" string="Title"/>
+                            <field name="sign_witness" string="Signature"/>
+                        </group>
+                    </group>
+
+                    <separator string="Notes"/>
+                    <field name="notes" nolabel="1"
+                           placeholder="Complete in replicates as necessary…"/>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>

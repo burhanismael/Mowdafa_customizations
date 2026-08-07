@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_cp_configuration" name="Configuration"
+              parent="menu_cp_root" sequence="90"/>
+
+    <menuitem id="menu_cp_protection_concern" name="Primary Concerns"
+              parent="menu_cp_configuration" action="action_cp_protection_concern"
+              sequence="35"/>
+
+    <menuitem id="menu_cp_case_worker" name="Case Workers"
+              parent="menu_cp_configuration" action="action_cp_case_worker"
+              sequence="4"/>
+
+    <menuitem id="menu_cp_supervisor" name="Supervisors"
+              parent="menu_cp_configuration" action="action_cp_supervisor"
+              sequence="5"/>
+
+    <menuitem id="menu_cp_partner_agency" name="Partner Agencies"
+              parent="menu_cp_configuration" action="action_cp_partner_agency"
+              sequence="10"/>
+
+    <menuitem id="menu_cp_event_type" name="Event Types"
+              parent="menu_cp_configuration" action="action_cp_event_type"
+              sequence="25"/>
+
+    <menuitem id="menu_cp_performance_rating" name="Performance Ratings"
+              parent="menu_cp_configuration" action="action_cp_performance_rating"
+              sequence="30"/>
+
+    <menuitem id="menu_cp_basic_need" name="Basic Needs"
+              parent="menu_cp_configuration" action="action_cp_basic_need"
+              sequence="20"/>
+
+</odoo>

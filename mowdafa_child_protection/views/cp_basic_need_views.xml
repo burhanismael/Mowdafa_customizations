@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_basic_need_tree" model="ir.ui.view">
+        <field name="name">cp.basic.need.tree</field>
+        <field name="model">cp.basic.need</field>
+        <field name="arch" type="xml">
+            <tree string="Basic Needs" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_basic_need" model="ir.actions.act_window">
+        <field name="name">Basic Needs</field>
+        <field name="res_model">cp.basic.need</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- seed: the values the partner form offers -->
+
+    <record id="basic_need_food" model="cp.basic.need">
+        <field name="name">Food</field><field name="sequence">10</field>
+    </record>
+
+    <record id="basic_need_education" model="cp.basic.need">
+        <field name="name">Education</field><field name="sequence">20</field>
+    </record>
+
+    <record id="basic_need_pss" model="cp.basic.need">
+        <field name="name">Psychosocial Support</field><field name="sequence">30</field>
+    </record>
+
+    <record id="basic_need_health" model="cp.basic.need">
+        <field name="name">Health Care</field><field name="sequence">40</field>
+    </record>
+
+    <record id="basic_need_legal" model="cp.basic.need">
+        <field name="name">Legal Support</field><field name="sequence">50</field>
+    </record>
+
+    <record id="basic_need_shelter" model="cp.basic.need">
+        <field name="name">Shelter</field><field name="sequence">60</field>
+    </record>
+
+    <record id="basic_need_other" model="cp.basic.need">
+        <field name="name">Other</field><field name="sequence">70</field>
+    </record>
+
+    <!-- Event types (Number of Events Participated) -->
+
+</odoo>

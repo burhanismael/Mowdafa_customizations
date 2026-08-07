@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_cp_reunification" model="ir.sequence">
+        <field name="name">cp.reunification</field>
+        <field name="code">cp.reunification</field>
+        <field name="prefix">REU/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="view_cp_reunification_form" model="ir.ui.view">
+        <field name="name">cp.reunification.form</field>
+        <field name="model">cp.reunification</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="case_id"/>
+                            <field name="date"/>
+                            <field name="verified_adult"/>
+                            <field name="with_verified_adult"/>
+                            <field name="not_verified_reason"/>
+                            <field name="tracing_type"/>
+                        </group>
+                        <group>
+                            <field name="additional_information"/>
+                            <field name="followup_needed"/>
+                            <field name="reintegration_priorities"/>
+                            <field name="completed_by"/>
+                            <field name="adult_signature"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>
