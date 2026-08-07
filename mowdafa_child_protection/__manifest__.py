@@ -29,6 +29,7 @@ dashboard. The nine managed-track satellite forms follow.
         'views/cp_partner_record_views.xml',
         'views/cp_forms_views.xml',
         'views/cp_master_views.xml',
+        'views/cp_child_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

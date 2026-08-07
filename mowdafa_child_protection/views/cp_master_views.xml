@@ -192,8 +192,132 @@
         <field name="name">Outstanding</field><field name="sequence">50</field>
     </record>
 
+    <!-- Case Workers -->
+    <record id="view_cp_case_worker_tree" model="ir.ui.view">
+        <field name="name">cp.case.worker.tree</field>
+        <field name="model">cp.case.worker</field>
+        <field name="arch" type="xml">
+            <tree string="Case Workers">
+                <field name="employee_id"/>
+                <field name="institution"/>
+                <field name="location"/>
+                <field name="id_no"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cp_case_worker_form" model="ir.ui.view">
+        <field name="name">cp.case.worker.form</field>
+        <field name="model">cp.case.worker</field>
+        <field name="arch" type="xml">
+            <form string="Case Worker">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cases" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="case_count == 0">
+                            <field name="case_count" widget="statinfo" string="Cases"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="code" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="institution"/>
+                        </group>
+                        <group>
+                            <field name="location"/>
+                            <field name="id_no"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cp_case_worker" model="ir.actions.act_window">
+        <field name="name">Case Workers</field>
+        <field name="res_model">cp.case.worker</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Supervisors -->
+    <record id="view_cp_supervisor_tree" model="ir.ui.view">
+        <field name="name">cp.supervisor.tree</field>
+        <field name="model">cp.supervisor</field>
+        <field name="arch" type="xml">
+            <tree string="Supervisors">
+                <field name="generated_code"/>
+                <field name="supervisor_name"/>
+                <field name="mother_first_name"/>
+                <field name="birth_date"/>
+                <field name="place_of_birth"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cp_supervisor_form" model="ir.ui.view">
+        <field name="name">cp.supervisor.form</field>
+        <field name="model">cp.supervisor</field>
+        <field name="arch" type="xml">
+            <form string="Supervisor">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cases" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="case_count == 0">
+                            <field name="case_count" widget="statinfo" string="Cases"/>
+                        </button>
+                    </div>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="supervisor_name" placeholder="Supervisor Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mother_first_name"/>
+                            <field name="birth_date"/>
+                        </group>
+                        <group>
+                            <field name="birth_order"/>
+                            <field name="place_of_birth"/>
+                            <field name="generated_code" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cp_supervisor" model="ir.actions.act_window">
+        <field name="name">Supervisors</field>
+        <field name="res_model">cp.supervisor</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
     <menuitem id="menu_cp_configuration" name="Configuration"
               parent="menu_cp_root" sequence="90"/>
+    <menuitem id="menu_cp_case_worker" name="Case Workers"
+              parent="menu_cp_configuration" action="action_cp_case_worker"
+              sequence="4"/>
+    <menuitem id="menu_cp_supervisor" name="Supervisors"
+              parent="menu_cp_configuration" action="action_cp_supervisor"
+              sequence="5"/>
     <menuitem id="menu_cp_partner_agency" name="Partner Agencies"
               parent="menu_cp_configuration" action="action_cp_partner_agency"
               sequence="10"/>

@@ -3,3 +3,4 @@ from . import cp_case
 from . import cp_partner_record
 from . import cp_forms
 from . import cp_master
+from . import cp_child

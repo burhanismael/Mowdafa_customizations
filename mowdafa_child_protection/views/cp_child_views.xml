@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_child_form" model="ir.ui.view">
+        <field name="name">cp.child.form</field>
+        <field name="model">cp.child</field>
+        <field name="arch" type="xml">
+            <form string="Child">
+                <sheet>
+                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="child_name" placeholder="Child Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mother_first_name"/>
+                            <field name="birth_date"/>
+                        </group>
+                        <group>
+                            <field name="birth_order"/>
+                            <field name="place_of_birth"/>
+                            <field name="generated_code" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cp_child_tree" model="ir.ui.view">
+        <field name="name">cp.child.tree</field>
+        <field name="model">cp.child</field>
+        <field name="arch" type="xml">
+            <tree string="Children">
+                <field name="generated_code"/>
+                <field name="child_name"/>
+                <field name="mother_first_name"/>
+                <field name="birth_date"/>
+                <field name="place_of_birth"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_cp_child_search" model="ir.ui.view">
+        <field name="name">cp.child.search</field>
+        <field name="model">cp.child</field>
+        <field name="arch" type="xml">
+            <search string="Children">
+                <field name="child_name"/>
+                <field name="generated_code"/>
+                <field name="mother_first_name"/>
+                <field name="place_of_birth"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cp_child" model="ir.actions.act_window">
+        <field name="name">Children</field>
+        <field name="res_model">cp.child</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_cp_child_search"/>
+    </record>
+
+    <menuitem id="menu_cp_child" name="Children"
+              parent="menu_cp_root" action="action_cp_child" sequence="6"/>
+
+</odoo>

@@ -23,3 +23,9 @@ access_cp_event_type_user,cp.event.type.user,model_cp_event_type,base.group_user
 access_cp_event_type_manager,cp.event.type.manager,model_cp_event_type,base.group_system,1,1,1,1
 access_cp_performance_rating_user,cp.performance.rating.user,model_cp_performance_rating,base.group_user,1,0,0,0
 access_cp_performance_rating_manager,cp.performance.rating.manager,model_cp_performance_rating,base.group_system,1,1,1,1
+access_cp_case_worker_user,cp.case.worker.user,model_cp_case_worker,base.group_user,1,0,0,0
+access_cp_case_worker_manager,cp.case.worker.manager,model_cp_case_worker,base.group_system,1,1,1,1
+access_cp_supervisor_user,cp.supervisor.user,model_cp_supervisor,base.group_user,1,0,0,0
+access_cp_supervisor_manager,cp.supervisor.manager,model_cp_supervisor,base.group_system,1,1,1,1
+access_cp_child_user,cp.child.user,model_cp_child,base.group_user,1,1,1,1
+access_cp_child_manager,cp.child.manager,model_cp_child,base.group_system,1,1,1,1
