@@ -6,12 +6,12 @@
         <field name="model">documents.folder</field>
         <field name="inherit_id" ref="documents.folder_view_form"/>
         <field name="arch" type="xml">
-            <!-- Write Users under the write groups -->
+            <!-- Write Users under Write Access -->
             <xpath expr="//field[@name='user_specific_write']" position="after">
                 <field name="write_user_ids" widget="many2many_tags"
                        options="{'no_create_edit': True}"/>
             </xpath>
-            <!-- Read Users under the read groups -->
+            <!-- Read Users under Read Access -->
             <xpath expr="//field[@name='user_specific']" position="after">
                 <field name="read_user_ids" widget="many2many_tags"
                        options="{'no_create_edit': True}"/>

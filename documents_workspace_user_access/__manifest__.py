@@ -21,6 +21,11 @@ here gets access to the workspace even if not in any of its groups.
         'security/documents_user_access_rules.xml',
         'views/documents_folder_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'documents_workspace_user_access/static/src/upload_write_access.xml',
+        ],
+    },
     'installable': True,
     'application': False,
 }

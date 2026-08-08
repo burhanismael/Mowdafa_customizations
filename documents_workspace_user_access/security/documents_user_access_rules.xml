@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="0">
+<odoo>
 
     <!--
-        Extend Documents' own document rules so a user listed on a
-        workspace's Read/Write Users can access it, on top of the
-        existing group-based access. Branches are OR-ed, so nothing that
-        already worked is taken away.
+        Force Documents' record rules onto a purely USER-BASED form.
+        The original rules live in the documents module's noupdate="1"
+        blocks, so instead of relying on a <record> override we call a
+        method that rewrites their domains on every module update.
+
+        Result: a workspace and its documents are reachable only through
+        the workspace's Read Users / Write Users (a document's owner keeps
+        access to their own; Documents Managers still see everything).
     -->
-
-    <!-- READ: also readable by workspace read/write users -->
-    <record id="documents.documents_document_readonly_rule" model="ir.rule">
-        <field name="domain_force">[
-            '|',
-                '|',
-                    ('folder_id.read_user_ids', 'in', [user.id]),
-                    ('folder_id.write_user_ids', 'in', [user.id]),
-                '&amp;',
-                    ('folder_id.read_group_ids', 'in', user.groups_id.ids),
-                    '|',
-                        ('folder_id.user_specific', '=', False),
-                        ('owner_id', '=', user.id)
-            ]</field>
-    </record>
-
-    <!-- WRITE/CREATE: also writable by workspace write users -->
-    <record id="documents.documents_document_write_rule" model="ir.rule">
-        <field name="domain_force">[
-            '|',
-                ('folder_id.write_user_ids', 'in', [user.id]),
-                '|',
-                    '&amp;',
-                        ('folder_id.group_ids', 'in', user.groups_id.ids),
-                        '|',
-                            ('folder_id.user_specific_write', '=', False),
-                            ('owner_id', '=', user.id),
-                    '&amp;',
-                        ('folder_id.read_group_ids', '=', False),
-                        ('folder_id.group_ids', '=', False)]
-            </field>
-    </record>
+    <function model="ir.rule" name="_apply_documents_user_based"/>
 
 </odoo>

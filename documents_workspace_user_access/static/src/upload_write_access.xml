@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Disable the Upload button unless the current user has write
+         access to the selected workspace (i.e. is a Write User). -->
+    <t t-inherit="documents.DocumentsViews.ControlPanel"
+       t-inherit-mode="extension">
+        <xpath expr="//span[label[@for='uploadFileInput']]" position="attributes">
+            <attribute name="t-att-data-tooltip">(!folder.id or folder.id === 'TRASH' or (folder.id and !folder.has_write_access)) and tooltip</attribute>
+        </xpath>
+        <xpath expr="//label[@for='uploadFileInput']" position="attributes">
+            <attribute name="t-attf-class">btn btn-primary o_documents_kanban_upload #{!folder.id or folder.id === 'TRASH' or (folder.id and !folder.has_write_access) ? 'pe-none opacity-25' : ''}</attribute>
+            <attribute name="t-att-aria-disabled">!folder.id or folder.id === 'TRASH' or (folder.id and !folder.has_write_access)</attribute>
+        </xpath>
+        <xpath expr="//input[@id='uploadFileInput']" position="attributes">
+            <attribute name="t-att-disabled">!folder.id or folder.id === 'TRASH' or (folder.id and !folder.has_write_access)</attribute>
+        </xpath>
+    </t>
+
+</templates>
