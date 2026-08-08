@@ -154,35 +154,121 @@
         </field>
     </record>
 
-    <record id="view_cp_verification_form" model="ir.ui.view">
-        <field name="name">cp.verification.form</field>
-        <field name="model">cp.verification</field>
+    <record id="view_cp_verification_child_form" model="ir.ui.view">
+        <field name="name">cp.verification.child.form</field>
+        <field name="model">cp.verification.child</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Child Verification Form">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                        <button name="action_view_registration" type="object"
+                                class="oe_stat_button" icon="fa-id-card-o"
+                                invisible="not registration_id">
+                            <field name="registration_id" invisible="1"/>
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Registration</span>
+                            </div>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
+
+                    <separator string="Section 1 — Information About the Child"/>
                     <group>
                         <group>
-                            <field name="case_id"/>
-                            <field name="kind"/>
+                            <field name="case_id" readonly="1"/>
+                            <field name="reg_id_number" readonly="1"/>
+                            <field name="child_full_name" readonly="1"/>
+                            <field name="child_nickname" readonly="1"/>
+                            <field name="child_sex" readonly="1"/>
+                            <field name="child_dob" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="adult_relationship"/>
+                            <field name="location" readonly="1"/>
                             <field name="interview_date"/>
                             <field name="interview_place"/>
                             <field name="interviewed_alone"/>
-                            <field name="adult_name"/>
-                            <field name="adult_relationship"/>
-                            <field name="adult_contact"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 2 — Verification"/>
+                    <p class="text-muted">On the Adult Verification Form, put a
+                        tick by the details that match and a cross by the
+                        details that do not.</p>
+                    <group>
+                        <group>
+                            <field name="info_match" widget="radio"
+                                   options="{'horizontal': true}"/>
                         </group>
                         <group>
-                            <field name="adult_address"/>
-                            <field name="photo_recognised"/>
-                            <field name="account"/>
-                            <field name="accounts_match"/>
-                            <field name="child_wishes"/>
-                            <field name="recommendation"/>
+                            <field name="accent_check" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                    </group>
+                    <field name="match_ids">
+                        <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="detail" string="Detail from the Adult Verification Form"/>
+                            <field name="adult_answer" string="Adult's answer"/>
+                            <field name="child_file" string="Child's file"/>
+                            <field name="match" widget="boolean_toggle"/>
+                        </tree>
+                    </field>
+
+                    <separator string="Section 3 — Wishes of the Child"/>
+                    <group>
+                        <group>
+                            <field name="knows_adult" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="wishes_reunification" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="reunification_refusal_reason"
+                                   invisible="wishes_reunification != 'no'"/>
+                        </group>
+                        <group>
+                            <field name="wishes_to_know"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="wishes_reunification != 'no'">
+                        <strong>Gate raised.</strong> The child does not wish to
+                        be reunified with the verified adult. The case is held
+                        at Verification. A protection supervisor must record a
+                        decision and a written reason on the case before it can
+                        move to In Care. This record is not altered.
+                    </div>
+
+                    <separator string="Section 4 — Recommendation"/>
+                    <group>
+                        <group>
+                            <field name="recommendation" widget="radio"/>
                             <field name="reasons"/>
-                            <field name="completed_by"/>
+                        </group>
+                        <group>
+                            <field name="alternative_action"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 5 — Form Completed By"/>
+                    <group>
+                        <group>
+                            <field name="completed_by" string="Name"/>
+                            <field name="completed_position" string="Position"/>
+                            <field name="completed_agency" string="Agency"/>
+                        </group>
+                        <group>
+                            <field name="completed_place" string="Place"/>
+                            <field name="completed_date" string="Date"/>
+                            <field name="completed_sign" string="Signature"/>
                         </group>
                     </group>
                 </sheet>

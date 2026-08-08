@@ -67,6 +67,15 @@ class CpPsychosocial(models.Model):
     action_points = fields.Text(
         string='Action Points (Agreed points)', groups='base.group_system')
 
+    # session recorded by
+    counsellor = fields.Char(
+        string='Counsellor', groups='base.group_system')
+    session_date = fields.Date(
+        string='Session Date', default=fields.Date.context_today,
+        groups='base.group_system')
+    signature = fields.Char(
+        string='Signature', groups='base.group_system')
+
     @api.onchange('case_id')
     def _onchange_case_id_person(self):
         for record in self:

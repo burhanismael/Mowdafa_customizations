@@ -148,7 +148,7 @@ class CpCase(models.Model):
     registration_ids = fields.One2many(
         'cp.registration', 'case_id', string='Registrations')
     verification_ids = fields.One2many(
-        'cp.verification', 'case_id', string='Child Verifications')
+        'cp.verification.child', 'case_id', string='Child Verifications')
     adult_verification_ids = fields.One2many(
         'cp.verification.adult', 'case_id', string='Adult Verifications')
     psychosocial_ids = fields.One2many(
@@ -179,12 +179,11 @@ class CpCase(models.Model):
              'kept untouched — the disagreement is evidence.')
 
     @api.depends('adult_verification_ids.recommendation',
-                 'verification_ids.kind', 'verification_ids.recommendation')
+                 'verification_ids.recommendation')
     def _compute_verification(self):
         for case in self:
             adult = case.adult_verification_ids[:1]
-            child = case.verification_ids.filtered(
-                lambda v: v.kind == 'child')[:1]
+            child = case.verification_ids[:1]
             case.verification_conflict = bool(
                 adult and child
                 and adult.recommendation != child.recommendation)
@@ -193,8 +192,7 @@ class CpCase(models.Model):
         """Where the two accounts agree, the case moves on its own."""
         for case in self:
             adult = case.adult_verification_ids[:1]
-            child = case.verification_ids.filtered(
-                lambda v: v.kind == 'child')[:1]
+            child = case.verification_ids[:1]
             if adult and child and adult.recommendation == child.recommendation:
                 case.recommendation = child.recommendation
                 case._advance_stage('in_care')
@@ -238,7 +236,7 @@ class CpCase(models.Model):
 
     @api.depends('handover_ids', 'registration_ids', 'verification_ids',
                  'placement_ids', 'psychosocial_ids', 'reunification_ids',
-                 'cp_followup_ids', 'verification_ids.kind',
+                 'cp_followup_ids',
                  'adult_verification_ids', 'daily_record_ids', 'mentoring_ids')
     def _compute_form_counts(self):
         for case in self:
@@ -252,9 +250,8 @@ class CpCase(models.Model):
             case.mentoring_count = len(case.mentoring_ids)
             case.reunification_count = len(case.reunification_ids)
             case.followup_visit_count = len(case.cp_followup_ids)
-            child_kinds = case.verification_ids.mapped('kind')
             case.adult_verified = bool(case.adult_verification_ids)
-            case.child_verified = 'child' in child_kinds
+            case.child_verified = bool(case.verification_ids)
 
     # ── header buttons: open the next form pre-linked to this case ──────
     def _open_cp_form(self, model, name, extra_context=None):
@@ -282,8 +279,7 @@ class CpCase(models.Model):
 
     def action_create_verification_child(self):
         return self._open_cp_form(
-            'cp.verification', _('Child Verification'),
-            {'default_kind': 'child'})
+            'cp.verification.child', _('Child Verification'))
 
     def action_move_in_care(self):
         """Manual push from Verification to In Care. Advances when the two
@@ -293,8 +289,7 @@ class CpCase(models.Model):
         self._sync_verification()
         if self.stage == 'verification':
             adult = self.adult_verification_ids[:1]
-            child = self.verification_ids.filtered(
-                lambda v: v.kind == 'child')[:1]
+            child = self.verification_ids[:1]
             if not (adult and child):
                 raise UserError(_(
                     'Add both an Adult Verification and a Child Verification '
@@ -360,7 +355,8 @@ class CpCase(models.Model):
 
     def action_view_verifications(self):
         return self._view_cp_records(
-            'cp.verification', _('Child Verifications'), self.verification_ids)
+            'cp.verification.child', _('Child Verifications'),
+            self.verification_ids)
 
     def action_view_adult_verifications(self):
         return self._view_cp_records(

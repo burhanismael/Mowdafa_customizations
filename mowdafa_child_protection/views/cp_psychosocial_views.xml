@@ -15,6 +15,15 @@
         <field name="arch" type="xml">
             <form string="Psychosocial Support Form">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
@@ -101,6 +110,17 @@
                     <label for="action_points" string="Action Points (agreed points)"/>
                     <field name="action_points" nolabel="1" class="col-12"
                            placeholder="Action points…"/>
+
+                    <separator string="Session Recorded By"/>
+                    <group>
+                        <group>
+                            <field name="counsellor"/>
+                            <field name="session_date" string="Date"/>
+                        </group>
+                        <group>
+                            <field name="signature"/>
+                        </group>
+                    </group>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>

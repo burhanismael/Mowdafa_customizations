@@ -16,6 +16,11 @@ class CpDailyRecord(models.Model):
     placement_id = fields.Many2one(
         'cp.placement', string='Placement', ondelete='set null',
         domain="[('case_id', '=', case_id)]")
+    # child summary — read from the case, for the header card
+    child_full_name = fields.Char(
+        related='case_id.child_name', string='Full Name')
+    child_sex = fields.Selection(related='case_id.sex', string='Sex')
+    child_age = fields.Integer(related='case_id.age_years', string='Age')
     date = fields.Date(
         string='Date', required=True, default=fields.Date.context_today)
     week = fields.Selection([

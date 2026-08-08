@@ -37,6 +37,8 @@ class CpMentoring(models.Model):
     placement_id = fields.Many2one(
         'cp.placement', string='Placement', ondelete='set null',
         domain="[('case_id', '=', case_id)]")
+    child_full_name = fields.Char(
+        related='case_id.child_name', string='Mentee')
     date = fields.Date(
         string='Date', required=True, default=fields.Date.context_today)
     mentor = fields.Char(string='Mentor Name')
@@ -44,7 +46,12 @@ class CpMentoring(models.Model):
 
     # 1 · weekly attendance / activity grid
     line_ids = fields.One2many(
-        'cp.mentoring.line', 'mentoring_id', string='Weekly Activities')
+        'cp.mentoring.line', 'mentoring_id', string='Weekly Activities',
+        default=lambda self: self._default_lines())
+
+    @api.model
+    def _default_lines(self):
+        return [(0, 0, {'sequence': 10, 'activity': 'Session attendance'})]
 
     # 1 · total hours this month
     total_hours = fields.Selection([
@@ -117,6 +124,4 @@ class CpMentoringMotivation(models.Model):
         ondelete='cascade')
     sequence = fields.Integer(string='Sequence', default=10)
     area = fields.Char(string='Activity')
-    increased = fields.Char(string='Increased')
-    no_change = fields.Char(string='No Change')
-    decreased = fields.Char(string='Decreased')
+    rating = fields.Selection(MOTIVATION, string='This Month')

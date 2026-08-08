@@ -13,25 +13,106 @@
         <field name="name">cp.reunification.form</field>
         <field name="model">cp.reunification</field>
         <field name="arch" type="xml">
-            <form>
+            <form string="Reunification Form">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
+
+                    <separator string="Section 1 — Identity of the Child"/>
                     <group>
                         <group>
-                            <field name="case_id"/>
-                            <field name="date"/>
-                            <field name="verified_adult"/>
-                            <field name="with_verified_adult"/>
-                            <field name="not_verified_reason"/>
-                            <field name="tracing_type"/>
+                            <field name="case_id" readonly="1"/>
+                            <field name="reg_id_number" readonly="1"/>
+                            <field name="child_full_name" readonly="1"/>
+                            <field name="child_nickname" readonly="1"/>
+                            <field name="child_sex" readonly="1"/>
+                            <field name="child_dob" readonly="1"/>
                         </group>
                         <group>
-                            <field name="additional_information"/>
-                            <field name="followup_needed"/>
-                            <field name="reintegration_priorities"/>
-                            <field name="completed_by"/>
+                            <field name="child_adult_relationship" readonly="1"/>
+                            <field name="child_location" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 2 — Identity of the Adult with whom the Child was Reunified"/>
+                    <group>
+                        <group>
+                            <field name="verified_adult" readonly="1"/>
+                            <field name="adult_nickname" readonly="1"/>
+                            <field name="adult_sex" readonly="1"/>
+                            <field name="adult_dob" readonly="1"/>
+                            <field name="adult_child_relationship" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="adult_phone" readonly="1"/>
+                            <field name="adult_location" readonly="1"/>
+                            <field name="directions_landmark"/>
+                        </group>
+                    </group>
+
+                    <separator string="Section 3 — Details of Reunification"/>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="with_verified_adult" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="not_verified_reason" widget="radio"
+                                   invisible="with_verified_adult != 'no'"/>
+                            <field name="not_verified_reason_other"
+                                   string="Other — please specify"
+                                   invisible="not_verified_reason != 'other'"/>
+                        </group>
+                        <group>
+                            <field name="reunification_type" widget="radio"/>
+                            <field name="reunification_type_other"
+                                   string="Other — please specify"
+                                   invisible="reunification_type != 'other'"/>
+                        </group>
+                    </group>
+                    <label for="additional_information"
+                           string="Additional information about the reunification"/>
+                    <field name="additional_information" nolabel="1" class="col-12"/>
+
+                    <separator string="Follow-up"/>
+                    <group>
+                        <group>
+                            <field name="followup_needed" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <label for="followup_interval" string="Follow up after — every"/>
+                            <div class="o_row">
+                                <field name="followup_interval" class="oe_inline"/>
+                                <field name="followup_unit" class="oe_inline"/>
+                            </div>
+                            <field name="followup_visits_count"
+                                   string="Number of visits to schedule"/>
+                        </group>
+                    </group>
+                    <label for="reintegration_priorities"
+                           string="Priorities for reintegration support or follow-up, including any immediate assistance required"/>
+                    <field name="reintegration_priorities" nolabel="1" class="col-12"/>
+
+                    <separator string="Section 4 — Form Completed By"/>
+                    <group>
+                        <group>
+                            <field name="completed_by" string="Name"/>
+                            <field name="completed_position" string="Position"/>
+                            <field name="completed_agency" string="Agency"/>
+                        </group>
+                        <group>
+                            <field name="completed_place" string="Place"/>
+                            <field name="completed_sign" string="Signature"/>
                             <field name="adult_signature"/>
                         </group>
                     </group>
