@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessError
 
 
 class CpCaseWorker(models.Model):
@@ -9,8 +9,8 @@ class CpCaseWorker(models.Model):
     _name = 'cp.case.worker'
     _description = 'CP Case Worker'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name = 'code'
-    _rec_names_search = ['code', 'employee_id.name']
+    _rec_name = 'employee_id'
+    _rec_names_search = ['employee_id.name', 'id_no', 'institution']
     _order = 'id desc'
 
     employee_id = fields.Many2one(
@@ -19,21 +19,26 @@ class CpCaseWorker(models.Model):
         string='Institution/Organization', required=True, tracking=True)
     location = fields.Char(string='Location', required=True, tracking=True)
     id_no = fields.Char(string='ID No.', required=True, tracking=True)
-    code = fields.Char(
-        string='Code', compute='_compute_code', store=True, tracking=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('active', 'Active'),
+    ], string='Status', default='draft', required=True, tracking=True,
+        copy=False)
     case_ids = fields.One2many(
         'cp.case', 'case_worker_id', string='Linked Cases')
     case_count = fields.Integer(
         string='Cases', compute='_compute_case_count')
 
-    @api.depends('institution', 'location', 'id_no')
-    def _compute_code(self):
-        for record in self:
-            institution = (record.institution or '').strip().upper()
-            location = (record.location or '').strip().upper()[:2]
-            id_no = (record.id_no or '').strip()
-            parts = [p for p in (institution, location, id_no) if p]
-            record.code = '-'.join(parts)
+    def action_activate(self):
+        self.write({'state': 'active'})
+
+    def action_reset_draft(self):
+        if not self.env.user.has_group(
+                'mowdafa_extended.group_reset_to_draft'):
+            raise AccessError(_(
+                'Only users in the "Reset to Draft" group may unlock an '
+                'active record.'))
+        self.write({'state': 'draft'})
 
     @api.depends('case_ids')
     def _compute_case_count(self):

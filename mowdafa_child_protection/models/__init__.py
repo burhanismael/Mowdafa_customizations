@@ -5,7 +5,6 @@ from . import cp_form_mixin
 # spine
 from . import cp_case
 from . import cp_partner_record
-from . import cp_child
 
 # master tables
 from . import cp_case_worker

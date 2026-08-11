@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 from collections import defaultdict
 from datetime import date
 
@@ -23,6 +24,13 @@ CARD_COLOURS = ['#F2382F', '#E9508E', '#8A4C20', '#19A8D8',
 # past arrest still means the man was caught, so the tile does not shrink
 # when the case moves on to court.
 CAUGHT_STATUSES = ('arrested', 'charged', 'convicted')
+
+# Page two: bar colour, and the pie slice colour per victim sex.
+BAR_COLOUR = '#E24A3B'
+SEX_COLOURS = {'female': '#C00000', 'male': '#FFC000', 'other': '#7C878D'}
+
+# Page three: last year against this one.
+COMPARE_COLOURS = {'previous': '#EE4B3B', 'current': '#14181B'}
 
 
 class GbvCaseReportWizard(models.TransientModel):
@@ -200,15 +208,19 @@ class GbvCaseReportWizard(models.TransientModel):
             return '%s %s' % (MONTH_SO[start.month - 1].upper(), start.year)
         return '%s – %s' % (start.strftime('%d/%m/%Y'), end.strftime('%d/%m/%Y'))
 
+    def _type_word(self, vtypes):
+        """The violence type as it reads inside a Somali title."""
+        self.ensure_one()
+        if len(vtypes) == 1:
+            return (vtypes.somali_name or vtypes.name or '').upper()
+        return 'XADGUDUBKA'
+
     def _block_title(self, vtypes):
         self.ensure_one()
         if self.title_override:
             return self.title_override
-        if len(vtypes) == 1:
-            word = (vtypes.somali_name or vtypes.name or '').upper()
-        else:
-            word = 'XADGUDUBKA'
-        return 'XOGTA KIISASKA %s PUNTLAND %s' % (word, self._period_label())
+        return 'XOGTA KIISASKA %s PUNTLAND %s' % (
+            self._type_word(vtypes), self._period_label())
 
     def _block_subtitle(self, vtypes):
         self.ensure_one()
@@ -308,8 +320,6 @@ class GbvCaseReportWizard(models.TransientModel):
             if region.id in no_data_ids:
                 continue
             region_districts = districts.filtered(lambda d: d.region_id == region)
-            if not region_districts and not unspecified.get(region.id):
-                continue
             lines, total = [], 0
             for line_index, district in enumerate(region_districts, start=1):
                 count = by_district.get(district.id, 0)
@@ -371,6 +381,11 @@ class GbvCaseReportWizard(models.TransientModel):
             circumference * sex['other_pct'] / 100.0, circumference)
         sex['other_offset'] = '-%.1f' % (
             circumference * (sex['female_pct'] + sex['male_pct']) / 100.0)
+        sex['pie'] = self._build_pie([
+            (_('Gabdho'), sex['female'], SEX_COLOURS['female']),
+            (_('Wiilal'), sex['male'], SEX_COLOURS['male']),
+            (_('Kale'), sex['other'], SEX_COLOURS['other']),
+        ])
 
         # ---- victim age -------------------------------------------------
         ages = [case.age_years for case in cases if case.age_years]
@@ -384,6 +399,28 @@ class GbvCaseReportWizard(models.TransientModel):
             'oldest': max(ages) if ages else 0,
             'youngest': min(ages) if ages else 0,
         }
+        age['tiles'] = [
+            {'label': 'TIRADA GUUD', 'value': age['total'],
+             'unit': _('Dhibane'), 'colour': '#e6f0e9'},
+            {'label': 'KA YAR 18 SANNO', 'value': age['under_18'],
+             'unit': _('Dhibane'), 'colour': '#e8e8f2'},
+            {'label': 'KA WEYN 18 SANNO', 'value': age['over_18'],
+             'unit': _('Dhibane'), 'colour': '#dbeffa'},
+            {'label': 'DHIBANAHA UGU WEYN', 'value': age['oldest'],
+             'unit': _('Sano jir'), 'colour': '#fdf2d1'},
+            {'label': 'DHIBANAHA UGU YAR', 'value': age['youngest'],
+             'unit': _('Sano jir'), 'colour': '#f9dce1'},
+        ]
+        # The three counts side by side, wider bars than the region
+        # chart because there are only three of them.
+        age['columns'] = [
+            {'label': _('Tirada Guud'), 'value': age['total']},
+            {'label': _('Ka yar 18'), 'value': age['under_18']},
+            {'label': _('Ka weyn 18'), 'value': age['over_18']},
+        ]
+        age['chart'] = self._build_bar_chart(
+            [dict(column, no_data=False) for column in age['columns']],
+            bar_cap=34.0)
 
         # ---- perpetrators ------------------------------------------------
         perpetrators = self.env['gbv.case.perpetrator'].search(
@@ -401,14 +438,51 @@ class GbvCaseReportWizard(models.TransientModel):
         perp_max = max([perp['total'], 1])
         perp['caught_pct'] = round(100.0 * perp['caught'] / perp_max, 1)
         perp['at_large_pct'] = round(100.0 * perp['at_large'] / perp_max, 1)
+        perp['tiles'] = [
+            {'label': 'TIRADA GUUD', 'value': perp['total'],
+             'unit': _('Eedaysane'), 'colour': '#e6f0e9'},
+            {'label': 'LA QABTAY', 'value': perp['caught'],
+             'unit': _('Eedaysane'), 'colour': '#e8e8f2'},
+            {'label': 'BAXSAD', 'value': perp['at_large'],
+             'unit': _('Eedaysane'), 'colour': '#dbeffa'},
+        ]
+        perp['age_tiles'] = [
+            {'label': 'EEDAYSANAHA UGU WEYN', 'value': perp['oldest'],
+             'unit': _('Sano jir'), 'colour': '#ececec'},
+            {'label': 'EEDAYSANAHA UGU YAR', 'value': perp['youngest'],
+             'unit': _('Sano jir'), 'colour': '#f9dce1'},
+        ]
+        perp['columns'] = [
+            {'label': _('Eedaysanayaasha'), 'value': perp['total']},
+            {'label': _('La qabtay'), 'value': perp['caught']},
+            {'label': _('Baxsad'), 'value': perp['at_large']},
+        ]
+        perp['chart'] = self._build_bar_chart(
+            [dict(column, no_data=False) for column in perp['columns']],
+            bar_cap=34.0)
 
         # ---- previous-year comparison -------------------------------------
         compare = self._build_comparison(vtypes, regions, no_data_ids) \
             if self.compare_previous else False
+        if compare:
+            compare['title'] = 'DHACDOOYINKA %s %s IYO %s' % (
+                self._type_word(vtypes),
+                compare['label_previous'], compare['label_current'])
+            compare['grouped'] = self._build_grouped_chart(compare['rows'])
 
         return {
             'title': self._block_title(vtypes),
             'subtitle': self._block_subtitle(vtypes),
+            'chart_title': 'JAANTUSKA KIISASKA %s EE GOBOLADA.'
+                           % self._type_word(vtypes),
+            'sex_title': 'TIRADA WIILASHA IYO HAWEENKA DHIBANAHA AH.',
+            'age_title': "DA'DA DHIBANAYAASHA",
+            'age_subtitle': 'Dhibanayaasha ka yar 18 iyo Toban iyo inta ka weyn',
+            'age_legend': "Da'da Dhibanayaasha",
+            'perp_title': 'XOGTA EEDAYSANAYAASHA FIL-DAMBIYEEDYADA %s'
+                          % self._type_word(vtypes),
+            'perp_subtitle': 'Tirada Guud, Inta la qabtay iyo Inta Baxsad ka ah',
+            'perp_legend': 'Xogta Eedaysanayaasha',
             'mode': mode,
             'columns': columns,
             'rows': rows,
@@ -417,11 +491,150 @@ class GbvCaseReportWizard(models.TransientModel):
             'cards': cards,
             'card_rows': card_rows,
             'bars': bars,
+            'chart': self._build_bar_chart(bars),
             'sex': sex,
             'age': age,
             'perp': perp,
             'compare': compare,
         }
+
+    # ==================================================================
+    # Page two — bar chart per region, pie chart per victim sex
+    # ==================================================================
+    @api.model
+    def _axis_scale(self, max_value):
+        """A round axis maximum with at most eight gridlines, so the
+        labels stay readable at print size. The 15% headroom keeps the
+        tallest bar off the top gridline."""
+        for step in (1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000):
+            axis_max = int(math.ceil(max(max_value * 1.15, 4) / float(step)) * step)
+            if axis_max / step <= 8:
+                return axis_max, step
+        return axis_max, step
+
+    @api.model
+    def _build_bar_chart(self, bars, bar_cap=20.0):
+        """SVG geometry for a bar chart, in user units. Bars flagged
+        no_data get the "Xog kama helin" note where the bar would have
+        been — a missing return is not a zero."""
+        left, right, top, bottom = 34.0, 344.0, 14.0, 196.0
+        values = [bar['value'] for bar in bars if not bar['no_data']]
+        axis_max, step = self._axis_scale(max(values) if values else 0)
+        plot_height = bottom - top
+
+        ticks, value = [], 0
+        while value <= axis_max:
+            ticks.append({
+                'label': value,
+                'y': round(bottom - plot_height * value / axis_max, 1),
+            })
+            value += step
+
+        slot = (right - left) / (len(bars) or 1)
+        bar_width = min(bar_cap, slot * 0.5)
+        items = []
+        for index, bar in enumerate(bars):
+            centre = left + slot * index + slot / 2.0
+            height = 0.0 if bar['no_data'] else plot_height * bar['value'] / axis_max
+            items.append({
+                'label': bar['label'],
+                'value': bar['value'],
+                'no_data': bar['no_data'],
+                'centre': round(centre, 1),
+                'x': round(centre - bar_width / 2.0, 1),
+                'width': round(bar_width, 1),
+                'y': round(bottom - height, 1),
+                'height': round(height, 1),
+            })
+        return {
+            'width': 360, 'height': 250,
+            'left': left, 'right': right, 'top': top, 'bottom': bottom,
+            'label_y': round(bottom + 8, 1),
+            'nodata_y': round(bottom - 34, 1),
+            'colour': BAR_COLOUR,
+            'ticks': ticks,
+            'bars': items,
+        }
+
+    @api.model
+    def _build_grouped_chart(self, rows):
+        """Two bars per region, last year beside this one. Full page
+        width, and the plot starts where the table below it does so the
+        columns line up under their bars."""
+        left, right, top, bottom = 62.0, 716.0, 14.0, 240.0
+        values = [row['previous'] for row in rows]
+        values += [0 if row['no_data'] else row['current'] for row in rows]
+        axis_max, step = self._axis_scale(max(values) if values else 0)
+        plot_height = bottom - top
+
+        ticks, value = [], 0
+        while value <= axis_max:
+            ticks.append({
+                'label': value,
+                'y': round(bottom - plot_height * value / axis_max, 1),
+            })
+            value += step
+
+        slot = (right - left) / (len(rows) or 1)
+        bar_width = min(26.0, slot * 0.34)
+        groups = []
+        for index, row in enumerate(rows):
+            centre = left + slot * index + slot / 2.0
+            pair = []
+            for offset, (value, colour) in enumerate((
+                    (row['previous'], COMPARE_COLOURS['previous']),
+                    (0 if row['no_data'] else row['current'],
+                     COMPARE_COLOURS['current']))):
+                height = plot_height * value / axis_max
+                pair.append({
+                    'x': round(centre - bar_width + bar_width * offset, 1),
+                    'y': round(bottom - height, 1),
+                    'width': round(bar_width, 1),
+                    'height': round(height, 1),
+                    'colour': colour,
+                })
+            groups.append({'label': row['name'], 'bars': pair})
+        return {
+            'width': 720, 'height': 246,
+            'left': left, 'right': right, 'top': top, 'bottom': bottom,
+            'ticks': ticks, 'groups': groups,
+            'previous_colour': COMPARE_COLOURS['previous'],
+            'current_colour': COMPARE_COLOURS['current'],
+        }
+
+    @api.model
+    def _build_pie(self, parts):
+        """SVG pie geometry from [(label, value, colour), ...]. A single
+        non-zero part is drawn as a plain circle: an arc whose start and
+        end coincide would collapse to nothing."""
+        centre, radius = 100.0, 88.0
+        drawn = [part for part in parts if part[1]]
+        pie = {'centre': centre, 'radius': radius, 'total': sum(p[1] for p in parts),
+               'circle': False, 'slices': []}
+        if not drawn:
+            return pie
+        total = float(sum(part[1] for part in drawn))
+        for label, value, colour in drawn:
+            pie['slices'].append({
+                'label': label, 'value': value, 'colour': colour,
+                'pct': round(100.0 * value / total, 1), 'd': ''})
+        if len(drawn) == 1:
+            pie['circle'] = drawn[0][2]
+            return pie
+        angle = -90.0
+        for slice_ in pie['slices']:
+            sweep = 360.0 * slice_['value'] / total
+            start, end = angle, angle + sweep
+            angle = end
+            slice_['d'] = 'M %.1f %.1f L %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f Z' % (
+                centre, centre,
+                centre + radius * math.cos(math.radians(start)),
+                centre + radius * math.sin(math.radians(start)),
+                radius, radius, 1 if sweep > 180 else 0,
+                centre + radius * math.cos(math.radians(end)),
+                centre + radius * math.sin(math.radians(end)),
+            )
+        return pie
 
     def _build_comparison(self, vtypes, regions, no_data_ids):
         self.ensure_one()

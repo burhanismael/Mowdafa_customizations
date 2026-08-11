@@ -13,4 +13,13 @@
         <field name="category_id" ref="module_category_gbv"/>
     </record>
 
+    <!-- Users allowed to unlock an active master record (case worker,
+         survivor, CP case worker, CP supervisor) back to draft. -->
+    <record id="group_reset_to_draft" model="res.groups">
+        <field name="name">Reset to Draft (GBV &amp; Child Protection)</field>
+        <field name="category_id" ref="module_category_gbv"/>
+        <field name="users"
+               eval="[(4, ref('base.user_admin')), (4, ref('base.user_root'))]"/>
+    </record>
+
 </odoo>

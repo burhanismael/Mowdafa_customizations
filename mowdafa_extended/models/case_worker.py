@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import AccessError
 
 
 class CaseWorker(models.Model):
@@ -37,6 +38,22 @@ class CaseWorker(models.Model):
         store=True,
         tracking=True,
     )
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('active', 'Active'),
+    ], string='Status', default='draft', required=True, tracking=True,
+        copy=False)
+
+    def action_activate(self):
+        self.write({'state': 'active'})
+
+    def action_reset_draft(self):
+        if not self.env.user.has_group(
+                'mowdafa_extended.group_reset_to_draft'):
+            raise AccessError(_(
+                'Only users in the "Reset to Draft" group may unlock an '
+                'active record.'))
+        self.write({'state': 'draft'})
 
     @api.depends('institution', 'location', 'id_no')
     def _compute_code(self):

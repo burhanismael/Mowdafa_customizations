@@ -6,6 +6,15 @@
         <field name="model">survivor.master</field>
         <field name="arch" type="xml">
             <form string="Survivor">
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object" invisible="state != 'active'"
+                            groups="mowdafa_extended.group_reset_to_draft"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_consent_forms" type="object"
@@ -14,20 +23,26 @@
                             <field name="consent_count" widget="statinfo" string="Consent Form"/>
                         </button>
                     </div>
-                    <field name="photo" widget="image" class="oe_avatar"/>
+                    <field name="photo" widget="image" class="oe_avatar"
+                           readonly="state == 'active'"/>
                     <div class="oe_title">
                         <h1>
-                            <field name="survivor_name" placeholder="Survivor Name"/>
+                            <field name="survivor_name" placeholder="Survivor Name"
+                                   readonly="state == 'active'"/>
                         </h1>
                     </div>
                     <group>
                         <group>
-                            <field name="mother_first_name"/>
-                            <field name="birth_date"/>
+                            <field name="mother_first_name"
+                                   readonly="state == 'active'"/>
+                            <field name="birth_date"
+                                   readonly="state == 'active'"/>
                         </group>
                         <group>
-                            <field name="birth_order"/>
-                            <field name="place_of_birth"/>
+                            <field name="birth_order"
+                                   readonly="state == 'active'"/>
+                            <field name="place_of_birth"
+                                   readonly="state == 'active'"/>
                             <field name="generated_code" readonly="1"/>
                         </group>
                     </group>
@@ -53,6 +68,9 @@
                 <field name="birth_order"/>
                 <field name="place_of_birth"/>
                 <field name="generated_code"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-info="state == 'draft'"/>
             </tree>
         </field>
     </record>
@@ -67,6 +85,14 @@
                 <field name="generated_code"/>
                 <field name="mother_first_name"/>
                 <field name="place_of_birth"/>
+                <filter string="Draft" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Active" name="filter_active"
+                        domain="[('state', '=', 'active')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                </group>
             </search>
         </field>
     </record>

@@ -29,8 +29,6 @@ access_cp_case_worker_user,cp.case.worker.user,model_cp_case_worker,base.group_u
 access_cp_case_worker_manager,cp.case.worker.manager,model_cp_case_worker,base.group_system,1,1,1,1
 access_cp_supervisor_user,cp.supervisor.user,model_cp_supervisor,base.group_user,1,0,0,0
 access_cp_supervisor_manager,cp.supervisor.manager,model_cp_supervisor,base.group_system,1,1,1,1
-access_cp_child_user,cp.child.user,model_cp_child,base.group_user,1,1,1,1
-access_cp_child_manager,cp.child.manager,model_cp_child,base.group_system,1,1,1,1
 access_cp_protection_concern_user,cp.protection.concern.user,model_cp_protection_concern,base.group_user,1,0,0,0
 access_cp_protection_concern_manager,cp.protection.concern.manager,model_cp_protection_concern,base.group_system,1,1,1,1
 access_cp_registration_action_user,cp.registration.action.user,model_cp_registration_action,base.group_user,1,1,1,1

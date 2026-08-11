@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import AccessError, ValidationError
 
 
 class SurvivorMaster(models.Model):
@@ -17,6 +17,22 @@ class SurvivorMaster(models.Model):
         tracking=True,
     )
     photo = fields.Binary(string='Photo', attachment=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('active', 'Active'),
+    ], string='Status', default='draft', required=True, tracking=True,
+        copy=False)
+
+    def action_activate(self):
+        self.write({'state': 'active'})
+
+    def action_reset_draft(self):
+        if not self.env.user.has_group(
+                'mowdafa_extended.group_reset_to_draft'):
+            raise AccessError(_(
+                'Only users in the "Reset to Draft" group may unlock an '
+                'active record.'))
+        self.write({'state': 'draft'})
 
     @api.constrains('survivor_name', 'mother_first_name', 'birth_date')
     def _check_unique_survivor(self):

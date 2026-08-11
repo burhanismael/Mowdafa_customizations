@@ -6,11 +6,12 @@
         <field name="model">cp.supervisor</field>
         <field name="arch" type="xml">
             <tree string="Supervisors">
-                <field name="generated_code"/>
-                <field name="supervisor_name"/>
-                <field name="mother_first_name"/>
-                <field name="birth_date"/>
-                <field name="place_of_birth"/>
+                <field name="employee_id"/>
+                <field name="institution"/>
+                <field name="id_no"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-info="state == 'draft'"/>
             </tree>
         </field>
     </record>
@@ -20,6 +21,15 @@
         <field name="model">cp.supervisor</field>
         <field name="arch" type="xml">
             <form string="Supervisor">
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" string="Reset to Draft"
+                            type="object" invisible="state != 'active'"
+                            groups="mowdafa_extended.group_reset_to_draft"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_cases" type="object"
@@ -28,21 +38,20 @@
                             <field name="case_count" widget="statinfo" string="Cases"/>
                         </button>
                     </div>
-                    <field name="photo" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
+                        <label for="employee_id" string="Supervisor"/>
                         <h1>
-                            <field name="supervisor_name" placeholder="Supervisor Name"/>
+                            <field name="employee_id" placeholder="Employee"
+                                   readonly="state == 'active'"/>
                         </h1>
                     </div>
                     <group>
                         <group>
-                            <field name="mother_first_name"/>
-                            <field name="birth_date"/>
+                            <field name="institution"
+                                   readonly="state == 'active'"/>
                         </group>
                         <group>
-                            <field name="birth_order"/>
-                            <field name="place_of_birth"/>
-                            <field name="generated_code" readonly="1"/>
+                            <field name="id_no" readonly="state == 'active'"/>
                         </group>
                     </group>
                 </sheet>
