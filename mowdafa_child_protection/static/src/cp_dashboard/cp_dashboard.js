@@ -4,13 +4,15 @@ import { useService } from "@web/core/utils/hooks";
 import { Component, useState, onWillStart } from "@odoo/owl";
 
 /**
- * Child Protection dashboard — one screen, two halves.
+ * Child Protection dashboard — one screen, three reports.
  *
- * One RPC (cp.case.get_dashboard_data) returns both: the managed
- * caseload (cp.case: stages, recommendations) and the partner report
- * (cp.partner.record: by agency, region, concern, sex, age, status).
- * They share a screen but never a number — "cases we handle" and
- * "records we hold" stay clearly apart.
+ * One RPC (cp.case.get_dashboard_data) returns all of them: the managed
+ * caseload (cp.case: stages, recommendations), the partner report
+ * (cp.partner.record: by agency, region, concern, sex, age, status) and
+ * the ministry report (cp.ministry.case: the same cuts, minus agency).
+ * They share a screen but never a number — each table is counted on its
+ * own, so "cases we handle", "records we hold" and the ministry's own
+ * intake stay clearly apart.
  */
 const RECO_COLORS = {
     reunification: "#0ca30c",
@@ -141,6 +143,27 @@ export class CpDashboard extends Component {
         };
     }
 
+    // ── ministry report ──────────────────────────────────────────────
+    get ministryRegionBars() {
+        return this._bars(this.state.data.ministry_regions);
+    }
+
+    get ministryConcernBars() {
+        return this._bars(this.state.data.ministry_concerns);
+    }
+
+    get ministrySexBars() {
+        return this._bars(this.state.data.ministry_sex);
+    }
+
+    get ministryAgeBars() {
+        return this._bars(this.state.data.ministry_ages);
+    }
+
+    get ministryStatusBars() {
+        return this._bars(this.state.data.ministry_status);
+    }
+
     // status colour never travels alone — it always ships with an icon
     statusTone(name) {
         return {
@@ -192,6 +215,25 @@ export class CpDashboard extends Component {
 
     openPartnerCritical() {
         this.openCases("cp.partner.record",
+            [["risk_level", "in", ["critical", "high"]]], "Critical Risk");
+    }
+
+    openMinistry() {
+        this.openCases("cp.ministry.case", [], "Ministry Cases");
+    }
+
+    openMinistryActive() {
+        this.openCases("cp.ministry.case",
+            [["case_status", "in", ["open", "active"]]], "Active");
+    }
+
+    openMinistryClosed() {
+        this.openCases("cp.ministry.case",
+            [["case_status", "=", "closed"]], "Closed");
+    }
+
+    openMinistryCritical() {
+        this.openCases("cp.ministry.case",
             [["risk_level", "in", ["critical", "high"]]], "Critical Risk");
     }
 }

@@ -304,6 +304,127 @@
                 </div>
             </div>
 
+            <!-- ═══ MINISTRY REPORT — the ministry's own intake ═══ -->
+            <div class="o_cp_section_title mt-2 mb-3">
+                <i class="fa fa-institution"/>Ministry cases — a report of their own
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openMinistry">
+                        <div class="o_cp_tile_icon">
+                            <i class="fa fa-child" role="img" title="Ministry cases"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Ministry cases</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.ministry_total"/>
+                            <div class="o_cp_tile_sub">keyed by the ministry</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openMinistryActive">
+                        <div class="o_cp_tile_icon is-good">
+                            <i class="fa fa-check-circle" role="img" title="Active"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Active</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.ministry_active"/>
+                            <div class="o_cp_tile_sub">
+                                <t t-esc="pct(tiles.ministry_active, tiles.ministry_total)"/> of cases
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openMinistryClosed">
+                        <div class="o_cp_tile_icon is-neutral">
+                            <i class="fa fa-archive" role="img" title="Closed"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Closed</div>
+                            <div class="o_cp_tile_value" t-esc="tiles.ministry_closed"/>
+                            <div class="o_cp_tile_sub">closed on the record</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="o_cp_tile p-3 h-100 cursor-pointer" t-on-click="openMinistryCritical">
+                        <div class="o_cp_tile_icon is-critical">
+                            <i class="fa fa-exclamation-triangle" role="img" title="Critical risk"/>
+                        </div>
+                        <div>
+                            <div class="o_cp_tile_label">Critical risk</div>
+                            <div class="o_cp_tile_value text-danger" t-esc="tiles.ministry_critical"/>
+                            <div class="o_cp_tile_sub">flagged on intake</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-map-marker"/>By region</div>
+                        <t t-foreach="ministryRegionBars" t-as="row" t-key="row_index">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
+                        </t>
+                        <div t-if="!ministryRegionBars.length" class="text-muted small">—</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-shield"/>By protection concern</div>
+                        <t t-foreach="ministryConcernBars" t-as="row" t-key="row_index">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
+                        </t>
+                        <div t-if="!ministryConcernBars.length" class="text-muted small">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-venus-mars"/>By sex</div>
+                        <t t-foreach="ministrySexBars" t-as="row" t-key="row_index">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-bar-chart"/>By age band</div>
+                        <t t-foreach="ministryAgeBars" t-as="row" t-key="row_index">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="''"/>
+                                <t t-set="icon" t-value="false"/>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="o_cp_card p-3 h-100">
+                        <div class="o_cp_card_title"><i class="fa fa-heartbeat"/>By status &amp; risk</div>
+                        <t t-foreach="ministryStatusBars" t-as="row" t-key="row_index">
+                            <t t-call="mowdafa_child_protection.CpBarRow">
+                                <t t-set="tone" t-value="statusTone(row.name)"/>
+                                <t t-set="icon" t-value="statusIcon(row.name)"/>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
         </t>
     </div>
 </t>

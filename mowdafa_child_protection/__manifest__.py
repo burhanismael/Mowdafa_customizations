@@ -29,6 +29,7 @@ dashboard. The nine managed-track satellite forms follow.
         # spine (defines the root menu)
         'views/cp_case_views.xml',
         'views/cp_partner_record_views.xml',
+        'views/cp_ministry_case_views.xml',
         # master tables (define the actions the menus point at)
         'views/cp_partner_agency_views.xml',
         'views/cp_basic_need_views.xml',

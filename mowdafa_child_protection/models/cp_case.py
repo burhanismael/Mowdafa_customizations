@@ -561,6 +561,41 @@ class CpCase(models.Model):
             {'name': _('Critical/High'), 'count': tiles['partner_critical']},
         ]
 
+        # ── ministry cases — the same report, its own table ──────────────
+        # No agency breakdown here: a ministry case has no partner behind it.
+        Ministry = self.env['cp.ministry.case']
+        tiles.update({
+            'ministry_total': Ministry.search_count([]),
+            'ministry_active': Ministry.search_count(
+                [('case_status', 'in', ('open', 'active'))]),
+            'ministry_closed': Ministry.search_count(
+                [('case_status', '=', 'closed')]),
+            'ministry_critical': Ministry.search_count(
+                [('risk_level', 'in', ('critical', 'high'))]),
+        })
+
+        ministry_ages = [{
+            'name': label,
+            'count': Ministry.search_count(
+                [('age_years', '>=', lo), ('age_years', '<=', hi)]),
+        } for lo, hi, label in age_bands]
+        ministry_over_17 = Ministry.search_count([('age_years', '>', 17)])
+        if ministry_over_17:
+            ministry_ages.append({'name': '18+', 'count': ministry_over_17})
+
+        ministry_sex = count_by(Ministry, 'sex', [])
+        ministry_status_counts = count_by(Ministry, 'case_status', [])
+        ministry_status = [
+            {'name': _('Active'),
+             'count': (ministry_status_counts.get('open', 0)
+                       + ministry_status_counts.get('active', 0))},
+            {'name': _('Pending'),
+             'count': ministry_status_counts.get('pending', 0)},
+            {'name': _('Closed'),
+             'count': ministry_status_counts.get('closed', 0)},
+            {'name': _('Critical/High'), 'count': tiles['ministry_critical']},
+        ]
+
         return {
             'case_type': case_type,
             'tiles': tiles,
@@ -576,4 +611,13 @@ class CpCase(models.Model):
             ],
             'partner_ages': partner_ages,
             'partner_status': partner_status,
+            'ministry_regions': named_counts(Ministry, 'region_id', []),
+            'ministry_concerns': named_counts(
+                Ministry, 'protection_concern', [], concern_labels),
+            'ministry_sex': [
+                {'name': _('Female'), 'count': ministry_sex.get('female', 0)},
+                {'name': _('Male'), 'count': ministry_sex.get('male', 0)},
+            ],
+            'ministry_ages': ministry_ages,
+            'ministry_status': ministry_status,
         }

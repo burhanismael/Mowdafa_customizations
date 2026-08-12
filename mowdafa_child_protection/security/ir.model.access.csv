@@ -48,3 +48,7 @@ access_cp_followup_manager,cp.followup.manager,model_cp_followup,base.group_syst
 access_cp_followup_concern_user,cp.followup.concern.user,model_cp_followup_concern,base.group_user,1,1,1,1
 access_cp_followup_concern_manager,cp.followup.concern.manager,model_cp_followup_concern,base.group_system,1,1,1,1
 access_cp_partner_followup_manager,cp.partner.followup.manager,model_cp_partner_followup,base.group_system,1,1,1,1
+access_cp_ministry_case_user,cp.ministry.case.user,model_cp_ministry_case,base.group_user,1,1,1,0
+access_cp_ministry_case_manager,cp.ministry.case.manager,model_cp_ministry_case,base.group_system,1,1,1,1
+access_cp_ministry_followup_user,cp.ministry.followup.user,model_cp_ministry_followup,base.group_user,1,1,1,1
+access_cp_ministry_followup_manager,cp.ministry.followup.manager,model_cp_ministry_followup,base.group_system,1,1,1,1
