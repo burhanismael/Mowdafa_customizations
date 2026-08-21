@@ -44,6 +44,25 @@ class CaseWorker(models.Model):
     ], string='Status', default='draft', required=True, tracking=True,
         copy=False)
 
+    def init(self):
+        """The GBV access groups/rules were first installed inside a
+        noupdate block; clear the flag so the renamed groups and the
+        GBV Access category in gbv_security.xml apply on upgrade."""
+        self.env.cr.execute("""
+            UPDATE ir_model_data SET noupdate = false
+            WHERE module = 'mowdafa_extended'
+              AND (name IN ('group_gbv_case_worker', 'group_gbv_manager',
+                            'module_category_gbv_access')
+                   OR name LIKE 'rule\\_%')
+        """)
+
+    @api.model
+    def _default_for_user(self):
+        """The caseworker record of the logged-in user, active preferred."""
+        domain = [('employee_id.user_id', '=', self.env.uid)]
+        return (self.search(domain + [('state', '=', 'active')], limit=1)
+                or self.search(domain, limit=1))
+
     def action_activate(self):
         self.write({'state': 'active'})
 

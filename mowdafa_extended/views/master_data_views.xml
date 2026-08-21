@@ -85,6 +85,28 @@
         </field>
     </record>
 
+    <!-- Perpetrator Relationship -->
+    <record id="view_gbv_perpetrator_relationship_tree" model="ir.ui.view">
+        <field name="name">gbv.perpetrator.relationship.tree</field>
+        <field name="model">gbv.perpetrator.relationship</field>
+        <field name="arch" type="xml">
+            <tree string="Perpetrator Relationships" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active" widget="boolean_toggle" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_gbv_perpetrator_relationship" model="ir.actions.act_window">
+        <field name="name">Perpetrator Relationships</field>
+        <field name="res_model">gbv.perpetrator.relationship</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first perpetrator relationship</p>
+        </field>
+    </record>
+
     <!-- Configuration Menu -->
     <menuitem id="menu_gbv_configuration" name="Configuration"
               parent="menu_survivor_case_root" sequence="90"/>
@@ -96,4 +118,6 @@
               parent="menu_gbv_configuration" action="action_gbv_violence_type" sequence="30"/>
     <menuitem id="menu_gbv_risk_level" name="Risk Levels"
               parent="menu_gbv_configuration" action="action_gbv_risk_level" sequence="40"/>
+    <menuitem id="menu_gbv_perpetrator_relationship" name="Perpetrator Relationships"
+              parent="menu_gbv_configuration" action="action_gbv_perpetrator_relationship" sequence="50"/>
 </odoo>

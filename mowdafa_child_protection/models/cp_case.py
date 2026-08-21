@@ -130,7 +130,8 @@ class CpCase(models.Model):
         help='The verification fork: drives reunification, alternative '
              'care or further tracing.')
     case_worker_id = fields.Many2one(
-        'cp.case.worker', string='Case Worker', tracking=True)
+        'cp.case.worker', string='Case Worker', tracking=True,
+        default=lambda self: self.env['cp.case.worker']._default_for_user())
     supervisor_id = fields.Many2one(
         'cp.supervisor', string='Supervisor', tracking=True)
     placement_type = fields.Selection([

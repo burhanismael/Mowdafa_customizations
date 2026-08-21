@@ -40,7 +40,8 @@ class GbvCase(models.Model):
         required=True, tracking=True, index=True,
     )
     case_worker_id = fields.Many2one(
-        comodel_name='case.worker', string='Case Worker', tracking=True)
+        comodel_name='case.worker', string='Case Worker', tracking=True,
+        default=lambda self: self.env['case.worker']._default_for_user())
     region_id = fields.Many2one(
         comodel_name='gbv.region', string='Region', required=True, tracking=True)
     district_id = fields.Many2one(
@@ -63,6 +64,8 @@ class GbvCase(models.Model):
         string='Entry Channel', tracking=True,
     )
     reported_by = fields.Char(string='Reported By')
+    reported_by_number = fields.Char(string='Reported By Number')
+    reported_by_title = fields.Char(string='Reported By Title')
 
     # ── classification — this is what the dashboard counts ──────────────
     violence_type_id = fields.Many2one(
@@ -81,16 +84,14 @@ class GbvCase(models.Model):
         string='Population Group', tracking=True,
     )
     sex = fields.Selection(
-        selection=[('female', 'Female'), ('male', 'Male')],
-        string='Sex', required=True, tracking=True)
+        related='survivor_id.sex', string='Sex',
+        store=True, readonly=True, tracking=True)
     # computed AND stored — frozen at report date, so a survivor who turns 18
     # next month doesn't silently move out of the children figure
     age_band = fields.Char(
-        string='Age Band', compute='_compute_age_fields', store=True,
-        readonly=False)
+        string='Age Band', compute='_compute_age_fields', store=True)
     is_child = fields.Boolean(
-        string='Is a Child', compute='_compute_age_fields', store=True,
-        readonly=False)
+        string='Is a Child', compute='_compute_age_fields', store=True)
 
     # ── the two independent pipelines ────────────────────────────────────
     service_stage = fields.Selection(
@@ -128,12 +129,11 @@ class GbvCase(models.Model):
     )
     age_years = fields.Integer(
         string='Age (years)',
-        compute='_compute_age_years', store=True, readonly=False,
+        compute='_compute_age_years', store=True,
         tracking=True,
         help='Exact age at the date reported, for the oldest/youngest '
              'tiles on the statistical report. Filled from the survivor '
-             'birth date when there is one, typed otherwise. 0 prints '
-             'as a dash.',
+             'birth date. 0 prints as a dash.',
     )
 
     @api.onchange('region_id')
@@ -239,11 +239,6 @@ class GbvCase(models.Model):
             case.followup_count = len(case.followup_ids)
             case.referral_count = len(case.referral_ids)
             case.closure_count = len(case.closure_ids)
-
-    @api.onchange('survivor_id')
-    def _onchange_survivor(self):
-        if self.survivor_id and 'sex' in self.survivor_id._fields and self.survivor_id.sex:
-            self.sex = 'female' if self.survivor_id.sex in ('female', 'f') else 'male'
 
     # ── header actions: open a satellite form pre-linked to this case ───
     def _open_satellite(self, model, name):
@@ -517,16 +512,29 @@ class GbvCasePerpetrator(models.Model):
         selection=[('female', 'Female'), ('male', 'Male'), ('unknown', 'Unknown')],
         string='Sex', default='unknown')
     age_estimate = fields.Integer(string='Age (est.)')
-    relationship = fields.Selection(
-        selection=[
-            ('family', 'Family member'),
-            ('partner', 'Intimate partner'),
-            ('neighbour', 'Neighbour / Community'),
-            ('authority', 'Person in authority'),
-            ('stranger', 'Stranger'),
-            ('unknown', 'Unknown'),
-        ],
-        string='Relationship to Survivor', default='unknown')
+    relationship_id = fields.Many2one(
+        'gbv.perpetrator.relationship', string='Relationship to Survivor',
+        default=lambda self: self.env[
+            'gbv.perpetrator.relationship']._default_unknown())
+
+    def init(self):
+        """One-time migration: map the old selection column onto the
+        master-data records seeded by gbv.perpetrator.relationship."""
+        cr = self.env.cr
+        cr.execute("""
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'gbv_case_perpetrator'
+              AND column_name = 'relationship'""")
+        if not cr.fetchone():
+            return
+        from .master_data import PERPETRATOR_RELATIONSHIPS
+        for key, label in PERPETRATOR_RELATIONSHIPS:
+            cr.execute("""
+                UPDATE gbv_case_perpetrator p
+                SET relationship_id = r.id
+                FROM gbv_perpetrator_relationship r
+                WHERE p.relationship_id IS NULL
+                  AND p.relationship = %s AND r.name = %s""", (key, label))
     status = fields.Selection(
         selection=[
             ('at_large', 'At large'),

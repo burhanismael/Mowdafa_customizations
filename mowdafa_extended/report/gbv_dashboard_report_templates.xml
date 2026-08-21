@@ -1,0 +1,885 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_gbv_dashboard_document">
+  <t t-call="web.html_container">
+    <t t-call="web.external_layout">
+      <div class="page">
+        <style type="text/css">
+          .gbvd-page {
+            font-family: "DejaVu Sans", Arial, Helvetica, sans-serif;
+            color: #1d252b;
+            font-size: 10.5px;
+            line-height: 1.3;
+          }
+          /* Odoo's document layouts (e.g. Bold: .o_report_layout_bold
+             table thead tr th gets a 3px company-colour border-top,
+             !important) decorate tables with their own borders. Reset
+             at the same specificity — this block renders after the
+             layout assets, so equal selectors resolve in our favour —
+             and each component re-adds only the borders it wants. */
+          .gbvd-page table,
+          .gbvd-page thead,
+          .gbvd-page tbody,
+          .gbvd-page tr,
+          .gbvd-page th,
+          .gbvd-page td,
+          .gbvd-page table thead tr th,
+          .gbvd-page table tbody tr td,
+          .gbvd-page table[class] thead tr th,
+          .gbvd-page table[class] tbody tr td {
+            border: 0 !important;
+            background-clip: padding-box;
+          }
+          .gbvd-page table {
+            margin: 0 !important;
+            border-spacing: 0 !important;
+          }
+
+          /* ---- confidential header ---- */
+          .gbvd-conf {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1.2px;
+            color: #1a6fb5;
+            margin-bottom: 2px;
+          }
+          .gbvd-main-title {
+            text-align: center;
+            font-size: 21px;
+            font-weight: bold;
+            color: #14181b;
+            margin: 0 0 3px;
+          }
+          .gbvd-period {
+            text-align: center;
+            font-size: 10px;
+            color: #4c565d;
+            margin-bottom: 8px;
+          }
+          .gbvd-pills {
+            text-align: center;
+            margin-bottom: 14px;
+          }
+          .gbvd-pill {
+            display: inline-block;
+            border: 1px solid #d4dade;
+            border-radius: 11px;
+            background: #f1f3f5;
+            padding: 3px 12px;
+            margin: 0 3px;
+            font-size: 9.5px;
+            color: #4c565d;
+          }
+          .gbvd-pill b {
+            color: #14538c;
+          }
+
+          /* ---- numbered section heading (no tables: wkhtmltopdf draws
+                 stray borders around layout tables) ---- */
+          .gbvd-sec {
+            margin: 14px 0 9px;
+            overflow: hidden;
+          }
+          /* heading + panel stay on one page: wkhtmltopdf honours
+             page-break-inside on a wrapping block, but not
+             page-break-after on the heading itself. */
+          .gbvd-block {
+            page-break-inside: avoid;
+          }
+          .gbvd-sec-num {
+            float: left;
+            width: 17px;
+            height: 17px;
+            line-height: 17px;
+            background: #1a6fb5;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 3px;
+          }
+          .gbvd-sec-txt {
+            float: left;
+            padding: 0 10px 0 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #14181b;
+            line-height: 17px;
+          }
+          .gbvd-sec-rule {
+            overflow: hidden;
+            height: 10px;
+            border-bottom: 1px solid #e2e7eb;
+          }
+
+          /* ---- KPI cards ---- */
+          .gbvd-cards {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 7px 7px !important;
+            border: 0 !important;
+          }
+          .gbvd-page .gbvd-cards > tbody > tr > td.gbvd-card {
+            width: 25%;
+            border: 1px solid #e3e8ec !important;
+            border-radius: 6px;
+            background: #ffffff;
+            padding: 10px 12px 9px !important;
+            vertical-align: top;
+          }
+          .gbvd-card-head {
+            overflow: hidden;
+          }
+          .gbvd-card-ico {
+            float: right;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 10px;
+          }
+          .gbvd-card-lbl {
+            display: block;
+            margin-right: 22px;
+            padding-top: 4px;
+            font-size: 8.5px;
+            font-weight: bold;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            color: #7d8894;
+          }
+          .gbvd-card-val {
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.25;
+            margin-top: 3px;
+          }
+          .gbvd-card-sub {
+            font-size: 9px;
+            font-weight: bold;
+          }
+
+          /* ---- section 2: two white panels side by side ---- */
+          .gbvd-panels {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 7px 0 !important;
+            border: 0 !important;
+            page-break-inside: avoid;
+          }
+          .gbvd-page .gbvd-panels > tbody > tr > td.gbvd-panel {
+            width: 50%;
+            border: 1px solid #e3e8ec !important;
+            border-radius: 6px;
+            background: #ffffff;
+            padding: 12px 12px 10px !important;
+            vertical-align: top;
+          }
+          /* horizontal stacked bars */
+          .gbvd-hbars {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 0 !important;
+          }
+          .gbvd-hbars td {
+            border: 0 !important;
+            padding: 4px 0 !important;
+            vertical-align: middle;
+          }
+          .gbvd-hbars .hb-lbl {
+            width: 72px;
+            padding-right: 8px !important;
+            text-align: right;
+            font-size: 9.5px;
+            color: #1d252b;
+          }
+          .gbvd-hbars .hb-val {
+            width: 24px;
+            padding-left: 8px !important;
+            font-size: 9.5px;
+            font-weight: bold;
+            color: #14181b;
+          }
+          .gbvd-track {
+            background: #edf1f5;
+            height: 12px;
+            border-radius: 2px;
+            overflow: hidden;
+          }
+          .gbvd-seg {
+            float: left;
+            height: 12px;
+          }
+          .gbvd-legend {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 9px;
+            color: #3c454b;
+          }
+          .gbvd-leg-sq {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 4px 0 10px;
+          }
+          /* region status table */
+          .gbvd-rtable {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 0 !important;
+          }
+          .gbvd-rtable th {
+            background: #1F3A57 !important;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 6px 7px !important;
+            border: 0 !important;
+            text-align: center;
+          }
+          .gbvd-page .gbvd-panel .gbvd-rtable tbody tr td {
+            font-size: 9.5px;
+            padding: 5px 7px !important;
+            border: 0 !important;
+            border-bottom: 1px solid #eceff2 !important;
+            text-align: center;
+            color: #1d252b;
+          }
+          .gbvd-page .gbvd-panel .gbvd-rtable th.first,
+          .gbvd-page .gbvd-panel .gbvd-rtable tbody tr td.first {
+            text-align: left;
+          }
+          .gbvd-rtable td.tot {
+            font-weight: bold;
+          }
+          .gbvd-rtable tr.alt td {
+            background: #faf3f4;
+          }
+          .gbvd-page .gbvd-panel .gbvd-rtable tr.grand td {
+            background: #f6dfe3 !important;
+            font-weight: bold;
+            border-bottom: 0 !important;
+          }
+          .gbvd-note {
+            margin-top: 8px;
+            font-size: 8px;
+            font-style: italic;
+            color: #98a2ab;
+          }
+
+          /* ---- section 3: donut panels ---- */
+          .gbvd-ptitle {
+            border-left: 3px solid #1a6fb5;
+            padding-left: 7px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #14181b;
+            margin-bottom: 8px;
+          }
+          .gbvd-donut-row {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 0 !important;
+          }
+          .gbvd-donut-row td {
+            padding: 0 !important;
+            vertical-align: middle;
+          }
+          .gbvd-donut-row .dn-chart {
+            width: 60%;
+            text-align: center;
+          }
+          .gbvd-dleg {
+            font-size: 9.5px;
+            color: #3c454b;
+            margin: 6px 0;
+            white-space: nowrap;
+          }
+          .gbvd-dleg b {
+            color: #14181b;
+          }
+
+          /* ---- sections 5/6: wide-label horizontal bars ---- */
+          .gbvd-hbars .hb-lbl-wide {
+            width: 190px;
+            padding-right: 10px !important;
+            text-align: right;
+            font-size: 9.5px;
+            color: #1d252b;
+          }
+          .gbvd-hbars .hb-pct {
+            width: 40px;
+            padding-left: 8px !important;
+            font-size: 9px;
+            color: #98a2ab;
+          }
+
+          /* ---- section 9: comparison + ministry footer ---- */
+          .gbvd-org {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 9.5px;
+            line-height: 1.5;
+            color: #14538c;
+          }
+
+          /* ---- section 8: justice funnel ---- */
+          .gbvd-funnel-seg {
+            float: left;
+            height: 14px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 14px;
+          }
+          .gbvd-funnel-stub {
+            float: left;
+            width: 26px;
+            height: 14px;
+            text-align: center;
+            background: #ccd9e6;
+            color: #1F3A57;
+            font-size: 9px;
+            font-weight: bold;
+            line-height: 14px;
+            border-radius: 2px;
+          }
+          .gbvd-track-tall {
+            background: #edf1f5;
+            height: 14px;
+            border-radius: 2px;
+            overflow: hidden;
+          }
+
+          /* ---- section 4: age-band chart ----
+             Explicit pixel size: wkhtmltopdf's WebKit computes height 0
+             for an SVG sized width:100%/height:auto from its viewBox. */
+          .gbvd-svg-wide {
+            display: block;
+            margin: 0 auto;
+          }
+        </style>
+
+        <div class="gbvd-page">
+          <t t-set="labels" t-value="report['labels']"/>
+          <t t-set="header" t-value="report['header']"/>
+
+          <!-- ============ confidential header ============ -->
+          <div class="gbvd-conf"><t t-esc="header['confidential']"/></div>
+          <div class="gbvd-main-title"><t t-esc="header['title']"/></div>
+          <div class="gbvd-period"><t t-esc="header['period']"/></div>
+          <div class="gbvd-pills">
+            <t t-foreach="header['pills']" t-as="pill">
+              <span class="gbvd-pill"><t t-esc="pill[0]"/>:
+                <b t-esc="pill[1]"/></span>
+            </t>
+          </div>
+
+          <div class="gbvd-block">
+          <!-- ============ 1. Tirakoobka Muhiimka ah ============ -->
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">1</span><span class="gbvd-sec-txt"><t t-esc="labels['sec1']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-cards">
+            <tbody>
+              <t t-foreach="[report['kpis'][:4], report['kpis'][4:]]" t-as="card_row">
+                <tr>
+                  <t t-foreach="card_row" t-as="card">
+                    <td class="gbvd-card">
+                      <div class="gbvd-card-head">
+                        <span class="gbvd-card-ico"
+                              t-attf-style="background: #{card['icon_bg']}; color: #{card['colour']};">
+                          <t t-esc="card['icon']"/>
+                        </span>
+                        <span class="gbvd-card-lbl"><t t-esc="card['label']"/></span>
+                      </div>
+                      <div class="gbvd-card-val"
+                           t-attf-style="color: #{card['colour']};">
+                        <t t-esc="card['value']"/>
+                      </div>
+                      <div class="gbvd-card-sub"
+                           t-attf-style="color: #{card['sub_colour']};">
+                        <t t-esc="card['sub']"/>
+                      </div>
+                    </td>
+                  </t>
+                </tr>
+              </t>
+            </tbody>
+          </table>
+
+          </div>
+          <div class="gbvd-block">
+          <!-- ============ 2. Kiisaska Gobol Kasta ============ -->
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">2</span><span class="gbvd-sec-txt"><t t-esc="labels['sec2']"/>
+              <span style="font-size: 9px; font-weight: normal; font-style: italic; color: #98a2ab;">&#160;&#160;<t t-esc="labels['sec2_sub']"/></span></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel">
+                  <table class="gbvd-hbars">
+                    <tbody>
+                      <t t-foreach="report['sec2']['bars']" t-as="bar">
+                        <tr>
+                          <td class="hb-lbl"><t t-esc="bar['name']"/></td>
+                          <td>
+                            <div class="gbvd-track">
+                              <div class="gbvd-seg" t-attf-style="width: #{bar['open_w']}; background: #2E75B6;">&#160;</div>
+                              <div class="gbvd-seg" t-attf-style="width: #{bar['closed_w']}; background: #1F4E79;">&#160;</div>
+                              <div class="gbvd-seg" t-attf-style="width: #{bar['court_w']}; background: #C77D18;">&#160;</div>
+                            </div>
+                          </td>
+                          <td class="hb-val"><t t-esc="bar['total']"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                  <div class="gbvd-legend">
+                    <span class="gbvd-leg-sq" style="background: #2E75B6;">&#160;</span><t t-esc="labels['leg_open']"/>
+                    <span class="gbvd-leg-sq" style="background: #1F4E79;">&#160;</span><t t-esc="labels['leg_closed']"/>
+                    <span class="gbvd-leg-sq" style="background: #C77D18;">&#160;</span><t t-esc="labels['leg_court']"/>
+                  </div>
+                </td>
+                <td class="gbvd-panel">
+                  <table class="gbvd-rtable">
+                    <thead>
+                      <tr>
+                        <th class="first"><t t-esc="labels['th_region']"/></th>
+                        <th><t t-esc="labels['th_open']"/></th>
+                        <th><t t-esc="labels['th_closed']"/></th>
+                        <th><t t-esc="labels['th_court']"/></th>
+                        <th><t t-esc="labels['th_total']"/></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="report['sec2']['rows']" t-as="row">
+                        <tr t-att-class="'alt' if row_index % 2 else ''">
+                          <td class="first"><t t-esc="row['name']"/></td>
+                          <td><t t-esc="row['open']"/></td>
+                          <td><t t-esc="row['closed']"/></td>
+                          <td><t t-esc="row['court']"/></td>
+                          <td class="tot"><t t-esc="row['total']"/></td>
+                        </tr>
+                      </t>
+                      <tr class="grand">
+                        <td class="first"><t t-esc="labels['total_row']"/></td>
+                        <td><t t-esc="report['sec2']['totals']['open']"/></td>
+                        <td><t t-esc="report['sec2']['totals']['closed']"/></td>
+                        <td><t t-esc="report['sec2']['totals']['court']"/></td>
+                        <td class="tot"><t t-esc="report['sec2']['totals']['total']"/></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="gbvd-note"><t t-esc="labels['sec2_note']"/></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          </div>
+          <div class="gbvd-block">
+          <!-- ============ 3. Xaaladda / Jinsiga ============ -->
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">3</span><span class="gbvd-sec-txt"><t t-esc="labels['sec3']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <t t-foreach="[report['sec3']['left'], report['sec3']['right']]" t-as="panel">
+                  <td class="gbvd-panel">
+                    <div class="gbvd-ptitle"><t t-esc="panel['title']"/></div>
+                    <table class="gbvd-donut-row">
+                      <tbody>
+                        <tr>
+                          <td class="dn-chart">
+                            <svg width="140" height="140" viewBox="0 0 160 160"
+                                 xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="80" cy="80" r="60" fill="none"
+                                      stroke="#edf1f5" stroke-width="26"/>
+                              <t t-foreach="panel['segments']" t-as="seg">
+                                <circle t-if="seg['circle']" cx="80" cy="80"
+                                        r="60" fill="none"
+                                        t-att-stroke="seg['colour']"
+                                        stroke-width="26"/>
+                                <path t-else="" fill="none"
+                                      t-att-d="seg['d']"
+                                      t-att-stroke="seg['colour']"
+                                      stroke-width="26"/>
+                              </t>
+                              <text x="80" y="86" text-anchor="middle"
+                                    font-size="30" font-weight="bold"
+                                    fill="#14181b"><t t-esc="panel['total']"/></text>
+                              <text x="80" y="103" text-anchor="middle"
+                                    font-size="9" letter-spacing="3"
+                                    fill="#98a2ab"><t t-esc="panel['unit']"/></text>
+                            </svg>
+                          </td>
+                          <td>
+                            <t t-foreach="panel['legend']" t-as="item">
+                              <div class="gbvd-dleg">
+                                <span class="gbvd-leg-sq" t-attf-style="background: #{item['colour']};">&#160;</span>
+                                <t t-esc="item['label']"/> · <b t-esc="item['value']"/>
+                              </div>
+                            </t>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </t>
+              </tr>
+            </tbody>
+          </table>
+
+          </div>
+          <div class="gbvd-block">
+          <!-- ============ 4. Da'da Dhibbanayaasha ============ -->
+          <t t-set="sec4" t-value="report['sec4']"/>
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">4</span><span class="gbvd-sec-txt"><t t-esc="labels['sec4']"/>
+              <span style="font-size: 9px; font-weight: normal; font-style: italic; color: #98a2ab;">&#160;&#160;<t t-esc="labels['sec4_sub']"/></span></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel" style="width: 100%;">
+                  <svg class="gbvd-svg-wide" width="700" height="194"
+                       viewBox="0 0 720 200"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <!-- gridlines + y ticks -->
+                    <t t-foreach="sec4['ticks']" t-as="tick">
+                      <line t-att-x1="sec4['left']" t-att-y1="tick['y']"
+                            t-att-x2="sec4['right']" t-att-y2="tick['y']"
+                            stroke="#eef1f4" stroke-width="1"/>
+                      <text t-att-x="sec4['left'] - 8" t-att-y="tick['y'] + 3"
+                            font-size="9" text-anchor="end" fill="#98a2ab">
+                        <t t-esc="tick['label']"/>
+                      </text>
+                    </t>
+                    <!-- group labels -->
+                    <text t-att-x="sec4['divider_x'] - 10" y="12"
+                          font-size="10" font-weight="bold"
+                          text-anchor="end" fill="#C77D18">
+                      <t t-esc="sec4['children_label']"/>
+                    </text>
+                    <text t-att-x="sec4['divider_x'] + 12" y="12"
+                          font-size="10" font-weight="bold"
+                          text-anchor="start" fill="#2E75B6">
+                      <t t-esc="sec4['adults_label']"/>
+                    </text>
+                    <!-- child / adult divider -->
+                    <line t-att-x1="sec4['divider_x']" y1="18"
+                          t-att-x2="sec4['divider_x']"
+                          t-att-y2="sec4['bottom']"
+                          stroke="#C77D18" stroke-width="1.4"
+                          stroke-dasharray="5 4"/>
+                    <!-- bars, value labels, band labels -->
+                    <t t-foreach="sec4['bars']" t-as="bar">
+                      <rect t-if="bar['height']"
+                            t-att-x="bar['x']" t-att-y="bar['y']"
+                            t-att-width="46" t-att-height="bar['height']"
+                            t-att-fill="bar['colour']"/>
+                      <text t-att-x="bar['centre']" t-att-y="bar['y'] - 5"
+                            font-size="11" font-weight="bold"
+                            text-anchor="middle" fill="#14181b">
+                        <t t-esc="bar['value']"/>
+                      </text>
+                      <text t-att-x="bar['centre']" t-att-y="sec4['label_y']"
+                            font-size="10" text-anchor="middle"
+                            fill="#5c748c">
+                        <t t-esc="bar['label']"/>
+                      </text>
+                    </t>
+                    <!-- baseline -->
+                    <line t-att-x1="sec4['left']" t-att-y1="sec4['bottom']"
+                          t-att-x2="sec4['right']" t-att-y2="sec4['bottom']"
+                          stroke="#c9d1d8" stroke-width="1"/>
+                  </svg>
+                  <div class="gbvd-legend">
+                    <span class="gbvd-leg-sq" style="background: #C77D18;">&#160;</span><t t-esc="sec4['children_legend']"/>
+                    <span class="gbvd-leg-sq" style="background: #2E75B6;">&#160;</span><t t-esc="sec4['adults_legend']"/>
+                  </div>
+                  <div class="gbvd-note" t-if="sec4['note']"
+                       style="color: #6d9dc5;"><t t-esc="sec4['note']"/></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          </div>
+          <div class="gbvd-block">
+          <!-- ============ 5. Nooca Xadgudubka ============ -->
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">5</span><span class="gbvd-sec-txt"><t t-esc="labels['sec5']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel" style="width: 100%;">
+                  <table class="gbvd-hbars">
+                    <tbody>
+                      <t t-foreach="report['sec5']['bars']" t-as="bar">
+                        <tr>
+                          <td class="hb-lbl-wide"><t t-esc="bar['name']"/></td>
+                          <td>
+                            <div class="gbvd-track">
+                              <div class="gbvd-seg" t-attf-style="width: #{bar['width']}; background: #2E75B6;">&#160;</div>
+                            </div>
+                          </td>
+                          <td class="hb-val"><t t-esc="bar['count']"/></td>
+                          <td class="hb-pct"><t t-esc="bar['share']"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          </div>
+          <div class="gbvd-block">
+          <!-- ============ 6. Xiriirinta Adeegyada ============ -->
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">6</span><span class="gbvd-sec-txt"><t t-esc="labels['sec6']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel" style="width: 100%;">
+                  <table class="gbvd-hbars">
+                    <tbody>
+                      <t t-foreach="report['sec6']['bars']" t-as="bar">
+                        <tr>
+                          <td class="hb-lbl-wide"><t t-esc="bar['name']"/></td>
+                          <td>
+                            <div class="gbvd-track">
+                              <div class="gbvd-seg" t-attf-style="width: #{bar['width']}; background: #157F76;">&#160;</div>
+                            </div>
+                          </td>
+                          <td class="hb-val"><t t-esc="bar['count']"/></td>
+                          <td class="hb-pct"><t t-esc="bar['share']"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                  <div class="gbvd-note" style="color: #6d9dc5;">
+                    <t t-esc="report['sec6']['note']"/>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          </div>
+
+          <!-- ============ 7. Kiisaska Bishii ============ -->
+          <t t-set="sec7" t-value="report['sec7']"/>
+          <div class="gbvd-block">
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">7</span><span class="gbvd-sec-txt"><t t-esc="labels['sec7']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel" style="width: 100%;">
+                  <svg class="gbvd-svg-wide" width="700" height="188"
+                       viewBox="0 0 720 194"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <t t-foreach="sec7['ticks']" t-as="tick">
+                      <line t-att-x1="sec7['left']" t-att-y1="tick['y']"
+                            t-att-x2="sec7['right']" t-att-y2="tick['y']"
+                            stroke="#eef1f4" stroke-width="1"/>
+                      <text t-att-x="sec7['left'] - 8" t-att-y="tick['y'] + 3"
+                            font-size="9" text-anchor="end" fill="#98a2ab">
+                        <t t-esc="tick['label']"/>
+                      </text>
+                    </t>
+                    <path t-att-d="sec7['area']" fill="#dce8f4"
+                          fill-opacity="0.7" stroke="none"/>
+                    <polyline t-att-points="sec7['polyline']" fill="none"
+                              stroke="#1F3A57" stroke-width="2"/>
+                    <t t-foreach="sec7['points']" t-as="point">
+                      <circle t-att-cx="point['x']" t-att-cy="point['y']"
+                              r="4" fill="#ffffff" stroke="#1F3A57"
+                              stroke-width="1.6"/>
+                      <text t-if="point['value']"
+                            t-att-x="point['x']" t-att-y="point['y'] - 9"
+                            font-size="11" font-weight="bold"
+                            text-anchor="middle" fill="#14181b">
+                        <t t-esc="point['value']"/>
+                      </text>
+                      <text t-att-x="point['x']" t-att-y="sec7['label_y']"
+                            font-size="10" text-anchor="middle"
+                            fill="#5c748c">
+                        <t t-esc="point['label']"/>
+                      </text>
+                    </t>
+                    <line t-att-x1="sec7['left']" t-att-y1="sec7['bottom']"
+                          t-att-x2="sec7['right']" t-att-y2="sec7['bottom']"
+                          stroke="#c9d1d8" stroke-width="1"/>
+                  </svg>
+                  <div class="gbvd-note" t-if="sec7['note']"
+                       style="color: #6d9dc5;"><t t-esc="sec7['note']"/></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+
+          <!-- ============ 8. Gaadhitaanka Cadaalad ============ -->
+          <t t-set="sec8" t-value="report['sec8']"/>
+          <div class="gbvd-block">
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">8</span><span class="gbvd-sec-txt"><t t-esc="labels['sec8']"/>
+              <span style="font-size: 9px; font-weight: normal; font-style: italic; color: #98a2ab;">&#160;&#160;<t t-esc="labels['sec8_sub']"/></span></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <table class="gbvd-panels">
+            <tbody>
+              <tr>
+                <td class="gbvd-panel">
+                  <table class="gbvd-hbars">
+                    <tbody>
+                      <t t-foreach="sec8['bars']" t-as="bar">
+                        <tr>
+                          <td class="hb-lbl"><t t-esc="bar['name']"/></td>
+                          <td>
+                            <div class="gbvd-track-tall">
+                              <div t-if="bar['stub']" class="gbvd-funnel-stub">
+                                <t t-esc="bar['count']"/>
+                              </div>
+                              <div t-else="" class="gbvd-funnel-seg"
+                                   t-attf-style="width: #{bar['width']}; background: #{bar['colour']};">
+                                <t t-esc="bar['count']"/>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="hb-pct"><t t-esc="bar['pct']"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="gbvd-panel">
+                  <table class="gbvd-rtable">
+                    <thead>
+                      <tr>
+                        <th class="first"><t t-esc="labels['th_stage']"/></th>
+                        <th><t t-esc="labels['th_kiis']"/></th>
+                        <th><t t-esc="labels['th_pct']"/></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="sec8['rows']" t-as="row">
+                        <tr t-att-class="'alt' if row_index % 2 else ''">
+                          <td class="first"><t t-esc="row['name']"/></td>
+                          <td class="tot"><t t-esc="row['count']"/></td>
+                          <td class="tot"><t t-esc="row['pct']"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                  <div class="gbvd-note" t-if="sec8['note']"
+                       style="color: #6d9dc5;"><t t-esc="sec8['note']"/></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+
+          <!-- ============ 9. Barbar Dhig ============ -->
+          <t t-set="sec9" t-value="report['sec9']"/>
+          <div class="gbvd-block" t-if="sec9">
+          <div class="gbvd-sec">
+            <span class="gbvd-sec-num">9</span><span class="gbvd-sec-txt"><t t-esc="sec9['title']"/></span>
+            <div class="gbvd-sec-rule">&#160;</div>
+          </div>
+          <div class="gbvd-panel">
+            <table class="gbvd-rtable">
+              <thead>
+                <tr>
+                  <th class="first" style="width: 34px;"><t t-esc="labels['th_no']"/></th>
+                  <th class="first"><t t-esc="labels['th_region']"/></th>
+                  <th style="width: 70px;"><t t-esc="sec9['label_previous']"/></th>
+                  <th style="width: 70px;"><t t-esc="sec9['label_current']"/></th>
+                  <th style="width: 90px;"><t t-esc="labels['th_change']"/></th>
+                </tr>
+              </thead>
+              <tbody>
+                <t t-foreach="sec9['rows']" t-as="row">
+                  <tr t-att-class="'alt' if row_index % 2 else ''">
+                    <td class="first"><t t-esc="row['seq']"/>.</td>
+                    <td class="first"><t t-esc="row['name']"/></td>
+                    <td><t t-esc="row['prev']"/></td>
+                    <td><t t-esc="row['total']"/></td>
+                    <td class="tot" style="color: #14538c;"><t t-esc="row['change']"/></td>
+                  </tr>
+                </t>
+                <tr class="grand">
+                  <td class="first" colspan="2"><t t-esc="labels['total_row']"/></td>
+                  <td><t t-esc="sec9['totals']['prev']"/></td>
+                  <td><t t-esc="sec9['totals']['total']"/></td>
+                  <td class="tot" style="color: #14538c;"><t t-esc="sec9['totals']['change']"/></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          </div>
+
+          <!-- ============ ministry footer ============ -->
+          <div class="gbvd-org">
+            <t t-esc="labels['org_line1']"/><br/>
+            <t t-esc="labels['org_line2']"/><br/>
+            &#9993; <t t-esc="labels['org_email']"/>
+          </div>
+
+          <!-- Next sections are added here one by one, following the
+               design images. -->
+
+        </div>
+      </div>
+    </t>
+  </t>
+</template>
+
+<record id="paperformat_gbv_dashboard" model="report.paperformat">
+  <field name="name">MOWDAFA GBV Dashboard Summary (A4, compact)</field>
+  <field name="default" eval="False"/>
+  <field name="format">A4</field>
+  <field name="orientation">Portrait</field>
+  <field name="margin_top">28</field>
+  <field name="margin_bottom">16</field>
+  <field name="margin_left">7</field>
+  <field name="margin_right">7</field>
+  <field name="header_line" eval="False"/>
+  <field name="header_spacing">24</field>
+  <field name="dpi">96</field>
+</record>
+
+<record id="action_report_gbv_dashboard" model="ir.actions.report">
+  <field name="name">GBV Dashboard Summary Report</field>
+  <field name="model">gbv.dashboard.report.wizard</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_extended.report_gbv_dashboard_document</field>
+  <field name="report_file">mowdafa_extended.report_gbv_dashboard_document</field>
+  <field name="paperformat_id" ref="paperformat_gbv_dashboard"/>
+  <field name="print_report_name">'Warbixinta Dashboard - %s' % (object.date_from and object.date_from.strftime('%Y-%m-%d') or '')</field>
+  <field name="binding_model_id" eval="False"/>
+</record>
+
+</odoo>

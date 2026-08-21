@@ -29,6 +29,13 @@ class CpCaseWorker(models.Model):
     case_count = fields.Integer(
         string='Cases', compute='_compute_case_count')
 
+    @api.model
+    def _default_for_user(self):
+        """The caseworker record of the logged-in user, active preferred."""
+        domain = [('employee_id.user_id', '=', self.env.uid)]
+        return (self.search(domain + [('state', '=', 'active')], limit=1)
+                or self.search(domain, limit=1))
+
     def action_activate(self):
         self.write({'state': 'active'})
 

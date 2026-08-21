@@ -163,3 +163,49 @@ class GbvRiskLevel(models.Model):
 
     name = fields.Char(string='Name', required=True)
     code = fields.Char(string='Code')
+
+
+# Seeded on install/upgrade so the perpetrator lines keep their old
+# selection labels; the old selection key is kept to migrate stored rows.
+PERPETRATOR_RELATIONSHIPS = [
+    ('family', 'Family member'),
+    ('partner', 'Intimate partner'),
+    ('neighbour', 'Neighbour / Community'),
+    ('authority', 'Person in authority'),
+    ('stranger', 'Stranger'),
+    ('unknown', 'Unknown'),
+]
+
+
+class GbvPerpetratorRelationship(models.Model):
+    _name = 'gbv.perpetrator.relationship'
+    _description = 'Perpetrator Relationship to Survivor'
+    _order = 'sequence, name'
+
+    name = fields.Char(string='Name', required=True)
+    code = fields.Char(string='Code')
+    sequence = fields.Integer(string='Sequence', default=10)
+    active = fields.Boolean(string='Active', default=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)',
+         'That relationship already exists.'),
+    ]
+
+    def init(self):
+        self._seed_relationships()
+
+    @api.model
+    def _seed_relationships(self):
+        Relationship = self.with_context(active_test=False)
+        existing = {
+            (record.name or '').strip().lower()
+            for record in Relationship.search([])}
+        for index, (_key, label) in enumerate(PERPETRATOR_RELATIONSHIPS,
+                                              start=1):
+            if label.strip().lower() not in existing:
+                Relationship.create({'name': label, 'sequence': index * 10})
+
+    @api.model
+    def _default_unknown(self):
+        return self.search([('name', '=ilike', 'unknown')], limit=1)

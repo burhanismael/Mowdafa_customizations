@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="view_gbv_dashboard_report_wizard_form" model="ir.ui.view">
+    <field name="name">gbv.dashboard.report.wizard.form</field>
+    <field name="model">gbv.dashboard.report.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Dashboard Summary Report">
+        <!-- The dialog is bilingual: every label exists twice and the
+             Luqadda / Language toggle decides which variant shows. -->
+        <div class="oe_title" invisible="lang == 'en'">
+          <h1>Warbixinta Guud ee Dashboard-ka</h1>
+          <p class="text-muted">
+            Warbixinta xogta ee Wasaaradda, oo laga soo saaro xogta
+            kiisaska ee nool.<br/>
+            Dooro muddada, luqadda iyo waxa aad rabto in la daabaco.
+          </p>
+        </div>
+        <div class="oe_title" invisible="lang != 'en'">
+          <h1>Dashboard Summary Report</h1>
+          <p class="text-muted">
+            The Ministry's data report, generated from the live case
+            records.<br/>
+            Choose the period, the language and what to print.
+          </p>
+        </div>
+        <group>
+          <group string="Muddada" invisible="lang == 'en'">
+            <field name="period" string="Muddada"/>
+            <field name="year" invisible="period not in ('q1','q2','q3','q4')"/>
+            <field name="date_from" string="Laga bilaabo"/>
+            <field name="date_to" string="Ilaa"/>
+          </group>
+          <group string="Period" invisible="lang != 'en'">
+            <field name="period" string="Period"/>
+            <field name="year" invisible="period not in ('q1','q2','q3','q4')"/>
+            <field name="date_from" string="From"/>
+            <field name="date_to" string="To"/>
+          </group>
+          <group string="Baaxadda" invisible="lang == 'en'">
+            <field name="region_ids" string="Gobollada"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"
+                   placeholder="Dhammaan 9 Gobol"/>
+            <field name="violence_type_ids" string="Nooca Xadgudubka"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"
+                   placeholder="Dhammaan noocyada"/>
+          </group>
+          <group string="Scope" invisible="lang != 'en'">
+            <field name="region_ids" string="Regions"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"
+                   placeholder="All 9 regions"/>
+            <field name="violence_type_ids" string="Violence Type"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"
+                   placeholder="All types"/>
+          </group>
+        </group>
+        <group>
+          <group string="Qaabka Daabacaadda" invisible="lang == 'en'">
+            <field name="lang" string="Luqadda" widget="radio"
+                   options="{'horizontal': true}"/>
+            <label for="compare_previous" string="Barbar dhig"/>
+            <div>
+              <field name="compare_previous" nolabel="1" class="oe_inline"/>
+              <span class="ms-2">Barbar dhig sanadkii hore</span>
+            </div>
+            <label for="include_charts" string="Jaantusyada"/>
+            <div>
+              <field name="include_charts" nolabel="1" class="oe_inline"/>
+              <span class="ms-2">Ku dar jaantusyada</span>
+            </div>
+          </group>
+          <group string="Print Options" invisible="lang != 'en'">
+            <field name="lang" string="Language" widget="radio"
+                   options="{'horizontal': true}"/>
+            <label for="compare_previous" string="Comparison"/>
+            <div>
+              <field name="compare_previous" nolabel="1" class="oe_inline"/>
+              <span class="ms-2">Compare with previous year</span>
+            </div>
+            <label for="include_charts" string="Charts"/>
+            <div>
+              <field name="include_charts" nolabel="1" class="oe_inline"/>
+              <span class="ms-2">Include charts</span>
+            </div>
+          </group>
+          <group string="Wax-soo-saarka" invisible="lang == 'en'">
+            <field name="title_override" string="Cinwaan gaar ah"
+                   placeholder="WARBIXINTA GUUD EE DASHBOARD-KA 2026"/>
+            <field name="no_data_region_ids" string="Xog kama helin"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+          </group>
+          <group string="Output" invisible="lang != 'en'">
+            <field name="title_override" string="Custom title"
+                   placeholder="GBV CASES SUMMARY REPORT 2026"/>
+            <field name="no_data_region_ids" string="No data received"
+                   widget="many2many_tags"
+                   options="{'no_create': True}"/>
+            <field name="company_id" groups="base.group_multi_company"/>
+          </group>
+        </group>
+        <footer>
+          <button name="action_print" string="Daabac warbixinta"
+                  type="object" class="btn-primary" data-hotkey="q"
+                  invisible="lang == 'en'"/>
+          <button name="action_print" string="Print report"
+                  type="object" class="btn-primary"
+                  invisible="lang != 'en'"/>
+          <button string="Jooji" class="btn-secondary" special="cancel"
+                  data-hotkey="x" invisible="lang == 'en'"/>
+          <button string="Cancel" class="btn-secondary" special="cancel"
+                  invisible="lang != 'en'"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_gbv_dashboard_report_wizard" model="ir.actions.act_window">
+    <field name="name">Dashboard Summary Report</field>
+    <field name="res_model">gbv.dashboard.report.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="view_id" ref="view_gbv_dashboard_report_wizard_form"/>
+  </record>
+
+  <menuitem id="menu_gbv_dashboard_report_wizard"
+            name="Dashboard Summary Report"
+            parent="menu_gbv_reporting"
+            action="action_gbv_dashboard_report_wizard"
+            sequence="20"/>
+
+</odoo>

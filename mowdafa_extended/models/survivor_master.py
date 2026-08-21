@@ -67,6 +67,11 @@ class SurvivorMaster(models.Model):
         required=True,
         tracking=True,
     )
+    sex = fields.Selection(
+        selection=[('female', 'Female'), ('male', 'Male')],
+        string='Sex',
+        tracking=True,
+    )
     birth_order = fields.Char(
         string='Birth Order (Digits)',
         required=True,

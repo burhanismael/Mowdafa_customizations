@@ -29,6 +29,7 @@ class CaseClosure(models.Model):
         required=True,
         tracking=True,
         copy=False,
+        default=lambda self: self.env['case.worker']._default_for_user(),
     )
     supervisor_id = fields.Many2one(
         'case.worker',

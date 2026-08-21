@@ -30,6 +30,8 @@ access_gbv_violence_type_user,gbv.violence.type.user,model_gbv_violence_type,bas
 access_gbv_violence_type_manager,gbv.violence.type.manager,model_gbv_violence_type,base.group_system,1,1,1,1
 access_gbv_risk_level_user,gbv.risk.level.user,model_gbv_risk_level,base.group_user,1,1,1,0
 access_gbv_risk_level_manager,gbv.risk.level.manager,model_gbv_risk_level,base.group_system,1,1,1,1
+access_gbv_perpetrator_relationship_user,gbv.perpetrator.relationship.user,model_gbv_perpetrator_relationship,base.group_user,1,1,1,0
+access_gbv_perpetrator_relationship_manager,gbv.perpetrator.relationship.manager,model_gbv_perpetrator_relationship,base.group_system,1,1,1,1
 access_gbv_case_user,gbv.case.user,model_gbv_case,base.group_user,1,1,1,0
 access_gbv_case_manager,gbv.case.manager,model_gbv_case,base.group_system,1,1,1,1
 access_gbv_case_perpetrator_user,gbv.case.perpetrator.user,model_gbv_case_perpetrator,base.group_user,1,1,1,1
@@ -38,3 +40,4 @@ access_gbv_service_user,gbv.service.user,model_gbv_service,base.group_user,1,1,1
 access_gbv_service_manager,gbv.service.manager,model_gbv_service,base.group_system,1,1,1,1
 access_gbv_case_report_wizard_user,gbv.case.report.wizard.user,model_gbv_case_report_wizard,base.group_user,1,1,1,1
 access_case_closure_checklist_line_user,case.closure.checklist.line.user,model_case_closure_checklist_line,base.group_user,1,1,1,1
+access_gbv_dashboard_report_wizard_user,gbv.dashboard.report.wizard.user,model_gbv_dashboard_report_wizard,base.group_user,1,1,1,1

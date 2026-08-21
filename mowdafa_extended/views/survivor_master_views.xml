@@ -37,6 +37,8 @@
                                    readonly="state == 'active'"/>
                             <field name="birth_date"
                                    readonly="state == 'active'"/>
+                            <field name="sex" required="1"
+                                   readonly="state == 'active'"/>
                         </group>
                         <group>
                             <field name="birth_order"
@@ -65,6 +67,7 @@
                 <field name="survivor_name"/>
                 <field name="mother_first_name"/>
                 <field name="birth_date"/>
+                <field name="sex" optional="show"/>
                 <field name="birth_order"/>
                 <field name="place_of_birth"/>
                 <field name="generated_code"/>
