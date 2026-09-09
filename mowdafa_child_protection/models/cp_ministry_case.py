@@ -29,9 +29,9 @@ class CpMinistryCase(models.Model):
         'res.users', string='Entered By',
         default=lambda self: self.env.user, readonly=True)
     partner_worker_id = fields.Many2one(
-        'case.worker', string='Caseworker')
+        'cp.case.worker', string='Caseworker')
     partner_supervisor_id = fields.Many2one(
-        'case.worker', string='Supervisor')
+        'cp.supervisor', string='Supervisor')
 
     # ── 1 · child identification ─────────────────────────────────────────
     child_name = fields.Char(
@@ -221,15 +221,6 @@ class CpMinistryCase(models.Model):
             concern = Concern.create({'name': label})
         return concern.id
 
-    def _cp_directory_id(self, model, worker):
-        """Agency staff live in the GBV ``case.worker`` directory, MOWDAFA's
-        own in the CP ones. Carry the person over only when the same employee
-        is already in the CP directory — never invent an entry there."""
-        if not worker.employee_id:
-            return False
-        return self.env[model].search(
-            [('employee_id', '=', worker.employee_id.id)], limit=1).id
-
     def _case_values(self):
         """The reporting spine both tracks share, carried across so the
         officer does not key the child twice."""
@@ -253,10 +244,8 @@ class CpMinistryCase(models.Model):
             'risk_level': self.risk_level,
             'immediate_risk': self.immediate_risk,
             'risk_factors': self.risk_factors,
-            'case_worker_id': self._cp_directory_id(
-                'cp.case.worker', self.partner_worker_id),
-            'supervisor_id': self._cp_directory_id(
-                'cp.supervisor', self.partner_supervisor_id),
+            'case_worker_id': self.partner_worker_id.id,
+            'supervisor_id': self.partner_supervisor_id.id,
         }
 
     def action_create_case(self):

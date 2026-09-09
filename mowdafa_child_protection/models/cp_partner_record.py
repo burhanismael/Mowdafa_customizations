@@ -40,11 +40,11 @@ class CpPartnerRecord(models.Model):
     partner_short_name = fields.Char(
         string='Partner', compute='_compute_partner_short_name', store=True)
     partner_worker_id = fields.Many2one(
-        'case.worker', string='Caseworker',
+        'cp.case.worker', string='Caseworker',
         help='Filled from the agency when it names a usual caseworker; '
              'pick one it does not know and the agency learns it back.')
     partner_supervisor_id = fields.Many2one(
-        'case.worker', string='Supervisor')
+        'cp.supervisor', string='Supervisor')
     agency_sector = fields.Char(
         related='partner_agency_id.sector', string='Sector', readonly=True)
     agency_phone = fields.Char(
@@ -246,15 +246,6 @@ class CpPartnerRecord(models.Model):
             concern = Concern.create({'name': label})
         return concern.id
 
-    def _cp_directory_id(self, model, worker):
-        """Partner staff live in the GBV ``case.worker`` directory, MOWDAFA's
-        own in the CP ones. Carry the person over only when the same employee
-        is already in the CP directory — never invent an entry there."""
-        if not worker.employee_id:
-            return False
-        return self.env[model].search(
-            [('employee_id', '=', worker.employee_id.id)], limit=1).id
-
     def _case_values(self):
         """The reporting spine both tracks share, carried across so the
         officer does not key the child twice."""
@@ -278,10 +269,8 @@ class CpPartnerRecord(models.Model):
             'risk_level': self.risk_level,
             'immediate_risk': self.immediate_risk,
             'risk_factors': self.risk_factors,
-            'case_worker_id': self._cp_directory_id(
-                'cp.case.worker', self.partner_worker_id),
-            'supervisor_id': self._cp_directory_id(
-                'cp.supervisor', self.partner_supervisor_id),
+            'case_worker_id': self.partner_worker_id.id,
+            'supervisor_id': self.partner_supervisor_id.id,
         }
 
     def action_create_case(self):

@@ -23,12 +23,12 @@ class CpPartnerAgency(models.Model):
     sector = fields.Char(
         string='Sector', help='e.g. Child Protection sub-cluster')
     focal_point_id = fields.Many2one(
-        'case.worker', string='Caseworker', tracking=True,
+        'cp.case.worker', string='Caseworker', tracking=True,
         help='The agency\'s usual caseworker. Filled onto a new partner '
              'record automatically, and learned back from the first '
              'record that names one.')
     supervisor_id = fields.Many2one(
-        'case.worker', string='Supervisor', tracking=True,
+        'cp.supervisor', string='Supervisor', tracking=True,
         help='Filled onto a new partner record automatically, and '
              'learned back from the first record that names one.')
     phone = fields.Char(string='Phone')

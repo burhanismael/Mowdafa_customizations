@@ -58,12 +58,7 @@
     <field name="view_id" ref="view_gbv_case_report_wizard_form"/>
   </record>
 
-  <!-- Parented in the post-init hook, under the module's own Reporting menu
-       when there is one. Left top-level here only so the record is valid. -->
-  <menuitem id="menu_gbv_case_report_wizard"
-            name="Cases Statistical Report"
-            parent="menu_gbv_reporting"
-            action="action_gbv_case_report_wizard"
-            sequence="15"/>
+  <!-- The Reporting menu entry was removed on request; the wizard and its
+       action are kept so the report can be re-exposed later if needed. -->
 
 </odoo>
