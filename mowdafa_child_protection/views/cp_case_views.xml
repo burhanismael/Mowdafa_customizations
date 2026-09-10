@@ -45,7 +45,7 @@
                         invisible="stage != 'in_care'"/>
                     <button name="action_create_reunification" type="object"
                         string="Create Reunification" class="btn-primary"
-                        invisible="stage != 'in_care' or reunification_count &gt; 0 or recommendation not in ('reunification', 'reunification_support')"/>
+                        invisible="stage != 'in_care' or reunification_count &gt; 0"/>
                     <button name="action_create_followup_visit" type="object"
                         string="New Follow-up Visit" class="btn-primary"
                         invisible="stage not in ('reunification', 'followup')"/>
