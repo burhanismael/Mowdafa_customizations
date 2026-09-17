@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_referral_source_tree" model="ir.ui.view">
+        <field name="name">cp.referral.source.tree</field>
+        <field name="model">cp.referral.source</field>
+        <field name="arch" type="xml">
+            <tree string="Referral Sources" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_referral_source" model="ir.actions.act_window">
+        <field name="name">Referral Sources</field>
+        <field name="res_model">cp.referral.source</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <data noupdate="1">
+
+    <record id="referral_source_community" model="cp.referral.source">
+        <field name="name">Community Member</field><field name="sequence">10</field>
+    </record>
+
+    <record id="referral_source_health" model="cp.referral.source">
+        <field name="name">Health Facility</field><field name="sequence">20</field>
+    </record>
+
+    <record id="referral_source_ngo" model="cp.referral.source">
+        <field name="name">NGO</field><field name="sequence">30</field>
+    </record>
+
+    <record id="referral_source_police" model="cp.referral.source">
+        <field name="name">Police</field><field name="sequence">40</field>
+    </record>
+
+    <record id="referral_source_teacher" model="cp.referral.source">
+        <field name="name">Teacher</field><field name="sequence">50</field>
+    </record>
+
+    <record id="referral_source_self" model="cp.referral.source">
+        <field name="name">Self / Family</field><field name="sequence">60</field>
+    </record>
+
+    <record id="referral_source_other" model="cp.referral.source">
+        <field name="name">Other</field><field name="sequence">70</field>
+    </record>
+
+    </data>
+
+</odoo>

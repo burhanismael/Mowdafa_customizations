@@ -11,6 +11,10 @@ from . import cp_ministry_case
 from . import cp_case_worker
 from . import cp_supervisor
 from . import cp_protection_concern
+from . import cp_literacy_level
+from . import cp_grade_level
+from . import cp_referrer_type
+from . import cp_referral_source
 from . import cp_partner_agency
 from . import cp_basic_need
 from . import cp_event_type

@@ -27,18 +27,23 @@ class CpVerificationChild(models.Model):
         compute='_compute_registration_info', store=True)
     child_nickname = fields.Char(
         string='Nick Name', compute='_compute_registration_info', store=True)
-    location = fields.Char(
-        string='Country / Region / District / Town-Village / Camp',
-        compute='_compute_registration_info', store=True)
+    child_country = fields.Char(
+        string='Country', compute='_compute_registration_info', store=True)
+    child_region = fields.Char(
+        string='Region', compute='_compute_registration_info', store=True)
+    child_district = fields.Char(
+        string='District / Town', compute='_compute_registration_info',
+        store=True)
+    child_village = fields.Char(
+        string='Village / Camp', compute='_compute_registration_info',
+        store=True)
     child_full_name = fields.Char(
         related='case_id.child_name', string="Child's Name")
     child_sex = fields.Selection(related='case_id.sex', string='Sex')
     child_dob = fields.Date(
         related='case_id.date_of_birth', string='Date of Birth')
-    adult_relationship = fields.Char(string='The adult is My')
     interview_date = fields.Date(
         string='Interviewed On', default=fields.Date.context_today)
-    interview_place = fields.Char(string='Place')
     interviewed_alone = fields.Boolean(
         string='Interviewed Alone', default=True,
         help='The child is interviewed with no adult present.')
@@ -50,44 +55,21 @@ class CpVerificationChild(models.Model):
             rec.registration_id = reg.id if reg else False
             rec.reg_id_number = (reg.name if reg else False) or False
             rec.child_nickname = (reg.nickname if reg else False) or False
-            if reg:
-                parts = [
-                    reg.country_id.name if reg.country_id else '',
-                    reg.region_id.name if reg.region_id else '',
-                    reg.district_id.name if reg.district_id else '',
-                    reg.village or '',
-                ]
-                rec.location = ' · '.join(p for p in parts if p) or False
-            else:
-                rec.location = False
+            rec.child_country = (
+                reg.country_id.name if reg else False) or False
+            rec.child_region = (
+                reg.region_id.name if reg else False) or False
+            rec.child_district = (
+                reg.district_id.name if reg else False) or False
+            rec.child_village = (reg.village if reg else False) or False
 
     # ── Section 2 — verification ─────────────────────────────────────────
+    info_match_reason = fields.Text(
+        string='If not, describe what does not match')
     info_match = fields.Selection([
         ('yes', 'Yes'), ('no', 'No'),
     ], string='Does the information on the Adult Verification Form match '
               "with the information on the child's file?")
-    accent_check = fields.Selection([
-        ('yes', 'Yes'), ('no', 'No'), ('na', 'N/A — over 5'),
-    ], string='Accent check performed',
-        help='Children under 5 / recently separated.')
-    match_ids = fields.One2many(
-        'cp.verification.child.match', 'verification_id',
-        string='Detail Comparison',
-        default=lambda self: self._default_match())
-
-    @api.model
-    def _default_match(self):
-        details = [
-            "Child's name",
-            "Father's name",
-            "Mother's name",
-            'Place lived before the streets',
-        ]
-        return [
-            (0, 0, {'sequence': (i + 1) * 10, 'detail': d})
-            for i, d in enumerate(details)
-        ]
-
     # ── Section 3 — wishes of the child ──────────────────────────────────
     knows_adult = fields.Selection([
         ('yes', 'Yes'), ('no', 'No'),
@@ -166,9 +148,10 @@ class CpVerificationAdult(models.Model):
         string='Interviewed On', default=fields.Date.context_today)
     relationship = fields.Char(string='Child is My')
     adult_contact = fields.Char(string='Contact')
-    adult_location = fields.Char(
-        string='Country / Region / District / Town-Village / Camp')
-    interview_place = fields.Char(string='Place')
+    adult_country = fields.Char(string='Country')
+    adult_region = fields.Char(string='Region')
+    adult_district = fields.Char(string='District / Town')
+    adult_village = fields.Char(string='Village / Camp')
 
     # ── Section 2 — child's details, as stated by the adult ──────────────
     recognize = fields.Selection([
@@ -199,9 +182,10 @@ class CpVerificationAdult(models.Model):
 
     # ── Section 3 — circumstances of separation ──────────────────────────
     sep_date = fields.Char(string='Date of Separation')
-    sep_place = fields.Char(
-        string='Place of Separation '
-               '(Country / Region / District / Town-Village / Camp)')
+    sep_country = fields.Char(string='Country of Separation')
+    sep_region = fields.Char(string='Region of Separation')
+    sep_district = fields.Char(string='District / Town of Separation')
+    sep_village = fields.Char(string='Village / Camp of Separation')
     sep_circumstances = fields.Text(
         string='Circumstances of separation (how the child became separated, '
                'who the child was with at the time)')
@@ -234,9 +218,7 @@ class CpVerificationAdult(models.Model):
     completed_sign = fields.Char(string='Signature')
     interviewed_alone = fields.Boolean(string='Interviewed Alone')
 
-    # ── the verification decision (drives the case gate) ─────────────────
-    recommendation = fields.Selection(
-        RECOMMENDATIONS, string='Recommendation', required=True)
+    # ── the verification decision ────────────────────────────────────────
     reasons = fields.Text(string='Reasons')
 
     @api.model_create_multi
@@ -245,25 +227,3 @@ class CpVerificationAdult(models.Model):
         records.case_id._sync_verification()
         return records
 
-    def write(self, vals):
-        result = super().write(vals)
-        if 'recommendation' in vals:
-            self.case_id._sync_verification()
-        return result
-
-
-class CpVerificationChildMatch(models.Model):
-    """One comparison row of the child verification's Section 2 — a
-    side-by-side of the adult's answer against the child's file."""
-    _name = 'cp.verification.child.match'
-    _description = 'CP Child Verification Match Line'
-    _order = 'sequence, id'
-
-    verification_id = fields.Many2one(
-        'cp.verification.child', string='Child Verification',
-        required=True, ondelete='cascade')
-    sequence = fields.Integer(string='Sequence', default=10)
-    detail = fields.Char(string='Detail from the Adult Verification Form')
-    adult_answer = fields.Char(string="Adult's answer")
-    child_file = fields.Char(string="Child's file")
-    match = fields.Boolean(string='Match')

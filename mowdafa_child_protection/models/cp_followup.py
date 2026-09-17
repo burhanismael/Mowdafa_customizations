@@ -94,17 +94,9 @@ class CpFollowup(models.Model):
     ], string='If not, type of current care arrangement')
     caregiver = fields.Char(
         string='Caregiver', compute='_compute_carried', store=True)
-    new_caregiver_name = fields.Char(string='New caregiver — Name')
-    new_caregiver_nsd = fields.Char(
-        string='New caregiver — Nick Name / Sex / DOB')
-    new_caregiver_relationship = fields.Char(
-        string='New caregiver — Child is My')
-    new_caregiver_location = fields.Char(
-        string='New caregiver — Country / Region / District / Town / Camp')
-    new_care_start_date = fields.Date(
-        string='Date new care arrangements started')
-    change_circumstances = fields.Text(
-        string='Explain circumstances of change (timing & reason)')
+    new_caregiver_ids = fields.One2many(
+        'cp.followup.new.caregiver', 'followup_id',
+        string='New Caregivers')
 
     # ── Section 4 — activities ───────────────────────────────────────────
     in_school = fields.Selection([
@@ -171,8 +163,10 @@ class CpFollowup(models.Model):
             reu = case.reunification_ids[:1]
             record.reg_id_number = (reg.name if reg else False) or False
             record.child_nickname = (reg.nickname if reg else False) or False
-            record.visiting_address = (
-                reu.adult_location if reu else False) or False
+            record.visiting_address = ' / '.join(filter(None, [
+                reu.adult_country, reu.adult_region,
+                reu.adult_district, reu.adult_village,
+            ])) if reu else False
             record.caregiver = (reu.verified_adult if reu else False) or False
             record.followup_period = (
                 ('%s %s' % (reu.followup_interval, reu.followup_unit))
@@ -218,3 +212,30 @@ class CpFollowupConcern(models.Model):
         ('yes', 'Yes'), ('no', 'No'),
     ], string='Immediate action required')
     details = fields.Text(string='Details of concerns and action required')
+
+
+class CpFollowupNewCaregiver(models.Model):
+    """One new-caregiver row of the follow-up visit's Section 3 — the
+    person the child moved to, when the caregiver changed."""
+    _name = 'cp.followup.new.caregiver'
+    _description = 'CP Follow-up New Caregiver'
+    _order = 'id'
+
+    followup_id = fields.Many2one(
+        'cp.followup', string='Follow-up Visit',
+        required=True, ondelete='cascade')
+    name = fields.Char(string='Name', required=True)
+    nickname = fields.Char(string='Nick Name')
+    sex = fields.Selection(
+        [('female', 'Female'), ('male', 'Male')], string='Sex')
+    dob = fields.Date(string='Date of Birth')
+    relationship = fields.Char(string='Child is My')
+    country_id = fields.Many2one(
+        'res.country', string='Country',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
+    region = fields.Char(string='Region')
+    district = fields.Char(string='District / Town')
+    village = fields.Char(string='Village / Camp')
+    start_date = fields.Date(string='Date care started')
+    circumstances = fields.Char(
+        string='Circumstances of change (timing & reason)')

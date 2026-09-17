@@ -72,7 +72,7 @@
                             <field name="age_years"/>
                         </group>
                         <group>
-                            <field name="nationality"/>
+                            <field name="nationality_id" options="{'no_create': true}"/>
                             <field name="language"/>
                             <field name="current_address" string="Address"/>
                             <field name="population_group"/>

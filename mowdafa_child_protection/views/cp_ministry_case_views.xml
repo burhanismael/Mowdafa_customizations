@@ -64,7 +64,7 @@
                             <field name="age_years"/>
                         </group>
                         <group>
-                            <field name="nationality"/>
+                            <field name="nationality_id" options="{'no_create': true}"/>
                             <field name="language"/>
                             <field name="current_address" string="Address"/>
                             <field name="population_group"/>
@@ -93,13 +93,13 @@
                             <field name="date_identified"/>
                         </group>
                         <group>
-                            <field name="referral_source"/>
+                            <field name="referral_source_id" options="{'no_create': true}"/>
                             <field name="referral_reason"/>
                         </group>
                     </group>
                     <group>
                         <group string="4 · Child Protection Concern">
-                            <field name="protection_concern"/>
+                            <field name="protection_concern_id" options="{'no_create': true}"/>
                             <field name="concern_description"/>
                         </group>
                         <group string="5 · Safety &amp; Risk Assessment">
@@ -210,7 +210,7 @@
                 <field name="date_received" string="Received"/>
                 <field name="child_name" optional="hide"/>
                 <field name="district_id" string="District"/>
-                <field name="protection_concern" string="Concern"/>
+                <field name="protection_concern_id" string="Concern"/>
                 <field name="risk_level" widget="badge" string="Risk"
                        decoration-danger="risk_level in ('critical', 'high')"
                        decoration-warning="risk_level == 'moderate'"
@@ -236,7 +236,7 @@
                     <filter string="Region" name="group_region"
                             context="{'group_by': 'region_id'}"/>
                     <filter string="Concern" name="group_concern"
-                            context="{'group_by': 'protection_concern'}"/>
+                            context="{'group_by': 'protection_concern_id'}"/>
                     <filter string="Status" name="group_status"
                             context="{'group_by': 'case_status'}"/>
                 </group>

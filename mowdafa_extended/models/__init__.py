@@ -1,3 +1,4 @@
+from . import hr_employee
 from . import survivor_case
 from . import survivor_master
 from . import case_worker

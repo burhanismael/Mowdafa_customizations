@@ -128,7 +128,7 @@
                             <field name="date_of_birth"/>
                             <field name="dob_estimated"/>
                             <field name="age_years"/>
-                            <field name="nationality"/>
+                            <field name="nationality_id" options="{'no_create': true}"/>
                             <field name="population_group"/>
                             <field name="disability"/>
                         </group>

@@ -5,7 +5,6 @@ access_cp_placement_user,cp.placement.user,model_cp_placement,base.group_user,1,
 access_cp_handover_user,cp.handover.user,model_cp_handover,base.group_user,1,1,1,0
 access_cp_registration_user,cp.registration.user,model_cp_registration,base.group_user,1,1,1,0
 access_cp_verification_child_user,cp.verification.child.user,model_cp_verification_child,base.group_user,1,1,1,0
-access_cp_verification_child_match_user,cp.verification.child.match.user,model_cp_verification_child_match,base.group_user,1,1,1,1
 access_cp_verification_adult_user,cp.verification.adult.user,model_cp_verification_adult,base.group_user,1,1,1,0
 access_cp_daily_record_user,cp.daily.record.user,model_cp_daily_record,base.group_user,1,1,1,1
 access_cp_mentoring_user,cp.mentoring.user,model_cp_mentoring,base.group_user,1,1,1,1
@@ -31,7 +30,16 @@ access_cp_supervisor_user,cp.supervisor.user,model_cp_supervisor,base.group_user
 access_cp_supervisor_manager,cp.supervisor.manager,model_cp_supervisor,base.group_system,1,1,1,1
 access_cp_protection_concern_user,cp.protection.concern.user,model_cp_protection_concern,base.group_user,1,0,0,0
 access_cp_protection_concern_manager,cp.protection.concern.manager,model_cp_protection_concern,base.group_system,1,1,1,1
+access_cp_literacy_level_user,cp.literacy.level.user,model_cp_literacy_level,base.group_user,1,0,0,0
+access_cp_literacy_level_manager,cp.literacy.level.manager,model_cp_literacy_level,base.group_system,1,1,1,1
+access_cp_grade_level_user,cp.grade.level.user,model_cp_grade_level,base.group_user,1,0,0,0
+access_cp_grade_level_manager,cp.grade.level.manager,model_cp_grade_level,base.group_system,1,1,1,1
+access_cp_referrer_type_user,cp.referrer.type.user,model_cp_referrer_type,base.group_user,1,0,0,0
+access_cp_referrer_type_manager,cp.referrer.type.manager,model_cp_referrer_type,base.group_system,1,1,1,1
+access_cp_referral_source_user,cp.referral.source.user,model_cp_referral_source,base.group_user,1,0,0,0
+access_cp_referral_source_manager,cp.referral.source.manager,model_cp_referral_source,base.group_system,1,1,1,1
 access_cp_registration_action_user,cp.registration.action.user,model_cp_registration_action,base.group_user,1,1,1,1
+access_cp_followup_new_caregiver_user,cp.followup.new.caregiver.user,model_cp_followup_new_caregiver,base.group_user,1,1,1,1
 access_cp_placement_manager,cp.placement.manager,model_cp_placement,base.group_system,1,1,1,1
 access_cp_handover_manager,cp.handover.manager,model_cp_handover,base.group_system,1,1,1,1
 access_cp_registration_manager,cp.registration.manager,model_cp_registration,base.group_system,1,1,1,1

@@ -34,8 +34,12 @@ class CpHandover(models.Model):
         related='case_id.dob_estimated', string='DOB Estimated?')
     child_father = fields.Char(
         related='case_id.middle_name', string="Father's Name")
-    child_nationality = fields.Char(
-        related='case_id.nationality', string='Nationality')
+    child_nationality = fields.Many2one(
+        'res.country', string='Nationality')
+    case_worker_id = fields.Many2one(
+        'cp.case.worker', string='Case Worker')
+    supervisor_id = fields.Many2one(
+        'cp.supervisor', string='Supervisor')
 
     # handed over by
     by_organisation = fields.Char(string='Organisation')
@@ -44,7 +48,8 @@ class CpHandover(models.Model):
     by_location = fields.Char(string='Location')
     by_contact = fields.Char(string='Handing-over Contact')
     # handed over to / received by
-    to_institution = fields.Char(string='Institution / Location')
+    to_institution = fields.Char(string='Institution')
+    to_location = fields.Char(string='Location')
     handed_to_type = fields.Selection([
         ('family', 'Family'),
         ('institution', 'Institution'),
@@ -70,7 +75,16 @@ class CpHandover(models.Model):
         string='Receiver Signature', required=True)
     sign_witness = fields.Char(
         string='Witness Signature', required=True)
-    notes = fields.Char(string='Notes')
+    # drawn signatures, alongside the written ones
+    sign_handing_over_img = fields.Binary(
+        string='Handing-over Signature (drawn)')
+    sign_child_img = fields.Binary(
+        string='Child Signature (drawn)')
+    sign_receiver_img = fields.Binary(
+        string='Receiver Signature (drawn)')
+    sign_witness_img = fields.Binary(
+        string='Witness Signature (drawn)')
+    notes = fields.Text(string='Notes')
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -8,6 +8,22 @@
               parent="menu_cp_configuration" action="action_cp_protection_concern"
               sequence="35"/>
 
+    <menuitem id="menu_cp_literacy_level" name="Literacy Levels"
+              parent="menu_cp_configuration" action="action_cp_literacy_level"
+              sequence="40"/>
+
+    <menuitem id="menu_cp_grade_level" name="Grade Levels"
+              parent="menu_cp_configuration" action="action_cp_grade_level"
+              sequence="45"/>
+
+    <menuitem id="menu_cp_referrer_type" name="Referrer Types"
+              parent="menu_cp_configuration" action="action_cp_referrer_type"
+              sequence="50"/>
+
+    <menuitem id="menu_cp_referral_source" name="Referral Sources"
+              parent="menu_cp_configuration" action="action_cp_referral_source"
+              sequence="55"/>
+
     <menuitem id="menu_cp_case_worker" name="Case Workers"
               parent="menu_cp_configuration" action="action_cp_case_worker"
               sequence="4"/>

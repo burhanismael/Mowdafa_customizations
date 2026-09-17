@@ -84,14 +84,25 @@
                         </group>
                         <group>
                             <field name="caregiver" readonly="1"/>
-                            <field name="new_caregiver_name"/>
-                            <field name="new_caregiver_nsd"/>
-                            <field name="new_caregiver_relationship"/>
-                            <field name="new_caregiver_location"/>
-                            <field name="new_care_start_date"/>
-                            <field name="change_circumstances"/>
                         </group>
                     </group>
+                    <label for="new_caregiver_ids" string="New caregivers"/>
+                    <field name="new_caregiver_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="nickname" optional="show"/>
+                            <field name="sex"/>
+                            <field name="dob"/>
+                            <field name="relationship"/>
+                            <field name="country_id" optional="show"
+                                   options="{'no_create': true}"/>
+                            <field name="region" optional="show"/>
+                            <field name="district" optional="show"/>
+                            <field name="village" optional="show"/>
+                            <field name="start_date"/>
+                            <field name="circumstances"/>
+                        </tree>
+                    </field>
 
                     <separator string="Section 4 — Activities"/>
                     <group>

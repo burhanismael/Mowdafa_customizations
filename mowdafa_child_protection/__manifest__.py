@@ -38,6 +38,10 @@ dashboard. The nine managed-track satellite forms follow.
         'views/cp_case_worker_views.xml',
         'views/cp_supervisor_views.xml',
         'views/cp_protection_concern_views.xml',
+        'views/cp_literacy_level_views.xml',
+        'views/cp_grade_level_views.xml',
+        'views/cp_referrer_type_views.xml',
+        'views/cp_referral_source_views.xml',
         # managed-track forms
         'views/cp_placement_views.xml',
         'views/cp_handover_views.xml',

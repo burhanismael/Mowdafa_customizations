@@ -20,6 +20,39 @@
     white-space: nowrap;
 }
 
+/* The checkbox widget renders its options inside an additional wrapper. */
+.o_cp_protection_concerns {
+    width: 100%;
+    container-type: inline-size;
+}
+
+.o_cp_protection_concerns > div {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px 24px;
+}
+
+.o_cp_protection_concerns .form-check {
+    margin-bottom: 0;
+}
+
+.o_cp_protection_concerns .form-check-label {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+@container (max-width: 700px) {
+    .o_cp_protection_concerns > div {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container (max-width: 450px) {
+    .o_cp_protection_concerns > div {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* Child Protection case pipeline: compact kanban columns, headers, and cards. */
 .o_cp_case_compact_kanban .o_kanban_group {
     flex: 0 0 210px !important;

@@ -20,6 +20,7 @@ signatures of the guardian, case worker and survivor.
         'report/gbv_cases_report_templates.xml',
         'report/gbv_cases_report_actions.xml',
         'report/gbv_dashboard_report_templates.xml',
+        'views/hr_employee_views.xml',
         'views/survivor_case_views.xml',
         'views/survivor_master_views.xml',
         'views/case_worker_views.xml',

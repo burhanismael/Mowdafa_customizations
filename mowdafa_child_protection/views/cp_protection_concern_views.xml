@@ -19,6 +19,8 @@
         <field name="view_mode">tree</field>
     </record>
 
+    <data noupdate="1">
+
     <record id="concern_separated" model="cp.protection.concern">
         <field name="name">Separated child</field><field name="sequence">10</field>
     </record>
@@ -98,5 +100,7 @@
     <record id="concern_other" model="cp.protection.concern">
         <field name="name">Other</field><field name="sequence">110</field>
     </record>
+
+    </data>
 
 </odoo>

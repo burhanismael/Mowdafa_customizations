@@ -66,7 +66,9 @@ class CpCase(models.Model):
     date_of_birth = fields.Date(string='Date of Birth')
     dob_estimated = fields.Boolean(string='DOB Estimated?')
     age_years = fields.Integer(string='Age (years)', tracking=True)
-    nationality = fields.Char(string='Nationality')
+    nationality_id = fields.Many2one(
+        'res.country', string='Nationality',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
     population_group = fields.Selection([
         ('resident', 'Resident'),
         ('host', 'Host Community'),
@@ -179,22 +181,18 @@ class CpCase(models.Model):
         help='Required to open the gate. Both original records are '
              'kept untouched — the disagreement is evidence.')
 
-    @api.depends('adult_verification_ids.recommendation',
-                 'verification_ids.recommendation')
+    @api.depends('verification_ids.recommendation')
     def _compute_verification(self):
         for case in self:
-            adult = case.adult_verification_ids[:1]
-            child = case.verification_ids[:1]
-            case.verification_conflict = bool(
-                adult and child
-                and adult.recommendation != child.recommendation)
+            case.verification_conflict = False
 
     def _sync_verification(self):
-        """Where the two accounts agree, the case moves on its own."""
+        """Both accounts on file and the child verification decided:
+        the case moves on its own."""
         for case in self:
             adult = case.adult_verification_ids[:1]
             child = case.verification_ids[:1]
-            if adult and child and adult.recommendation == child.recommendation:
+            if adult and child and child.recommendation:
                 case.recommendation = child.recommendation
                 case._advance_stage('in_care')
             elif case.supervisor_decision:
@@ -269,14 +267,44 @@ class CpCase(models.Model):
         }
 
     def action_create_handover(self):
-        return self._open_cp_form('cp.handover', _('Hand-over'))
+        return self._open_cp_form(
+            'cp.handover', _('Hand-over'),
+            {'default_child_nationality': self.nationality_id.id,
+             'default_case_worker_id': self.case_worker_id.id,
+             'default_supervisor_id': self.supervisor_id.id})
 
     def action_create_registration(self):
-        return self._open_cp_form('cp.registration', _('Registration'))
+        return self._open_cp_form(
+            'cp.registration', _('Registration'),
+            {'default_child_nationality': self.nationality_id.id,
+             'default_country_id': self.country_id.id,
+             'default_region_id': self.region_id.id,
+             'default_district_id': self.district_id.id,
+             'default_village': self.village,
+             'default_nickname': self.nickname,
+             'default_father_name': self.middle_name,
+             'default_nationality_origin_id': self.nationality_id.id,
+             'default_pob_region': self.region_id.name,
+             'default_pob_district': self.district_id.display_name,
+             'default_pob_village': self.village,
+             'default_addr_region': self.region_id.name,
+             'default_addr_district': self.district_id.display_name,
+             'default_addr_village': self.village})
 
     def action_create_verification_adult(self):
+        registration = self.registration_ids[:1]
         return self._open_cp_form(
-            'cp.verification.adult', _('Adult Verification'))
+            'cp.verification.adult', _('Adult Verification'),
+            {'default_adult_name': self.child_name,
+             'default_adult_nickname': self.nickname,
+             'default_adult_sex': self.sex,
+             'default_adult_dob': self.date_of_birth,
+             'default_adult_dob_estimated': self.dob_estimated,
+             'default_adult_contact': registration.caregiver_tel,
+             'default_adult_country': self.country_id.name,
+             'default_adult_region': self.region_id.name,
+             'default_adult_district': self.district_id.display_name,
+             'default_adult_village': self.village})
 
     def action_create_verification_child(self):
         return self._open_cp_form(
@@ -294,15 +322,10 @@ class CpCase(models.Model):
             if not (adult and child):
                 raise UserError(_(
                     'Add both an Adult Verification and a Child Verification '
-                    '(each with a recommendation) before moving to In Care.'))
-            if self.verification_conflict and not self.supervisor_decision:
-                raise UserError(_(
-                    'The adult and child verifications recommend different '
-                    'things. Fill in the Verification Gate below — Supervisor '
-                    'Decision and Reason — then press Move to In Care again.'))
+                    'before moving to In Care.'))
             raise UserError(_(
-                'Each verification needs a recommendation before the case '
-                'can move to In Care.'))
+                'The child verification needs a recommendation before the '
+                'case can move to In Care.'))
         return True
 
     def action_create_psychosocial(self):
@@ -324,7 +347,19 @@ class CpCase(models.Model):
             'cp.mentoring', _('Mentoring Reports'), self.mentoring_ids)
 
     def action_create_reunification(self):
-        return self._open_cp_form('cp.reunification', _('Reunification'))
+        adult = self.adult_verification_ids[:1]
+        return self._open_cp_form(
+            'cp.reunification', _('Reunification'),
+            {'default_verified_adult': adult.adult_name,
+             'default_adult_nickname': adult.adult_nickname,
+             'default_adult_sex': adult.adult_sex or False,
+             'default_adult_dob': adult.adult_dob or False,
+             'default_adult_child_relationship': adult.relationship,
+             'default_adult_phone': adult.adult_contact,
+             'default_adult_country': adult.adult_country,
+             'default_adult_region': adult.adult_region,
+             'default_adult_district': adult.adult_district,
+             'default_adult_village': adult.adult_village})
 
     def action_create_followup_visit(self):
         return self._open_cp_form(
@@ -614,7 +649,7 @@ class CpCase(models.Model):
             'partner_status': partner_status,
             'ministry_regions': named_counts(Ministry, 'region_id', []),
             'ministry_concerns': named_counts(
-                Ministry, 'protection_concern', [], concern_labels),
+                Ministry, 'protection_concern_id', [], concern_labels),
             'ministry_sex': [
                 {'name': _('Female'), 'count': ministry_sex.get('female', 0)},
                 {'name': _('Male'), 'count': ministry_sex.get('male', 0)},

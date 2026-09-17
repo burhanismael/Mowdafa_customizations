@@ -16,6 +16,7 @@ class CaseWorker(models.Model):
         string='Employee',
         required=True,
         tracking=True,
+        domain=[('is_gbv_worker', '=', True)],
     )
     institution = fields.Char(
         string='Institution/Organization',

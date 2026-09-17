@@ -21,6 +21,8 @@
 
     <!-- seed: the values the partner form offers -->
 
+    <data noupdate="1">
+
     <record id="basic_need_food" model="cp.basic.need">
         <field name="name">Food</field><field name="sequence">10</field>
     </record>
@@ -50,5 +52,7 @@
     </record>
 
     <!-- Event types (Number of Events Participated) -->
+
+    </data>
 
 </odoo>

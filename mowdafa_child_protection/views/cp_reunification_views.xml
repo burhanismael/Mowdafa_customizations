@@ -39,23 +39,28 @@
                             <field name="child_dob" readonly="1"/>
                         </group>
                         <group>
-                            <field name="child_adult_relationship" readonly="1"/>
-                            <field name="child_location" readonly="1"/>
+                            <field name="child_country" readonly="1"/>
+                            <field name="child_region" readonly="1"/>
+                            <field name="child_district" readonly="1"/>
+                            <field name="child_village" readonly="1"/>
                         </group>
                     </group>
 
                     <separator string="Section 2 — Identity of the Adult with whom the Child was Reunified"/>
                     <group>
                         <group>
-                            <field name="verified_adult" readonly="1"/>
-                            <field name="adult_nickname" readonly="1"/>
-                            <field name="adult_sex" readonly="1"/>
-                            <field name="adult_dob" readonly="1"/>
-                            <field name="adult_child_relationship" readonly="1"/>
+                            <field name="verified_adult"/>
+                            <field name="adult_nickname"/>
+                            <field name="adult_sex"/>
+                            <field name="adult_dob"/>
+                            <field name="adult_child_relationship"/>
+                            <field name="adult_phone"/>
                         </group>
                         <group>
-                            <field name="adult_phone" readonly="1"/>
-                            <field name="adult_location" readonly="1"/>
+                            <field name="adult_country"/>
+                            <field name="adult_region"/>
+                            <field name="adult_district"/>
+                            <field name="adult_village"/>
                             <field name="directions_landmark"/>
                         </group>
                     </group>

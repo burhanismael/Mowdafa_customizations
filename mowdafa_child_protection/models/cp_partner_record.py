@@ -68,7 +68,9 @@ class CpPartnerRecord(models.Model):
     date_of_birth = fields.Date(string='Date of Birth')
     dob_estimated = fields.Boolean(string='DOB Estimated?')
     age_years = fields.Integer(string='Age (years)', required=True)
-    nationality = fields.Char(string='Nationality', default='Somali')
+    nationality_id = fields.Many2one(
+        'res.country', string='Nationality',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
     language = fields.Char(string='Language')
     population_group = fields.Selection([
         ('resident', 'Resident'),
@@ -257,7 +259,7 @@ class CpPartnerRecord(models.Model):
             'date_of_birth': self.date_of_birth,
             'dob_estimated': self.dob_estimated,
             'age_years': self.age_years,
-            'nationality': self.nationality,
+            'nationality_id': self.nationality_id.id,
             'population_group': self.population_group,
             'disability': self.disability,
             'region_id': self.region_id.id,

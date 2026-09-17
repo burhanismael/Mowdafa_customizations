@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 
-from .cp_case import CONCERNS
-
 
 class CpMinistryCase(models.Model):
     """A ministry case keyed on the same 12-section Puntland CP form as a
@@ -43,7 +41,9 @@ class CpMinistryCase(models.Model):
     date_of_birth = fields.Date(string='Date of Birth')
     dob_estimated = fields.Boolean(string='DOB Estimated?')
     age_years = fields.Integer(string='Age (years)', required=True)
-    nationality = fields.Char(string='Nationality', default='Somali')
+    nationality_id = fields.Many2one(
+        'res.country', string='Nationality',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
     language = fields.Char(string='Language')
     population_group = fields.Selection([
         ('resident', 'Resident'),
@@ -85,20 +85,14 @@ class CpMinistryCase(models.Model):
         'gbv.district', string='District', required=True, tracking=True,
         domain="[('region_id', '=?', region_id)]")
     date_identified = fields.Date(string='Date Identified')
-    referral_source = fields.Selection([
-        ('community', 'Community Member'),
-        ('health', 'Health Facility'),
-        ('ngo', 'NGO'),
-        ('police', 'Police'),
-        ('teacher', 'Teacher'),
-        ('self', 'Self / Family'),
-        ('other', 'Other'),
-    ], string='Referral Source')
+    referral_source_id = fields.Many2one(
+        'cp.referral.source', string='Referral Source')
     referral_reason = fields.Text(string='Reason')
 
     # ── 4 · protection concern / 5 · safety & risk ───────────────────────
-    protection_concern = fields.Selection(
-        CONCERNS, string='Primary Concern', required=True, tracking=True)
+    protection_concern_id = fields.Many2one(
+        'cp.protection.concern', string='Primary Concern',
+        required=True, tracking=True)
     concern_description = fields.Text(string='Concern Description')
     risk_level = fields.Selection([
         ('critical', 'Critical'),
@@ -207,39 +201,24 @@ class CpMinistryCase(models.Model):
         }
 
     # ── opening a MOWDAFA case from this record ──────────────────────────
-    def _concern_id(self):
-        """This form keys the concern as a fixed selection; the case points
-        at the master table. Match on the label, adding the entry the first
-        time a concern is carried across."""
-        self.ensure_one()
-        label = dict(CONCERNS).get(self.protection_concern)
-        if not label:
-            return False
-        Concern = self.env['cp.protection.concern'].sudo()
-        concern = Concern.search([('name', '=', label)], limit=1)
-        if not concern:
-            concern = Concern.create({'name': label})
-        return concern.id
-
     def _case_values(self):
         """The reporting spine both tracks share, carried across so the
         officer does not key the child twice."""
         self.ensure_one()
-        source = dict(self._fields['referral_source'].selection or [])
         return {
             'child_name': self.child_name,
             'sex': self.sex,
             'date_of_birth': self.date_of_birth,
             'dob_estimated': self.dob_estimated,
             'age_years': self.age_years,
-            'nationality': self.nationality,
+            'nationality_id': self.nationality_id.id,
             'population_group': self.population_group,
             'disability': self.disability,
             'region_id': self.region_id.id,
             'district_id': self.district_id.id,
             'date_identified': self.date_identified,
-            'referral_source': source.get(self.referral_source) or '',
-            'protection_concern_id': self._concern_id(),
+            'referral_source': self.referral_source_id.name or '',
+            'protection_concern_id': self.protection_concern_id.id,
             'concern_description': self.concern_description,
             'risk_level': self.risk_level,
             'immediate_risk': self.immediate_risk,

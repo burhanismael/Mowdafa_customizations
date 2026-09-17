@@ -19,6 +19,8 @@
         <field name="view_mode">tree</field>
     </record>
 
+    <data noupdate="1">
+
     <record id="rating_unsatisfactory" model="cp.performance.rating">
         <field name="name">Unsatisfactory</field><field name="sequence">10</field>
     </record>
@@ -40,5 +42,7 @@
     </record>
 
     <!-- Case Workers -->
+
+    </data>
 
 </odoo>

@@ -19,6 +19,8 @@
         <field name="view_mode">tree</field>
     </record>
 
+    <data noupdate="1">
+
     <record id="event_sports" model="cp.event.type">
         <field name="name">Sports</field><field name="sequence">10</field>
     </record>
@@ -54,5 +56,7 @@
     <record id="event_skill" model="cp.event.type">
         <field name="name">Skill Training</field><field name="sequence">90</field>
     </record>
+
+    </data>
 
 </odoo>

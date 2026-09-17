@@ -29,28 +29,40 @@
                     </div>
 
                     <!-- child summary card, read from the case -->
-                    <group col="4">
-                        <field name="case_id"/>
-                        <field name="child_full_name" string="Full Name"/>
-                        <field name="child_sex"/>
-                        <field name="child_dob"/>
-                        <field name="child_nationality"/>
+                    <group>
+                        <group>
+                            <field name="case_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="child_full_name" string="Full Name"
+                                   readonly="1"/>
+                            <field name="child_sex" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="child_dob" readonly="1"/>
+                            <field name="child_nationality" readonly="1"
+                                   force_save="1"/>
+                        </group>
                     </group>
 
                     <separator string="Registration Details"/>
                     <group>
                         <group>
                             <field name="name" string="Ref. Number" readonly="1"/>
-                            <field name="date" string="Date of registration"/>
-                            <field name="population_group"/>
+                            <field name="date" string="Date of registration"
+                                   readonly="1" force_save="1"/>
+                            <field name="population_group" readonly="1"/>
                         </group>
                         <group>
-                            <field name="country_id" options="{'no_create_edit': True}"/>
-                            <field name="region_id" options="{'no_create_edit': True}"/>
-                            <field name="district_id" options="{'no_create_edit': True}"/>
+                            <field name="country_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="region_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="district_id" readonly="1"
+                                   force_save="1"/>
                         </group>
                         <group>
-                            <field name="village"/>
+                            <field name="village" readonly="1"
+                                   force_save="1"/>
                             <field name="date_of_arrival"/>
                         </group>
                     </group>
@@ -81,10 +93,15 @@
                             <field name="mother_tel" string="Mother — Tel"/>
                         </group>
                         <group>
-                            <field name="relative_name" string="Relative — full name"/>
-                            <field name="relative_tel" string="Relative — Tel"/>
-                            <field name="household_tel" string="Telephone (child / household)"/>
-                            <field name="nationality_origin" string="Nationality / Country of Origin"/>
+                            <field name="relative_name" string="Relative — full name"
+                                   placeholder="e.g. Xasan Cali Faarax"/>
+                            <field name="relative_tel" string="Relative — Tel"
+                                   placeholder="e.g. 907 111 302"/>
+                            <field name="household_tel" string="Telephone (child / household)"
+                                   placeholder="e.g. 907 111 302"/>
+                            <field name="nationality_origin_id"
+                                   string="Nationality / Country of Origin"
+                                   options="{'no_create': true}"/>
                         </group>
                     </group>
 
@@ -95,11 +112,15 @@
                                    widget="radio" options="{'horizontal': true}"/>
                         </group>
                         <group>
-                            <field name="highest_grade" string="Highest grade completed"/>
+                            <field name="highest_grade_id"
+                                   string="Highest grade completed"
+                                   options="{'no_create': true}"/>
                         </group>
                         <group>
-                            <field name="literacy_level" string="Current literacy level"
-                                   widget="radio" options="{'horizontal': true}"/>
+                            <field name="literacy_level_ids"
+                                   string="Current literacy level"
+                                   widget="many2many_tags"
+                                   options="{'no_create': true}"/>
                         </group>
                     </group>
                     <label for="wants_to_learn"
@@ -109,26 +130,26 @@
                     <separator string="Place of Birth / Origin"/>
                     <group>
                         <group>
-                            <field name="pob_region" string="Region"/>
+                            <field name="pob_region" string="Region" readonly="1" force_save="1"/>
                         </group>
                         <group>
-                            <field name="pob_district" string="District / Town"/>
+                            <field name="pob_district" string="District / Town" readonly="1" force_save="1"/>
                         </group>
                         <group>
-                            <field name="pob_village" string="Village / Camp"/>
+                            <field name="pob_village" string="Village / Camp" readonly="1" force_save="1"/>
                         </group>
                     </group>
 
                     <separator string="Current Address"/>
                     <group>
                         <group>
-                            <field name="addr_region" string="Region"/>
+                            <field name="addr_region" string="Region" readonly="1" force_save="1"/>
                         </group>
                         <group>
-                            <field name="addr_district" string="District / Town"/>
+                            <field name="addr_district" string="District / Town" readonly="1" force_save="1"/>
                         </group>
                         <group>
-                            <field name="addr_village" string="Village / Camp"/>
+                            <field name="addr_village" string="Village / Camp" readonly="1" force_save="1"/>
                         </group>
                     </group>
 
@@ -136,7 +157,8 @@
                     <group>
                         <group>
                             <field name="found_at"/>
-                            <field name="referrer_type" widget="radio"/>
+                            <field name="referrer_type_id"
+                                   options="{'no_create': true}"/>
                         </group>
                         <group>
                             <field name="referrer_name"/>
@@ -165,7 +187,7 @@
 
                     <separator string="Protection Concerns Related to the Child (tick all that apply)"/>
                     <field name="concern_ids" nolabel="1"
-                           class="o_cp_events_horizontal"
+                           class="o_cp_protection_concerns"
                            widget="many2many_checkboxes"
                            options="{'no_create_edit': True}"/>
 

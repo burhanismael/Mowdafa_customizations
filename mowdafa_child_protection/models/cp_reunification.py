@@ -3,18 +3,6 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
 
-def _loc(rec, country='country_id', region='region_id',
-         district='district_id', village='village'):
-    """Join Country · Region · District · Village into one display string."""
-    parts = [
-        (getattr(rec, country).name if getattr(rec, country, False) else ''),
-        (getattr(rec, region).name if getattr(rec, region, False) else ''),
-        (getattr(rec, district).name if getattr(rec, district, False) else ''),
-        (getattr(rec, village) or ''),
-    ]
-    return ' · '.join(p for p in parts if p) or False
-
-
 class CpReunification(models.Model):
     """CP-14 — opens only if the recommendation permits. The child and
     adult identities are carried in from the registration and the
@@ -42,30 +30,28 @@ class CpReunification(models.Model):
     child_sex = fields.Selection(related='case_id.sex', string='Sex')
     child_dob = fields.Date(
         related='case_id.date_of_birth', string='Date of Birth')
-    child_adult_relationship = fields.Char(
-        string='The adult is My', compute='_compute_carried', store=True)
-    child_location = fields.Char(
-        string='Country / Region / District / Town-Village / Camp',
-        compute='_compute_carried', store=True)
+    child_country = fields.Char(
+        string='Country', compute='_compute_carried', store=True)
+    child_region = fields.Char(
+        string='Region', compute='_compute_carried', store=True)
+    child_district = fields.Char(
+        string='District / Town', compute='_compute_carried', store=True)
+    child_village = fields.Char(
+        string='Village / Camp', compute='_compute_carried', store=True)
 
-    # ── Section 2 — identity of the adult (carried from verification) ────
-    verified_adult = fields.Char(
-        string='Verified Adult', compute='_compute_carried', store=True)
-    adult_nickname = fields.Char(
-        string='Nick Name', compute='_compute_carried', store=True)
+    # ── Section 2 — identity of the adult (defaulted from verification) ──
+    verified_adult = fields.Char(string='Verified Adult')
+    adult_nickname = fields.Char(string='Nick Name')
     adult_sex = fields.Selection(
-        [('female', 'Female'), ('male', 'Male')],
-        string='Sex', compute='_compute_carried', store=True)
-    adult_dob = fields.Date(
-        string='Date of Birth', compute='_compute_carried', store=True)
-    adult_child_relationship = fields.Char(
-        string='The Child is My', compute='_compute_carried', store=True)
-    adult_phone = fields.Char(
-        string='Telephone number', compute='_compute_carried', store=True)
-    adult_location = fields.Char(
-        string='Country / Region / District / Town-Village / Camp',
-        compute='_compute_carried', store=True,
-        help='Where the child now lives.')
+        [('female', 'Female'), ('male', 'Male')], string='Sex')
+    adult_dob = fields.Date(string='Date of Birth')
+    adult_child_relationship = fields.Char(string='The Child is My')
+    adult_phone = fields.Char(string='Telephone number')
+    adult_country = fields.Char(
+        string='Country', help='Where the child now lives.')
+    adult_region = fields.Char(string='Region')
+    adult_district = fields.Char(string='District / Town')
+    adult_village = fields.Char(string='Village / Camp')
     directions_landmark = fields.Char(
         string='Directions / landmark for the follow-up visit')
 
@@ -116,36 +102,21 @@ class CpReunification(models.Model):
     completed_sign = fields.Char(string='Signature')
     adult_signature = fields.Char(string="Adult's Signature")
 
-    @api.depends(
-        'case_id', 'case_id.child_name',
-        'case_id.registration_ids', 'case_id.adult_verification_ids',
-        'case_id.verification_ids',
-        'case_id.adult_verification_ids.adult_name')
+    @api.depends('case_id', 'case_id.child_name', 'case_id.registration_ids')
     def _compute_carried(self):
         for record in self:
-            case = record.case_id
-            reg = case.registration_ids[:1]
-            adult = case.adult_verification_ids[:1]
-            child_ver = case.verification_ids[:1]
-            # child (from registration + child verification)
+            reg = record.case_id.registration_ids[:1]
+            # child (from registration)
             record.registration_id = reg.id if reg else False
             record.reg_id_number = (reg.name if reg else False) or False
             record.child_nickname = (reg.nickname if reg else False) or False
-            record.child_location = _loc(reg) if reg else False
-            record.child_adult_relationship = (
-                child_ver.adult_relationship if child_ver else False) or False
-            # adult (from adult verification)
-            record.verified_adult = (adult.adult_name if adult else False) or False
-            record.adult_nickname = (
-                adult.adult_nickname if adult else False) or False
-            record.adult_sex = adult.adult_sex if adult else False
-            record.adult_dob = adult.adult_dob if adult else False
-            record.adult_child_relationship = (
-                adult.relationship if adult else False) or False
-            record.adult_phone = (
-                adult.adult_contact if adult else False) or False
-            record.adult_location = (
-                adult.adult_location if adult else False) or False
+            record.child_country = (
+                reg.country_id.name if reg else False) or False
+            record.child_region = (
+                reg.region_id.name if reg else False) or False
+            record.child_district = (
+                reg.district_id.name if reg else False) or False
+            record.child_village = (reg.village if reg else False) or False
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cp_referrer_type_tree" model="ir.ui.view">
+        <field name="name">cp.referrer.type.tree</field>
+        <field name="model">cp.referrer.type</field>
+        <field name="arch" type="xml">
+            <tree string="Referrer Types" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_cp_referrer_type" model="ir.actions.act_window">
+        <field name="name">Referrer Types</field>
+        <field name="res_model">cp.referrer.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <data noupdate="1">
+
+    <record id="referrer_police" model="cp.referrer.type">
+        <field name="name">Police</field><field name="sequence">10</field>
+    </record>
+
+    <record id="referrer_ngo" model="cp.referrer.type">
+        <field name="name">NGO</field><field name="sequence">20</field>
+    </record>
+
+    <record id="referrer_community" model="cp.referrer.type">
+        <field name="name">Community Member</field><field name="sequence">30</field>
+    </record>
+
+    <record id="referrer_self" model="cp.referrer.type">
+        <field name="name">Self</field><field name="sequence">40</field>
+    </record>
+
+    <record id="referrer_other" model="cp.referrer.type">
+        <field name="name">Other</field><field name="sequence">50</field>
+    </record>
+
+    </data>
+
+</odoo>

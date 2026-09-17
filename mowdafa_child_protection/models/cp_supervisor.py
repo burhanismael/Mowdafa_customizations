@@ -15,7 +15,8 @@ class CpSupervisor(models.Model):
     _order = 'id desc'
 
     employee_id = fields.Many2one(
-        'hr.employee', string='Employee', required=True, tracking=True)
+        'hr.employee', string='Employee', required=True, tracking=True,
+        domain=[('is_cp_worker', '=', True)])
     institution = fields.Char(
         string='Institution/Organization', required=True, tracking=True)
     id_no = fields.Char(string='ID No.', required=True, tracking=True)

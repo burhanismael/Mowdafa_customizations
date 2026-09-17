@@ -22,8 +22,8 @@ class CpRegistration(models.Model):
     child_sex = fields.Selection(related='case_id.sex', string='Sex')
     child_dob = fields.Date(
         related='case_id.date_of_birth', string='Date of Birth')
-    child_nationality = fields.Char(
-        related='case_id.nationality', string='Nationality')
+    child_nationality = fields.Many2one(
+        'res.country', string='Nationality')
 
     # ── 1 · registration details ─────────────────────────────────────────
     date = fields.Date(
@@ -61,18 +61,17 @@ class CpRegistration(models.Model):
     relative_name = fields.Char(string='Relative — Full Name')
     relative_tel = fields.Char(string='Relative — Tel')
     household_tel = fields.Char(string='Telephone (child / household)')
-    nationality_origin = fields.Char(string='Nationality / Country of Origin')
+    nationality_origin_id = fields.Many2one(
+        'res.country', string='Nationality / Country of Origin')
 
     # ── A9 · schooling ───────────────────────────────────────────────────
     prev_schooling = fields.Selection([
         ('yes', 'Yes'), ('no', 'No'),
     ], string='Previous schooling?')
-    highest_grade = fields.Char(string='Highest Grade Completed')
-    literacy_level = fields.Selection([
-        ('reads', 'Reads'),
-        ('writes', 'Writes'),
-        ('neither', 'Neither'),
-    ], string='Current Literacy Level')
+    highest_grade_id = fields.Many2one(
+        'cp.grade.level', string='Highest Grade Completed')
+    literacy_level_ids = fields.Many2many(
+        'cp.literacy.level', string='Current Literacy Level')
     wants_to_learn = fields.Text(
         string='Interest in learning or vocational training')
 
@@ -88,13 +87,8 @@ class CpRegistration(models.Model):
 
     # ── identification & referral details ────────────────────────────────
     found_at = fields.Char(string='Place where child was found / brought from')
-    referrer_type = fields.Selection([
-        ('police', 'Police'),
-        ('ngo', 'NGO'),
-        ('community', 'Community Member'),
-        ('self', 'Self'),
-        ('other', 'Other'),
-    ], string='Referring person / organization')
+    referrer_type_id = fields.Many2one(
+        'cp.referrer.type', string='Referring person / organization')
     referrer_name = fields.Char(string='Referring organization — Full Name')
     referrer_contact = fields.Char(string='Referring organization — Contact')
     referral_reason = fields.Text(string='Reason for referral / rescue')
