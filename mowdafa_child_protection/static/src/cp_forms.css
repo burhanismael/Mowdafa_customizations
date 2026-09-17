@@ -53,36 +53,269 @@
     }
 }
 
-/* Child Protection case pipeline: compact kanban columns, headers, and cards. */
-.o_cp_case_compact_kanban .o_kanban_group {
-    flex: 0 0 210px !important;
-    width: 210px !important;
-    min-width: 210px !important;
-    padding: 0 6px !important;
+/* Child Protection pipeline. Scoped to the two case boards. */
+.o_cp_case_compact_kanban {
+    background: #f4f6fa;
 }
 
-.o_cp_case_compact_kanban .o_kanban_header,
-.o_cp_case_compact_kanban .o_kanban_header_title {
-    min-height: 32px !important;
-    padding: 4px 0 !important;
+.o_cp_case_compact_kanban .o_kanban_group:not(.o_column_folded) {
+    flex: 0 0 280px !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    padding: 0 10px !important;
+}
+
+.o_cp_case_compact_kanban .o_kanban_header {
+    margin-bottom: 12px;
+    border-bottom: 2px solid #dce2ed;
 }
 
 .o_cp_case_compact_kanban .o_column_title {
-    font-size: 13px !important;
-    line-height: 18px !important;
+    font-size: 14px !important;
+    font-weight: 700;
+    color: #344158;
 }
 
-.o_cp_case_compact_kanban .o_kanban_record {
+.o_cp_case_compact_kanban .cp-case-card {
+    --cp-accent: #64748b;
+    --cp-tint: #eef2f6;
     width: 100% !important;
-    margin: 4px 0 !important;
+    margin: 0 0 14px !important;
+    padding: 16px !important;
+    border: 1px solid #e1e6ef !important;
+    border-top: 4px solid var(--cp-accent) !important;
+    border-radius: 12px !important;
+    background: #fff;
+    box-shadow: 0 3px 10px rgb(30 41 59 / 5%);
+    font-size: 13px;
+    transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.o_cp_case_compact_kanban .cp-case-card:hover {
+    box-shadow: 0 6px 18px rgb(30 41 59 / 12%);
+    border-color: var(--cp-accent) !important;
+}
+
+.o_cp_case_compact_kanban .cp-stage-handover { --cp-accent: #7661ad; --cp-tint: #f0ecf9; }
+.o_cp_case_compact_kanban .cp-stage-registration { --cp-accent: #3478ba; --cp-tint: #eaf3fc; }
+.o_cp_case_compact_kanban .cp-stage-verification { --cp-accent: #a86c16; --cp-tint: #fff4df; }
+.o_cp_case_compact_kanban .cp-stage-in_care { --cp-accent: #168279; --cp-tint: #e5f5f1; }
+.o_cp_case_compact_kanban .cp-stage-reunification { --cp-accent: #37804a; --cp-tint: #eaf5ec; }
+.o_cp_case_compact_kanban .cp-stage-followup { --cp-accent: #6264b5; --cp-tint: #eeeefb; }
+
+.o_cp_case_compact_kanban .cp-card-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.o_cp_case_compact_kanban .cp-case-reference {
+    color: var(--cp-accent);
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.o_cp_case_compact_kanban .cp-child-name {
+    color: #243247;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+}
+
+.o_cp_case_compact_kanban .cp-card-detail {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    color: #667085;
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+}
+
+.o_cp_case_compact_kanban .cp-card-detail > .fa { width: 14px; flex-shrink: 0; text-align: center; }
+.o_cp_case_compact_kanban .cp-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+
+.o_cp_case_compact_kanban .cp-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 20px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.o_cp_case_compact_kanban .cp-stage-tag { color: var(--cp-accent); background: var(--cp-tint); }
+.o_cp_case_compact_kanban .cp-risk-critical { color: #a51d36; background: #fde7ec; }
+.o_cp_case_compact_kanban .cp-risk-high { color: #ac3e15; background: #fff0e5; }
+.o_cp_case_compact_kanban .cp-risk-moderate { color: #895b0c; background: #fff5d6; }
+.o_cp_case_compact_kanban .cp-risk-low,
+.o_cp_case_compact_kanban .cp-recommendation-reunification { color: #256b40; background: #e8f5ec; }
+.o_cp_case_compact_kanban .cp-recommendation-reunification_support { color: #25649a; background: #e9f2fc; }
+.o_cp_case_compact_kanban .cp-recommendation-alt_care { color: #7a4aa0; background: #f3ecfa; }
+.o_cp_case_compact_kanban .cp-recommendation-tracing { color: #965319; background: #fff0df; }
+
+.o_cp_case_compact_kanban .cp-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #edf0f5;
+    color: #667085;
     font-size: 12px;
 }
 
-.o_cp_case_compact_kanban .oe_kanban_global_click > .flex-grow-1 {
-    padding: 6px 8px !important;
+.o_cp_case_compact_kanban .cp-worker-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    height: 26px;
+    border-radius: 50%;
+    color: var(--cp-accent);
+    background: var(--cp-tint);
 }
 
-.o_cp_case_compact_kanban .badge {
-    font-size: 10px;
-    padding: 2px 5px;
+.o_cp_case_compact_kanban .cp-worker-name { min-width: 0; overflow-wrap: anywhere; }
+.o_cp_case_compact_kanban .cp-open-icon { margin-left: auto; color: #98a2b3; }
+
+/* Child registration forms: neutral layout and consistent field alignment. */
+.o_cp_registration_form .o_form_sheet {
+    padding: 24px !important;
+}
+
+.o_cp_registration_form .cp-registration-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.o_cp_registration_form .oe_title h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.o_cp_registration_form .cp-registration-summary {
+    margin: 0 0 24px;
+    padding: 0;
+}
+
+.o_cp_registration_form .cp-registration-tabs .nav-tabs {
+    flex-wrap: wrap;
+}
+
+.o_cp_registration_form .cp-registration-tabs .nav-link {
+    color: inherit;
+}
+
+.o_cp_registration_form .cp-registration-tabs .nav-link.active {
+    background: transparent;
+    color: inherit;
+    font-weight: 600;
+}
+
+.o_cp_registration_form .cp-registration-section {
+    margin: 20px 0;
+    padding: 0;
+}
+
+.o_cp_registration_form .cp-registration-section > .o_horizontal_separator:first-child {
+    margin-top: 0;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+    text-transform: none;
+}
+
+.o_cp_registration_form .o_inner_group {
+    row-gap: 14px;
+    align-items: start;
+}
+
+.o_cp_registration_form .o_inner_group > .o_cell {
+    min-width: 0;
+    align-self: start;
+}
+
+.o_cp_registration_form .o_form_label {
+    white-space: normal !important;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.o_cp_registration_form .o_field_radio .form-check {
+    margin-bottom: 6px;
+}
+
+.o_cp_registration_form .o_field_radio .form-check-label {
+    white-space: normal;
+    line-height: 1.5;
+}
+
+.o_cp_registration_form .o_field_radio.o_horizontal {
+    flex-wrap: wrap;
+    column-gap: 14px;
+}
+
+.o_cp_registration_form .cp-registration-section > .o_field_widget {
+    margin-bottom: 18px;
+}
+
+.o_cp_registration_form .o_cp_protection_concerns .form-check {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+@media (min-width: 576px) {
+    .o_cp_registration_form .o_inner_group {
+        grid-template-columns: minmax(150px, 42%) minmax(0, 1fr);
+        column-gap: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .o_cp_registration_form .o_form_sheet { padding: 12px !important; }
+}
+
+/* Incident report checkbox sections: equal columns with checkbox-first labels. */
+.o_cp_incident_choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 14px 28px;
+    margin: 12px 0 24px;
+}
+
+.o_cp_incident_choices .o_cp_incident_choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+}
+
+.o_cp_incident_choices .o_field_boolean {
+    flex: 0 0 auto;
+    width: auto !important;
+    margin: 0;
+}
+
+.o_cp_incident_choices .o_form_label {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
 }

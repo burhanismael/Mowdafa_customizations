@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Sequence: CP/2026/0001 -->
-    <record id="seq_cp_case" model="ir.sequence">
-        <field name="name">Child Protection Case</field>
-        <field name="code">cp.case</field>
-        <field name="prefix">CP/%(year)s/</field>
+    <record id="caafag_seq_cp_case" model="ir.sequence">
+        <field name="name">CAAFAG Case</field>
+        <field name="code">cp.caafag.case</field>
+        <field name="prefix">CFG/%(year)s/</field>
         <field name="padding">4</field>
         <field name="company_id" eval="False"/>
     </record>
 
     <!-- Form -->
-    <record id="view_cp_case_form" model="ir.ui.view">
-        <field name="name">cp.case.form</field>
-        <field name="model">cp.case</field>
+    <record id="caafag_view_cp_case_form" model="ir.ui.view">
+        <field name="name">cp.caafag.case.form</field>
+        <field name="model">cp.caafag.case</field>
         <field name="arch" type="xml">
             <form string="Child Protection Case">
                 <header>
@@ -42,6 +42,9 @@
                         invisible="stage != 'in_care'"/>
                     <button name="action_create_mentoring" type="object"
                         string="Create Mentoring Report"
+                        invisible="stage != 'in_care'"/>
+                    <button name="action_create_case_report" type="object"
+                        string="Create Case Report"
                         invisible="stage != 'in_care'"/>
                     <button name="action_create_reunification" type="object"
                         string="Create Reunification" class="btn-primary"
@@ -97,6 +100,11 @@
                                 class="oe_stat_button" icon="fa-users"
                                 invisible="mentoring_count == 0">
                             <field name="mentoring_count" widget="statinfo" string="Mentoring"/>
+                        </button>
+                        <button name="action_view_case_reports" type="object"
+                                class="oe_stat_button" icon="fa-exclamation-triangle"
+                                invisible="case_report_count == 0">
+                            <field name="case_report_count" widget="statinfo" string="Case Reports"/>
                         </button>
                         <button name="action_view_reunifications" type="object"
                                 class="oe_stat_button" icon="fa-handshake-o"
@@ -191,9 +199,9 @@
     </record>
 
     <!-- List -->
-    <record id="view_cp_case_tree" model="ir.ui.view">
-        <field name="name">cp.case.tree</field>
-        <field name="model">cp.case</field>
+    <record id="caafag_view_cp_case_tree" model="ir.ui.view">
+        <field name="name">cp.caafag.case.tree</field>
+        <field name="model">cp.caafag.case</field>
         <field name="arch" type="xml">
             <tree string="Child Protection Cases">
                 <field name="name"/>
@@ -213,9 +221,9 @@
     </record>
 
     <!-- Care pipeline: stage accents and labelled risk/recommendation tags. -->
-    <record id="view_cp_case_kanban" model="ir.ui.view">
-        <field name="name">cp.case.kanban</field>
-        <field name="model">cp.case</field>
+    <record id="caafag_view_cp_case_kanban" model="ir.ui.view">
+        <field name="name">cp.caafag.case.kanban</field>
+        <field name="model">cp.caafag.case</field>
         <field name="arch" type="xml">
             <kanban default_group_by="stage" quick_create="false"
                     class="o_cp_case_compact_kanban">
@@ -280,23 +288,16 @@
     </record>
 
     <!-- Search -->
-    <record id="view_cp_case_search" model="ir.ui.view">
-        <field name="name">cp.case.search</field>
-        <field name="model">cp.case</field>
+    <record id="caafag_view_cp_case_search" model="ir.ui.view">
+        <field name="name">cp.caafag.case.search</field>
+        <field name="model">cp.caafag.case</field>
         <field name="arch" type="xml">
-            <search string="Child Protection Cases">
+            <search string="CAAFAG Cases">
                 <field name="name"/>
                 <field name="child_name"/>
-                <filter string="Street Children Cases" name="type_street"
-                        domain="[('case_type', '=', 'street')]"/>
-                <filter string="CAAFAG" name="type_caafag"
-                        domain="[('case_type', '=', 'caafag')]"/>
-                <separator/>
                 <filter string="Critical / High Risk" name="high_risk"
                         domain="[('risk_level', 'in', ('critical', 'high'))]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Case Type" name="group_case_type"
-                            context="{'group_by': 'case_type'}"/>
                     <filter string="Stage" name="group_stage"
                             context="{'group_by': 'stage'}"/>
                     <filter string="Region" name="group_region"
@@ -311,48 +312,22 @@
     </record>
 
     <!-- Actions -->
-    <record id="action_cp_case_managed" model="ir.actions.act_window">
-        <field name="name">Cases</field>
-        <field name="res_model">cp.case</field>
+    <!-- Action -->
+    <record id="caafag_action_cp_case" model="ir.actions.act_window">
+        <field name="name">CAAFAG</field>
+        <field name="res_model">cp.caafag.case</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[]</field>
-        <field name="context">{}</field>
-        <field name="search_view_id" ref="view_cp_case_search"/>
+        <field name="search_view_id" ref="caafag_view_cp_case_search"/>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Open a child's file</p>
-            <p>Children MOWDAFA cares for directly — the full journey
-               from hand-over to reunification.</p>
+            <p class="o_view_nocontent_smiling_face">Open a CAAFAG file</p>
+            <p>Children formerly associated with armed forces and groups
+               — the full journey from hand-over to reunification, in its
+               own register.</p>
         </field>
     </record>
 
-    <record id="action_cp_case_street" model="ir.actions.act_window">
-        <field name="name">Street Children Cases</field>
-        <field name="res_model">cp.case</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="domain">[('case_type', '=', 'street')]</field>
-        <field name="context">{'default_case_type': 'street'}</field>
-        <field name="search_view_id" ref="view_cp_case_search"/>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Open a street child's file</p>
-        </field>
-    </record>
 
-    <record id="action_cp_dashboard" model="ir.actions.client">
-        <field name="name">CP Dashboard</field>
-        <field name="tag">mowdafa_child_protection.cp_dashboard</field>
-    </record>
-
-    <!-- Menus -->
-    <menuitem id="menu_cp_root" name="Child Protection" sequence="61"
-              web_icon="mowdafa_child_protection,static/src/icon.png"/>
-    <menuitem id="menu_cp_dashboard" name="Dashboard"
-              parent="menu_cp_root" action="action_cp_dashboard" sequence="1"/>
-    <menuitem id="menu_cp_case_managed" name="Cases"
-              parent="menu_cp_root" sequence="5"
-              groups="group_cp_street,group_cp_caafag"/>
-    <menuitem id="menu_cp_case_street" name="Street Children Cases"
-              parent="menu_cp_case_managed" action="action_cp_case_street"
-              sequence="10" groups="group_cp_street"/>
-    <!-- The CAAFAG menu lives in cp_caafag_case_views.xml — its action
-         points at the separate cp.caafag.case register. -->
+    <menuitem id="menu_cp_case_caafag" name="CAAFAG"
+              parent="menu_cp_case_managed" action="caafag_action_cp_case"
+              sequence="20" groups="group_cp_caafag"/>
 </odoo>

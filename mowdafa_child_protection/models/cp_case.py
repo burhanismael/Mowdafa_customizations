@@ -293,9 +293,18 @@ class CpCase(models.Model):
 
     def action_create_verification_adult(self):
         registration = self.registration_ids[:1]
+        worker = self.case_worker_id
+        employee = worker.employee_id
         return self._open_cp_form(
             'cp.verification.adult', _('Adult Verification'),
-            {'default_adult_name': self.child_name,
+            {'default_completed_by': employee.name,
+             'default_completed_position': (
+                 employee.job_title or employee.job_id.name),
+             'default_completed_agency': worker.institution,
+             'default_completed_place': worker.location,
+             'default_completed_date': fields.Date.context_today(self),
+             'default_completed_sign': employee.name,
+             'default_adult_name': self.child_name,
              'default_adult_nickname': self.nickname,
              'default_adult_sex': self.sex,
              'default_adult_dob': self.date_of_birth,
@@ -307,8 +316,17 @@ class CpCase(models.Model):
              'default_adult_village': self.village})
 
     def action_create_verification_child(self):
+        worker = self.case_worker_id
+        employee = worker.employee_id
         return self._open_cp_form(
-            'cp.verification.child', _('Child Verification'))
+            'cp.verification.child', _('Child Verification'),
+            {'default_completed_by': employee.name,
+             'default_completed_position': (
+                 employee.job_title or employee.job_id.name),
+             'default_completed_agency': worker.institution,
+             'default_completed_place': worker.location,
+             'default_completed_date': fields.Date.context_today(self),
+             'default_completed_sign': employee.name})
 
     def action_move_in_care(self):
         """Manual push from Verification to In Care. Advances when the two
@@ -423,7 +441,7 @@ class CpCase(models.Model):
         counts = {}
         if self.ids:
             for res_id, count in self.env['ir.attachment']._read_group(
-                    [('res_model', '=', 'cp.case'), ('res_id', 'in', self.ids)],
+                    [('res_model', '=', self._name), ('res_id', 'in', self.ids)],
                     groupby=['res_id'], aggregates=['__count']):
                 counts[res_id] = count
         for case in self:
@@ -436,9 +454,9 @@ class CpCase(models.Model):
             'name': 'Documents',
             'res_model': 'ir.attachment',
             'view_mode': 'kanban,tree,form',
-            'domain': [('res_model', '=', 'cp.case'),
+            'domain': [('res_model', '=', self._name),
                        ('res_id', '=', self.id)],
-            'context': {'default_res_model': 'cp.case',
+            'context': {'default_res_model': self._name,
                         'default_res_id': self.id},
         }
 
@@ -492,8 +510,13 @@ class CpCase(models.Model):
         Case = self
         Partner = self.env['cp.partner.record']
 
-        # managed cases can be filtered to a single case type
-        case_domain = [('case_type', '=', case_type)] if case_type else []
+        # managed cases can be filtered to a single case type; CAAFAG
+        # lives in its own register (table) since the split
+        case_domain = []
+        if case_type == 'caafag':
+            Case = self.env['cp.caafag.case']
+        elif case_type:
+            case_domain = [('case_type', '=', case_type)]
 
         def count_by(model, field, domain):
             result = {}

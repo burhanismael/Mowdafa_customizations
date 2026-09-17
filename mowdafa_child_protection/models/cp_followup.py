@@ -145,7 +145,7 @@ class CpFollowup(models.Model):
         case_id = self.env.context.get('default_case_id')
         if not case_id:
             return []
-        case = self.env['cp.case'].browse(case_id)
+        case = self.env[self._fields['case_id'].comodel_name].browse(case_id)
         reg = case.registration_ids[:1]
         return [
             (0, 0, {'sequence': (i + 1) * 10,

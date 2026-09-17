@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="seq_cp_verification" model="ir.sequence">
-        <field name="name">cp.verification</field>
-        <field name="code">cp.verification</field>
-        <field name="prefix">VER/%(year)s/</field>
+    <record id="caafag_seq_cp_verification" model="ir.sequence">
+        <field name="name">cp.caafag.verification</field>
+        <field name="code">cp.caafag.verification</field>
+        <field name="prefix">CVER/%(year)s/</field>
         <field name="padding">4</field>
         <field name="company_id" eval="False"/>
     </record>
 
-    <record id="view_cp_verification_adult_form" model="ir.ui.view">
-        <field name="name">cp.verification.adult.form</field>
-        <field name="model">cp.verification.adult</field>
+    <record id="caafag_view_cp_verification_adult_form" model="ir.ui.view">
+        <field name="name">cp.caafag.verification.adult.form</field>
+        <field name="model">cp.caafag.verification.adult</field>
         <field name="arch" type="xml">
             <form string="Adult Verification Form">
                 <sheet>
@@ -167,9 +167,9 @@
         </field>
     </record>
 
-    <record id="view_cp_verification_child_form" model="ir.ui.view">
-        <field name="name">cp.verification.child.form</field>
-        <field name="model">cp.verification.child</field>
+    <record id="caafag_view_cp_verification_child_form" model="ir.ui.view">
+        <field name="name">cp.caafag.verification.child.form</field>
+        <field name="model">cp.caafag.verification.child</field>
         <field name="arch" type="xml">
             <form string="Child Verification Form">
                 <sheet>

@@ -30,3 +30,7 @@ from . import cp_mentoring
 from . import cp_psychosocial
 from . import cp_reunification
 from . import cp_followup
+
+# CAAFAG track — same shape, separate tables (must import after the
+# street-children models it prototypes)
+from . import cp_caafag

@@ -26,7 +26,7 @@ class CpFormMixin(models.AbstractModel):
         return {
             'type': 'ir.actions.act_window',
             'name': _('Case'),
-            'res_model': 'cp.case',
+            'res_model': self.case_id._name,
             'view_mode': 'form',
             'res_id': self.case_id.id,
         }

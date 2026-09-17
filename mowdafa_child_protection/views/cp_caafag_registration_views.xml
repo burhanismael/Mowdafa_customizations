@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-  <record id="seq_cp_registration" model="ir.sequence">
-    <field name="name">cp.registration</field>
-    <field name="code">cp.registration</field>
-    <field name="prefix">REG/%(year)s/</field>
+  <record id="caafag_seq_cp_registration" model="ir.sequence">
+    <field name="name">cp.caafag.registration</field>
+    <field name="code">cp.caafag.registration</field>
+    <field name="prefix">CREG/%(year)s/</field>
     <field name="padding">4</field>
     <field name="company_id" eval="False"/>
   </record>
-  <record id="view_cp_registration_form" model="ir.ui.view">
-    <field name="name">cp.registration.form</field>
-    <field name="model">cp.registration</field>
+  <record id="caafag_view_cp_registration_form" model="ir.ui.view">
+    <field name="name">cp.caafag.registration.form</field>
+    <field name="model">cp.caafag.registration</field>
     <field name="arch" type="xml">
       <form string="Registration Form" class="o_cp_registration_form">
         <sheet>
@@ -21,7 +21,7 @@
             </button>
           </div>
           <div class="oe_title">
-            <span class="cp-registration-eyebrow">Street Children · Child Registration</span>
+            <span class="cp-registration-eyebrow">CAAFAG · Child Registration</span>
             <h1>
               <field name="name" readonly="1"/>
             </h1>
@@ -71,6 +71,24 @@
                   </group>
                 </group>
               </div>
+              <div class="cp-registration-section">
+                <separator string="Centre Enrolment"/>
+                <group>
+                  <group>
+                    <field name="centre"/>
+                    <field name="entry_month"/>
+                    <field name="education_level"/>
+                  </group>
+                  <group>
+                    <field name="emergency_contact"/>
+                    <field name="health_problems"/>
+                    <field name="on_medication" widget="radio"/>
+                  </group>
+                </group>
+                <group>
+                  <field name="emergency_treatment_auth"/>
+                </group>
+              </div>
             </page>
             <page name="personal" string="Personal &amp; Education">
               <div class="cp-registration-section">
@@ -105,6 +123,64 @@
                 </group>
                 <label for="wants_to_learn" string="Interest in learning or vocational training"/>
                 <field name="wants_to_learn" nolabel="1" class="col-12"/>
+              </div>
+            </page>
+            <page name="profile" string="CAAFAG Profile" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+              <div class="cp-registration-section" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                <separator string="CAAFAG Profile" groups="mowdafa_child_protection.group_cp_protection_supervisor"/>
+                <p class="text-muted" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                        Section 2 of the CAAFAG registration. Restricted to
+                        the protection-supervisor group; excluded from
+                        reports and exports.</p>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="force_type" widget="radio"/>
+                    <field name="group_name"/>
+                    <field name="military_unit"/>
+                    <field name="commander" placeholder="optional"/>
+                  </group>
+                  <group>
+                    <field name="unit_location"/>
+                    <field name="clan"/>
+                    <field name="landmarks"/>
+                  </group>
+                  <group>
+                    <field name="recruit_status" widget="radio"/>
+                    <field name="date_joined"/>
+                    <field name="recruitment_process" widget="radio"/>
+                  </group>
+                  <group>
+                    <field name="recruitment_place"/>
+                  </group>
+                </group>
+                <group string="If not forced — reasons" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="reason_services"/>
+                    <field name="reason_financial"/>
+                    <field name="reason_family"/>
+                  </group>
+                  <group>
+                    <field name="reason_friends"/>
+                    <field name="reason_beliefs"/>
+                    <field name="reason_defend"/>
+                  </group>
+                </group>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="main_role" widget="radio"/>
+                    <field name="weapon_used" widget="radio"/>
+                    <field name="date_left"/>
+                    <field name="still_associated" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                  <group>
+                    <field name="leave_how"/>
+                    <field name="demobilisation_place"/>
+                    <field name="release_papers" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                </group>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <field name="wishes_after_release" placeholder="free text"/>
+                </group>
               </div>
             </page>
             <page name="care" string="Location &amp; Care">

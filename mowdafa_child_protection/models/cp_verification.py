@@ -99,6 +99,7 @@ class CpVerificationChild(models.Model):
     completed_place = fields.Char(string='Place')
     completed_date = fields.Date(string='Date')
     completed_sign = fields.Char(string='Signature')
+    completed_sign_img = fields.Binary(string='Signature (drawn)')
 
     def action_view_registration(self):
         self.ensure_one()
@@ -171,9 +172,12 @@ class CpVerificationAdult(models.Model):
         [('yes', 'Yes'), ('no', 'No')], string='Is she alive?')
     mother_address = fields.Char(string='Current address of Mother')
     other_family = fields.Text(string='Names of other family members')
-    lived_before = fields.Char(
-        string='Where did the child live before living on the streets? '
-               '(Country / Region / District / Town-Village / Camp)')
+    lived_country_id = fields.Many2one(
+        'res.country', string='Country (lived before)',
+        default=lambda self: self.env.ref('base.so', raise_if_not_found=False))
+    lived_region = fields.Char(string='Region (lived before)')
+    lived_district = fields.Char(string='District / Town (lived before)')
+    lived_village = fields.Char(string='Village / Camp (lived before)')
     identifying_info = fields.Text(
         string="Information about the child's life that would help identify "
                'the child')
@@ -216,6 +220,7 @@ class CpVerificationAdult(models.Model):
     completed_date = fields.Date(string='Date')
     completed_place = fields.Char(string='Place')
     completed_sign = fields.Char(string='Signature')
+    completed_sign_img = fields.Binary(string='Signature (drawn)')
     interviewed_alone = fields.Boolean(string='Interviewed Alone')
 
     # ── the verification decision ────────────────────────────────────────

@@ -52,6 +52,18 @@ dashboard. The nine managed-track satellite forms follow.
         'views/cp_psychosocial_views.xml',
         'views/cp_reunification_views.xml',
         'views/cp_followup_views.xml',
+        # CAAFAG track — separate register, same shape
+        'views/cp_caafag_case_views.xml',
+        'views/cp_caafag_placement_views.xml',
+        'views/cp_caafag_handover_views.xml',
+        'views/cp_caafag_registration_views.xml',
+        'views/cp_caafag_verification_views.xml',
+        'views/cp_caafag_daily_record_views.xml',
+        'views/cp_caafag_mentoring_views.xml',
+        'views/cp_caafag_psychosocial_views.xml',
+        'views/cp_caafag_reunification_views.xml',
+        'views/cp_caafag_followup_views.xml',
+        'views/cp_caafag_case_report_views.xml',
         # menus last — they reference the actions above
         'views/cp_menus.xml',
     ],
