@@ -63,11 +63,9 @@
                   <group>
                     <field name="consent_registration" widget="radio" options="{'horizontal': true}"/>
                     <field name="consent_registration_by" string="Given By"/>
-                    <field name="child_assent" string="Child's Assent"/>
                   </group>
                   <group>
                     <field name="consent_data" widget="radio" options="{'horizontal': true}"/>
-                    <field name="consent_data_limits" string="Limits"/>
                   </group>
                 </group>
               </div>
@@ -76,7 +74,8 @@
                 <group>
                   <group>
                     <field name="batch_id" options="{'no_create': true}"/>
-                    <field name="skill_id" options="{'no_create': true}"/>
+                    <field name="skill_ids" widget="many2many_tags"
+                           options="{'no_create': true}"/>
                     <field name="skill_certified"/>
                     <field name="centre"/>
                     <field name="entry_month"/>
@@ -231,16 +230,25 @@
                   <group>
                     <field name="care_type" widget="radio"/>
                     <field name="care_before"/>
+                  </group>
+                  <group>
                     <field name="care_adequate" widget="radio" options="{'horizontal': true}"/>
                     <field name="care_action_needed" widget="radio" options="{'horizontal': true}"/>
                   </group>
-                  <group>
-                    <field name="caregiver_name"/>
-                    <field name="caregiver_tel"/>
-                    <field name="care_institution"/>
-                    <field name="care_location"/>
-                  </group>
                 </group>
+                <separator string="Caregivers"/>
+                <field name="care_location_ids" nolabel="1" class="w-100">
+                  <tree editable="bottom">
+                    <field name="name"/>
+                    <field name="telephone"/>
+                    <field name="institution"/>
+                    <field name="region_id" optional="show"
+                           options="{'no_create': true}"/>
+                    <field name="district_id" optional="show"
+                           options="{'no_create': true}"/>
+                    <field name="village" optional="show"/>
+                  </tree>
+                </field>
               </div>
             </page>
             <page name="protection" string="Protection &amp; Actions">
@@ -298,6 +306,8 @@
                     <field name="officer_date"/>
                     <field name="officer_location"/>
                     <field name="officer_sign"/>
+                    <field name="officer_sign_img"
+                           string="Signature (drawn)" widget="signature"/>
                   </group>
                 </group>
               </div>

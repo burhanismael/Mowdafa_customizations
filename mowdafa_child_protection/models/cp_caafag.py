@@ -122,6 +122,9 @@ class CpCaafagRegistration(models.Model):
     action_ids = fields.One2many(
         'cp.caafag.registration.action', 'registration_id',
         string='Immediate Actions')
+    care_location_ids = fields.One2many(
+        'cp.caafag.registration.care.location', 'registration_id',
+        string='Care Locations')
     concern_ids = fields.Many2many(
         'cp.protection.concern', 'cp_caafag_registration_concern_rel',
         'registration_id', 'concern_id', string='Protection Concerns')
@@ -131,10 +134,11 @@ class CpCaafagRegistration(models.Model):
         'cp.caafag.batch', string='Batch',
         help='The centre batch this registration enrols into '
              '(Configuration → Batches).')
-    skill_id = fields.Many2one(
-        'cp.caafag.skill', string='Chosen vocational skill',
-        help='Drives the Batch KPI report (Configuration → '
-             'Vocational Skills).')
+    skill_ids = fields.Many2many(
+        'cp.caafag.skill', 'cp_caafag_registration_skill_rel',
+        'registration_id', 'skill_id', string='Chosen vocational skills',
+        help='A child can take more than one skill. Drives the Batch KPI '
+             'report (Configuration → Vocational Skills).')
     skill_certified = fields.Boolean(
         string='Skill certified',
         help='The child was certified in the chosen vocational skill.')
@@ -213,6 +217,16 @@ class CpCaafagRegistration(models.Model):
     ], string='Release papers served?', groups=_CAAFAG_GROUPS)
     wishes_after_release = fields.Text(
         string='Wishes after release', groups=_CAAFAG_GROUPS)
+
+
+class CpCaafagRegistrationCareLocation(models.Model):
+    _name = 'cp.caafag.registration.care.location'
+    _inherit = 'cp.registration.care.location'
+    _description = 'CAAFAG Registration Care Location'
+
+    registration_id = fields.Many2one(
+        'cp.caafag.registration', string='Registration',
+        required=True, ondelete='cascade')
 
 
 class CpCaafagRegistrationAction(models.Model):
@@ -582,8 +596,8 @@ class CpCaafagBatch(models.Model):
         # chosen vocational skill, grouped from the registrations
         by_skill = {}
         for reg in self.registration_ids:
-            if reg.skill_id:
-                by_skill.setdefault(reg.skill_id.name, []).append(reg)
+            for skill in reg.skill_ids:
+                by_skill.setdefault(skill.name, []).append(reg)
         skills = []
         for label, regs in sorted(
                 by_skill.items(), key=lambda kv: -len(kv[1])):

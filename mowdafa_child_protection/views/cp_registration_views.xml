@@ -63,11 +63,9 @@
                   <group>
                     <field name="consent_registration" widget="radio" options="{'horizontal': true}"/>
                     <field name="consent_registration_by" string="Given By"/>
-                    <field name="child_assent" string="Child's Assent"/>
                   </group>
                   <group>
                     <field name="consent_data" widget="radio" options="{'horizontal': true}"/>
-                    <field name="consent_data_limits" string="Limits"/>
                   </group>
                 </group>
               </div>
@@ -156,10 +154,19 @@
                     <field name="care_action_needed" widget="radio" options="{'horizontal': true}"/>
                   </group>
                   <group>
-                    <field name="caregiver_name"/>
-                    <field name="caregiver_tel"/>
-                    <field name="care_institution"/>
-                    <field name="care_location"/>
+                    <label for="care_location_ids" string="Caregivers"/>
+                    <field name="care_location_ids" nolabel="1">
+                      <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="telephone"/>
+                        <field name="institution"/>
+                        <field name="region_id" optional="show"
+                               options="{'no_create': true}"/>
+                        <field name="district_id" optional="show"
+                               options="{'no_create': true}"/>
+                        <field name="village" optional="show"/>
+                      </tree>
+                    </field>
                   </group>
                 </group>
               </div>
@@ -219,6 +226,8 @@
                     <field name="officer_date"/>
                     <field name="officer_location"/>
                     <field name="officer_sign"/>
+                    <field name="officer_sign_img"
+                           string="Signature (drawn)" widget="signature"/>
                   </group>
                 </group>
               </div>

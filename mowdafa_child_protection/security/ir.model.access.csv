@@ -97,3 +97,5 @@ access_cp_caafag_case_report_manager,cp.caafag.case.report.manager,model_cp_caaf
 access_cp_caafag_batch_user,cp.caafag.batch.user,model_cp_caafag_batch,base.group_user,1,1,1,1
 access_cp_caafag_batch_report_wizard_user,cp.caafag.batch.report.wizard.user,model_cp_caafag_batch_report_wizard,base.group_user,1,1,1,1
 access_cp_caafag_skill_user,cp.caafag.skill.user,model_cp_caafag_skill,base.group_user,1,1,1,1
+access_cp_registration_care_location_user,cp.registration.care.location.user,model_cp_registration_care_location,base.group_user,1,1,1,1
+access_cp_caafag_registration_care_location_user,cp.caafag.registration.care.location.user,model_cp_caafag_registration_care_location,base.group_user,1,1,1,1

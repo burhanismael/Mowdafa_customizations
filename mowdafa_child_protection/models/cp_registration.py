@@ -102,10 +102,9 @@ class CpRegistration(models.Model):
         ('streets', 'Living on the streets'),
         ('other', 'Other'),
     ], string='Type of care arrangement')
-    caregiver_name = fields.Char(string='Caregiver — Full Names')
-    caregiver_tel = fields.Char(string='Caregiver — Telephone')
-    care_institution = fields.Char(string='Institution Name')
-    care_location = fields.Char(string='Region / District / Village / Camp')
+    care_location_ids = fields.One2many(
+        'cp.registration.care.location', 'registration_id',
+        string='Caregivers')
     care_before = fields.Char(string='Care arrangement before')
     care_adequate = fields.Selection([
         ('yes', 'Yes'), ('no', 'No'),
@@ -152,6 +151,7 @@ class CpRegistration(models.Model):
     officer_location = fields.Char(
         string='Region / District / Village / Camp')
     officer_sign = fields.Char(string='Signature')
+    officer_sign_img = fields.Binary(string='Signature (drawn)')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -178,3 +178,23 @@ class CpRegistrationAction(models.Model):
         ('in_progress', 'In Progress'),
         ('done', 'Done'),
     ], string='Status', default='pending')
+
+
+class CpRegistrationCareLocation(models.Model):
+    """One care-location row of the registration's current care
+    arrangements — where the child is being cared for."""
+    _name = 'cp.registration.care.location'
+    _description = 'CP Registration Care Location'
+    _order = 'id'
+
+    registration_id = fields.Many2one(
+        'cp.registration', string='Registration',
+        required=True, ondelete='cascade')
+    name = fields.Char(string='Caregiver — Full Names')
+    telephone = fields.Char(string='Caregiver — Telephone')
+    institution = fields.Char(string='Institution Name')
+    region_id = fields.Many2one('gbv.region', string='Region')
+    district_id = fields.Many2one(
+        'gbv.district', string='District / Town',
+        domain="[('region_id', '=?', region_id)]")
+    village = fields.Char(string='Village / Camp')

@@ -279,14 +279,27 @@ class CpCase(models.Model):
              'default_to_location': worker.location,
              'default_received_by': employee.name,
              'default_received_role': (
-                 employee.job_title or employee.job_id.name),
+                 employee.job_title or employee.job_id.name
+                 or (worker and 'Case Worker') or False),
              'default_received_contact': (
-                 employee.work_phone or employee.mobile_phone)})
+                 employee.work_phone or employee.mobile_phone
+                 or employee.work_email),
+             'default_received_address': worker.location})
 
     def action_create_registration(self):
+        worker = self.case_worker_id
+        employee = worker.employee_id
         return self._open_cp_form(
             'cp.registration', _('Registration'),
-            {'default_child_nationality': self.nationality_id.id,
+            {'default_officer_name': employee.name,
+             'default_officer_position': (
+                 employee.job_title or employee.job_id.name
+                 or (worker and 'Case Worker') or False),
+             'default_officer_agency': worker.institution,
+             'default_officer_date': fields.Date.context_today(self),
+             'default_officer_location': worker.location,
+             'default_officer_sign': employee.name,
+             'default_child_nationality': self.nationality_id.id,
              'default_country_id': self.country_id.id,
              'default_region_id': self.region_id.id,
              'default_district_id': self.district_id.id,
@@ -309,7 +322,8 @@ class CpCase(models.Model):
             'cp.verification.adult', _('Adult Verification'),
             {'default_completed_by': employee.name,
              'default_completed_position': (
-                 employee.job_title or employee.job_id.name),
+                 employee.job_title or employee.job_id.name
+                 or (worker and 'Case Worker') or False),
              'default_completed_agency': worker.institution,
              'default_completed_place': worker.location,
              'default_completed_date': fields.Date.context_today(self),
@@ -319,7 +333,7 @@ class CpCase(models.Model):
              'default_adult_sex': self.sex,
              'default_adult_dob': self.date_of_birth,
              'default_adult_dob_estimated': self.dob_estimated,
-             'default_adult_contact': registration.caregiver_tel,
+             'default_adult_contact': registration.care_location_ids[:1].telephone,
              'default_adult_country': self.country_id.name,
              'default_adult_region': self.region_id.name,
              'default_adult_district': self.district_id.display_name,
@@ -332,7 +346,8 @@ class CpCase(models.Model):
             'cp.verification.child', _('Child Verification'),
             {'default_completed_by': employee.name,
              'default_completed_position': (
-                 employee.job_title or employee.job_id.name),
+                 employee.job_title or employee.job_id.name
+                 or (worker and 'Case Worker') or False),
              'default_completed_agency': worker.institution,
              'default_completed_place': worker.location,
              'default_completed_date': fields.Date.context_today(self),
