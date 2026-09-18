@@ -4,6 +4,7 @@ nine forms, but each model gets its own table, so the two registers never
 blur. Prototype inheritance copies every field and method; only the
 relational links are re-pointed at the CAAFAG variants."""
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 # ── the case ─────────────────────────────────────────────────────────────
@@ -126,6 +127,17 @@ class CpCaafagRegistration(models.Model):
         'registration_id', 'concern_id', string='Protection Concerns')
 
     # ── centre enrolment (CAAFAG only) ───────────────────────────────────
+    batch_id = fields.Many2one(
+        'cp.caafag.batch', string='Batch',
+        help='The centre batch this registration enrols into '
+             '(Configuration → Batches).')
+    skill_id = fields.Many2one(
+        'cp.caafag.skill', string='Chosen vocational skill',
+        help='Drives the Batch KPI report (Configuration → '
+             'Vocational Skills).')
+    skill_certified = fields.Boolean(
+        string='Skill certified',
+        help='The child was certified in the chosen vocational skill.')
     centre = fields.Char(string='Centre')
     entry_month = fields.Char(string='Entry month / year')
     education_level = fields.Char(string='Education level')
@@ -410,3 +422,266 @@ class CpCaafagCaseReport(models.Model):
     ], string='Action taken', default='advice')
     sign_child = fields.Binary(string='Signature of the Child')
     sign_supervisor = fields.Binary(string='Signature of the supervisor')
+
+
+# ── batches (Configuration master) + the Batch KPI report data ───────────
+class CpCaafagBatch(models.Model):
+    """A centre batch (e.g. BC-2026-03 — Garowe Centre): the cohort a
+    CAAFAG registration enrols into. The Batch KPI report prints from
+    here."""
+    _name = 'cp.caafag.batch'
+    _description = 'CAAFAG Batch'
+    _order = 'date_start desc, id desc'
+
+    name = fields.Char(string='Batch', required=True)
+    centre = fields.Char(string='Centre')
+    date_start = fields.Date(string='Started')
+    date_end = fields.Date(string='Completed')
+    duration = fields.Char(string='Duration', help='e.g. 6 months')
+    metrics_recorded = fields.Boolean(
+        string='Additional KPI figures verified',
+        help='Enable after entering the batch figures below. Unverified figures print as a dash.')
+    skills_count = fields.Integer(string='Skills offered')
+    above_satisfactory_count = fields.Integer(string='Children above satisfactory')
+    dropout_count = fields.Integer(string='Confirmed dropouts')
+    attendance_month = fields.Integer(string='Attendance month', default=6)
+    attendance_percent = fields.Float(string='Attendance (%)', digits=(5, 1))
+    attendance_baseline_percent = fields.Float(
+        string='First month attendance (%)', digits=(5, 1))
+    active = fields.Boolean(string='Active', default=True)
+    registration_ids = fields.One2many(
+        'cp.caafag.registration', 'batch_id', string='Registrations')
+    registration_count = fields.Integer(
+        string='Enrolled', compute='_compute_registration_count')
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'That batch already exists.'),
+    ]
+
+    @api.depends('registration_ids')
+    def _compute_registration_count(self):
+        for batch in self:
+            batch.registration_count = len(batch.registration_ids)
+
+    @api.constrains('metrics_recorded', 'skills_count', 'above_satisfactory_count',
+                    'dropout_count', 'attendance_month', 'attendance_percent',
+                    'attendance_baseline_percent', 'registration_ids')
+    def _check_kpi_metrics(self):
+        for batch in self:
+            if not batch.metrics_recorded:
+                continue
+            total = len(batch.registration_ids.mapped('case_id'))
+            if (batch.skills_count < 0 or batch.attendance_month < 1
+                    or not 0 <= batch.above_satisfactory_count <= total
+                    or not 0 <= batch.dropout_count <= total
+                    or not 0 <= batch.attendance_percent <= 100
+                    or not 0 <= batch.attendance_baseline_percent <= 100):
+                raise ValidationError(
+                    'KPI counts must be non-negative and child counts cannot exceed '
+                    'enrolment. Attendance must be between 0 and 100, and month at least 1.')
+
+    def _kpi_data(self):
+        """Everything the Batch KPI report prints, in one dict."""
+        self.ensure_one()
+        cases = self.registration_ids.mapped('case_id')
+        total = len(cases)
+
+        def pct(part, whole=None):
+            whole = total if whole is None else whole
+            return round(100.0 * part / whole, 1) if whole else 0.0
+
+        boys = cases.filtered(lambda c: c.sex == 'male')
+        girls = cases.filtered(lambda c: c.sex == 'female')
+        ages = [c.age_years for c in cases if c.age_years]
+        completed = cases.filtered(
+            lambda c: c.stage in ('reunification', 'followup'))
+        pss = cases.filtered(lambda c: c.psychosocial_ids)
+
+        bands = [('6–9', 6, 9), ('10–12', 10, 12),
+                 ('13–15', 13, 15), ('16–17', 16, 17)]
+        age_rows = []
+        for label, lo, hi in bands:
+            band = cases.filtered(lambda c, lo=lo, hi=hi: lo <= c.age_years <= hi)
+            age_rows.append({
+                'label': label,
+                'boys': len(band.filtered(lambda c: c.sex == 'male')),
+                'girls': len(band.filtered(lambda c: c.sex == 'female')),
+                'total': len(band),
+                'pct': pct(len(band)),
+                'completed': len(band.filtered(
+                    lambda c: c.stage in ('reunification', 'followup'))),
+            })
+
+        other = cases.filtered(lambda c: not 6 <= c.age_years <= 17)
+        if other:
+            age_rows.append({
+                'label': 'Other / unknown',
+                'boys': len(other.filtered(lambda c: c.sex == 'male')),
+                'girls': len(other.filtered(lambda c: c.sex == 'female')),
+                'total': len(other), 'pct': pct(len(other)),
+                'completed': len(other & completed),
+            })
+
+        def grouped(records, key):
+            counts = {}
+            for rec in records:
+                label = key(rec) or 'Undefined'
+                counts[label] = counts.get(label, 0) + 1
+            rows = [{'label': k, 'count': v, 'pct': pct(v)}
+                    for k, v in counts.items()]
+            rows.sort(key=lambda r: r['count'], reverse=True)
+            return rows
+
+        regions = grouped(cases, lambda c: c.region_id.name)
+        max_region = max([r['count'] for r in regions], default=1)
+
+        # districts keep their region, so the district bars can wear the
+        # region's colour and share one legend
+        region_order = [r['label'] for r in regions]
+        district_map = {}
+        for case in cases:
+            label = case.district_id.name or 'Undefined'
+            entry = district_map.setdefault(
+                label, {'count': 0,
+                        'region': case.region_id.name or 'Undefined'})
+            entry['count'] += 1
+        districts = [{
+            'label': label,
+            'count': entry['count'],
+            'pct': pct(entry['count']),
+            'region': entry['region'],
+            'color': (region_order.index(entry['region'])
+                      if entry['region'] in region_order else 0),
+        } for label, entry in district_map.items()]
+        districts.sort(key=lambda r: -r['count'])
+        max_district = max([r['count'] for r in districts], default=1)
+
+        # region rows with their districts and sex split, for the table
+        by_region = {}
+        for case in cases:
+            by_region.setdefault(
+                case.region_id.name or 'Undefined', []).append(case)
+        region_rows = []
+        for label, recs in sorted(
+                by_region.items(), key=lambda kv: -len(kv[1])):
+            district_counts = {}
+            for case in recs:
+                district = case.district_id.name or 'Undefined'
+                district_counts[district] = district_counts.get(district, 0) + 1
+            region_rows.append({
+                'label': label,
+                'districts': ', '.join(
+                    '%s (%s)' % (k, v) for k, v in sorted(
+                        district_counts.items(), key=lambda kv: -kv[1])),
+                'count': len(recs),
+                'pct': pct(len(recs)),
+                'boys': sum(1 for c in recs if c.sex == 'male'),
+                'girls': sum(1 for c in recs if c.sex == 'female'),
+            })
+
+        # chosen vocational skill, grouped from the registrations
+        by_skill = {}
+        for reg in self.registration_ids:
+            if reg.skill_id:
+                by_skill.setdefault(reg.skill_id.name, []).append(reg)
+        skills = []
+        for label, regs in sorted(
+                by_skill.items(), key=lambda kv: -len(kv[1])):
+            enrolled = len(regs)
+            skill_cases = [r.case_id for r in regs]
+            certified = sum(1 for r in regs if r.skill_certified)
+            skills.append({
+                'label': label,
+                'enrolled': enrolled,
+                'boys': sum(1 for c in skill_cases if c.sex == 'male'),
+                'girls': sum(1 for c in skill_cases if c.sex == 'female'),
+                'completed': sum(1 for c in skill_cases
+                                 if c.stage in ('reunification', 'followup')),
+                'certified': certified,
+                'rate': int(round(100.0 * certified / enrolled))
+                        if enrolled else 0,
+            })
+        max_skill = max([s['enrolled'] for s in skills], default=1)
+        skill_enrolments = sum(s['enrolled'] for s in skills)
+        skill_certified_total = sum(s['certified'] for s in skills)
+
+        # education level on entry — the registration's highest grade,
+        # kept in the master's pedagogical order
+        edu_map = {}
+        for reg in self.registration_ids:
+            grade = reg.highest_grade_id
+            key = grade.name if grade else 'Not recorded'
+            entry = edu_map.setdefault(
+                key, {'count': 0,
+                      'seq': grade.sequence if grade else 9999})
+            entry['count'] += 1
+        edu_rows = [{
+            'label': label,
+            'count': entry['count'],
+            'pct': pct(entry['count']),
+        } for label, entry in sorted(
+            edu_map.items(), key=lambda kv: kv[1]['seq'])]
+        max_edu = max([r['count'] for r in edu_rows], default=1)
+        edu_top = (max(edu_rows, key=lambda r: r['count'])
+                   if edu_rows else False)
+
+        return {
+            'total': total,
+            'boys': len(boys), 'boys_pct': pct(len(boys)),
+            'girls': len(girls), 'girls_pct': pct(len(girls)),
+            'avg_age': round(sum(ages) / len(ages), 1) if ages else 0,
+            'completed': len(completed),
+            'completed_pct': pct(len(completed)),
+            'dropped': total - len(completed),
+            'dropped_pct': pct(total - len(completed)),
+            'pss': len(pss), 'pss_pct': pct(len(pss)),
+            'regions': regions, 'max_region': max_region,
+            'districts': districts, 'max_district': max_district,
+            'region_count': len(regions), 'district_count': len(districts),
+            'age_rows': age_rows,
+            'chart_max': max(6, ((max(max(r['boys'], r['girls']) for r in age_rows) + 5) // 6) * 6),
+            'region_rows': region_rows,
+            'skills': skills, 'max_skill': max_skill,
+            'skills_offered': len(skills),
+            'skill_enrolments': skill_enrolments,
+            'skill_certified_total': skill_certified_total,
+            'edu_rows': edu_rows, 'max_edu': max_edu, 'edu_top': edu_top,
+            'skill_rate_total': int(round(
+                100.0 * skill_certified_total / skill_enrolments))
+                if skill_enrolments else 0,
+            'issued': fields.Date.context_today(self),
+            'above_satisfactory_pct': pct(self.above_satisfactory_count),
+            'dropout_pct': pct(self.dropout_count),
+            'attendance_change': round(self.attendance_percent - self.attendance_baseline_percent, 1),
+        }
+
+
+class CpCaafagBatchReportWizard(models.TransientModel):
+    """Pick a batch, print its KPI report."""
+    _name = 'cp.caafag.batch.report.wizard'
+    _description = 'CAAFAG Batch KPI Report Wizard'
+
+    batch_id = fields.Many2one(
+        'cp.caafag.batch', string='Batch', required=True)
+
+    def action_print(self):
+        self.ensure_one()
+        return self.env.ref(
+            'mowdafa_child_protection.action_report_cp_caafag_batch'
+        ).report_action(self.batch_id)
+
+
+class CpCaafagSkill(models.Model):
+    """Master list of vocational skills a CAAFAG registration can choose;
+    the Batch KPI report groups on it."""
+    _name = 'cp.caafag.skill'
+    _description = 'CAAFAG Vocational Skill'
+    _order = 'sequence, id'
+
+    name = fields.Char(string='Skill', required=True)
+    sequence = fields.Integer(string='Sequence', default=10)
+    active = fields.Boolean(string='Active', default=True)
+
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'That skill already exists.'),
+    ]

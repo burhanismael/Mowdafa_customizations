@@ -89,7 +89,8 @@ class CpCase(models.Model):
     village = fields.Char(string='Village / Section')
     camp = fields.Char(string='Camp / Settlement')
     date_identified = fields.Date(string='Date Identified')
-    referral_source = fields.Char(string='Referral Source')
+    referral_source_id = fields.Many2one(
+        'cp.referral.source', string='Referral Source')
 
     @api.depends('first_name', 'middle_name', 'last_name', 'other_names')
     def _compute_child_name(self):
@@ -267,11 +268,20 @@ class CpCase(models.Model):
         }
 
     def action_create_handover(self):
+        worker = self.case_worker_id
+        employee = worker.employee_id
         return self._open_cp_form(
             'cp.handover', _('Hand-over'),
             {'default_child_nationality': self.nationality_id.id,
-             'default_case_worker_id': self.case_worker_id.id,
-             'default_supervisor_id': self.supervisor_id.id})
+             'default_case_worker_id': worker.id,
+             'default_supervisor_id': self.supervisor_id.id,
+             'default_to_institution': worker.institution,
+             'default_to_location': worker.location,
+             'default_received_by': employee.name,
+             'default_received_role': (
+                 employee.job_title or employee.job_id.name),
+             'default_received_contact': (
+                 employee.work_phone or employee.mobile_phone)})
 
     def action_create_registration(self):
         return self._open_cp_form(
@@ -365,19 +375,7 @@ class CpCase(models.Model):
             'cp.mentoring', _('Mentoring Reports'), self.mentoring_ids)
 
     def action_create_reunification(self):
-        adult = self.adult_verification_ids[:1]
-        return self._open_cp_form(
-            'cp.reunification', _('Reunification'),
-            {'default_verified_adult': adult.adult_name,
-             'default_adult_nickname': adult.adult_nickname,
-             'default_adult_sex': adult.adult_sex or False,
-             'default_adult_dob': adult.adult_dob or False,
-             'default_adult_child_relationship': adult.relationship,
-             'default_adult_phone': adult.adult_contact,
-             'default_adult_country': adult.adult_country,
-             'default_adult_region': adult.adult_region,
-             'default_adult_district': adult.adult_district,
-             'default_adult_village': adult.adult_village})
+        return self._open_cp_form('cp.reunification', _('Reunification'))
 
     def action_create_followup_visit(self):
         return self._open_cp_form(

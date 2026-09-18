@@ -57,7 +57,7 @@ class CpHandover(models.Model):
     ], string='Child was handed over to', default='institution')
     handed_to_other = fields.Char(string='If Other, specify')
     received_by = fields.Char(
-        string='Name of MOWDAFA staff / family member', required=True)
+        string='Name of MOWDAFA staff', required=True)
     received_role = fields.Char(string='Role')
     received_contact = fields.Char(string='Receiver Contact')
     received_address = fields.Char(string='Complete Address')

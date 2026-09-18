@@ -151,7 +151,7 @@
                         <group>
                             <field name="camp"/>
                             <field name="date_identified"/>
-                            <field name="referral_source"/>
+                            <field name="referral_source_id" options="{'no_create': true}"/>
                         </group>
                     </group>
                     <group>

@@ -85,12 +85,6 @@ class CpReunification(models.Model):
     followup_needed = fields.Selection([
         ('yes', 'Yes'), ('no', 'No'),
     ], string='Is there a need for follow-up?', default='yes')
-    followup_interval = fields.Integer(string='Follow up after — every')
-    followup_unit = fields.Selection([
-        ('days', 'days'), ('weeks', 'weeks'), ('months', 'months'),
-    ], string='Unit', default='weeks')
-    followup_visits_count = fields.Integer(
-        string='Number of visits to schedule')
     reintegration_priorities = fields.Text(
         string='Priorities for reintegration support or follow-up')
 

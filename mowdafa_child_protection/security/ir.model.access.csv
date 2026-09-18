@@ -94,3 +94,6 @@ access_cp_caafag_followup_new_caregiver_user,cp.caafag.followup.new.caregiver.us
 access_cp_caafag_followup_new_caregiver_manager,cp.caafag.followup.new.caregiver.manager,model_cp_caafag_followup_new_caregiver,base.group_system,1,1,1,1
 access_cp_caafag_case_report_user,cp.caafag.case.report.user,model_cp_caafag_case_report,base.group_user,1,1,1,0
 access_cp_caafag_case_report_manager,cp.caafag.case.report.manager,model_cp_caafag_case_report,base.group_system,1,1,1,1
+access_cp_caafag_batch_user,cp.caafag.batch.user,model_cp_caafag_batch,base.group_user,1,1,1,1
+access_cp_caafag_batch_report_wizard_user,cp.caafag.batch.report.wizard.user,model_cp_caafag_batch_report_wizard,base.group_user,1,1,1,1
+access_cp_caafag_skill_user,cp.caafag.skill.user,model_cp_caafag_skill,base.group_user,1,1,1,1

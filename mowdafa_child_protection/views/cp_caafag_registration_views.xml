@@ -75,6 +75,9 @@
                 <separator string="Centre Enrolment"/>
                 <group>
                   <group>
+                    <field name="batch_id" options="{'no_create': true}"/>
+                    <field name="skill_id" options="{'no_create': true}"/>
+                    <field name="skill_certified"/>
                     <field name="centre"/>
                     <field name="entry_month"/>
                     <field name="education_level"/>

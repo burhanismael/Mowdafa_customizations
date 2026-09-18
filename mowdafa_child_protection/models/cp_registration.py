@@ -145,13 +145,13 @@ class CpRegistration(models.Model):
         string='Date Case Management Plan (Care Plan) will be finalised')
 
     # ── E · child protection / social worker officer ─────────────────────
-    officer_name = fields.Char(string='Officer — Full Name')
-    officer_position = fields.Char(string='Officer — Position')
-    officer_agency = fields.Char(string='Officer — Agency')
-    officer_date = fields.Date(string='Officer — Date')
+    officer_name = fields.Char(string='Full Name')
+    officer_position = fields.Char(string='Position')
+    officer_agency = fields.Char(string='Agency')
+    officer_date = fields.Date(string='Date')
     officer_location = fields.Char(
-        string='Officer — Region / District / Village / Camp')
-    officer_sign = fields.Char(string='Officer — Signature')
+        string='Region / District / Village / Camp')
+    officer_sign = fields.Char(string='Signature')
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="caafag_view_cp_batch_tree" model="ir.ui.view">
+        <field name="name">cp.caafag.batch.tree</field>
+        <field name="model">cp.caafag.batch</field>
+        <field name="arch" type="xml">
+            <tree string="Batches">
+                <field name="name"/>
+                <field name="centre"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="duration"/>
+                <field name="registration_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="caafag_view_cp_batch_form" model="ir.ui.view">
+        <field name="name">cp.caafag.batch.form</field>
+        <field name="model">cp.caafag.batch</field>
+        <field name="arch" type="xml">
+            <form string="Batch">
+                <header>
+                    <button name="%(action_report_cp_caafag_batch)d"
+                            string="Print KPI Report" type="action"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="BC-2026-03"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="centre"/>
+                            <field name="duration" placeholder="6 months"/>
+                            <field name="registration_count"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <group string="Additional report KPIs">
+                        <field name="metrics_recorded"/>
+                        <field name="skills_count"/>
+                        <field name="above_satisfactory_count"/>
+                        <field name="dropout_count"/>
+                        <field name="attendance_month"/>
+                        <field name="attendance_percent"/>
+                        <field name="attendance_baseline_percent"/>
+                    </group>
+                    <separator string="Registrations"/>
+                    <field name="registration_ids" readonly="1">
+                        <tree>
+                            <field name="name"/>
+                            <field name="child_full_name"/>
+                            <field name="date"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="caafag_action_cp_batch" model="ir.actions.act_window">
+        <field name="name">Batches</field>
+        <field name="res_model">cp.caafag.batch</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_cp_caafag_batch" name="Batches"
+              parent="menu_cp_configuration" action="caafag_action_cp_batch"
+              sequence="60"/>
+
+    <!-- Vocational skills master -->
+    <record id="caafag_view_cp_skill_tree" model="ir.ui.view">
+        <field name="name">cp.caafag.skill.tree</field>
+        <field name="model">cp.caafag.skill</field>
+        <field name="arch" type="xml">
+            <tree string="Vocational Skills" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" column_invisible="True"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="caafag_action_cp_skill" model="ir.actions.act_window">
+        <field name="name">Vocational Skills</field>
+        <field name="res_model">cp.caafag.skill</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="menu_cp_caafag_skill" name="Vocational Skills"
+              parent="menu_cp_configuration" action="caafag_action_cp_skill"
+              sequence="65"/>
+
+    <!-- Batch KPI report wizard: pick a batch, print -->
+    <record id="caafag_view_cp_batch_report_wizard_form" model="ir.ui.view">
+        <field name="name">cp.caafag.batch.report.wizard.form</field>
+        <field name="model">cp.caafag.batch.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Batch KPI Report">
+                <group>
+                    <field name="batch_id" options="{'no_create': true}"/>
+                </group>
+                <footer>
+                    <button name="action_print" string="Print" type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="caafag_action_cp_batch_report_wizard"
+            model="ir.actions.act_window">
+        <field name="name">Batch KPI Report</field>
+        <field name="res_model">cp.caafag.batch.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="caafag_view_cp_batch_report_wizard_form"/>
+    </record>
+
+    <menuitem id="menu_cp_caafag_batch_report" name="Batch KPI Report"
+              parent="menu_cp_root"
+              action="caafag_action_cp_batch_report_wizard"
+              sequence="50"/>
+
+</odoo>

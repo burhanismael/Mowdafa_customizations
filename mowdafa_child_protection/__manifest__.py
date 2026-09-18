@@ -64,6 +64,8 @@ dashboard. The nine managed-track satellite forms follow.
         'views/cp_caafag_reunification_views.xml',
         'views/cp_caafag_followup_views.xml',
         'views/cp_caafag_case_report_views.xml',
+        'report/cp_caafag_batch_report.xml',
+        'views/cp_caafag_batch_views.xml',
         # menus last — they reference the actions above
         'views/cp_menus.xml',
     ],

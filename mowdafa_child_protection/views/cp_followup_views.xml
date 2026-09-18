@@ -34,7 +34,6 @@
                             <field name="visit_type" widget="radio"/>
                         </group>
                         <group>
-                            <field name="followup_period" readonly="1"/>
                             <field name="visit_number"/>
                             <field name="due_date"/>
                             <field name="status" readonly="1"/>

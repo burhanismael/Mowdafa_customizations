@@ -248,11 +248,25 @@ class CpPartnerRecord(models.Model):
             concern = Concern.create({'name': label})
         return concern.id
 
+    def _referral_source_id(self):
+        """The partner form keys the source as a fixed selection; the case
+        points at the master table. Match on the label, adding the entry
+        the first time a source is carried across."""
+        self.ensure_one()
+        source = dict(self._fields['referral_source'].selection or [])
+        label = source.get(self.referral_source)
+        if not label:
+            return False
+        Source = self.env['cp.referral.source'].sudo()
+        record = Source.search([('name', '=', label)], limit=1)
+        if not record:
+            record = Source.create({'name': label})
+        return record.id
+
     def _case_values(self):
         """The reporting spine both tracks share, carried across so the
         officer does not key the child twice."""
         self.ensure_one()
-        source = dict(self._fields['referral_source'].selection or [])
         return {
             'child_name': self.child_name,
             'sex': self.sex,
@@ -265,7 +279,7 @@ class CpPartnerRecord(models.Model):
             'region_id': self.region_id.id,
             'district_id': self.district_id.id,
             'date_identified': self.date_identified,
-            'referral_source': source.get(self.referral_source) or '',
+            'referral_source_id': self._referral_source_id(),
             'protection_concern_id': self._concern_id(),
             'concern_description': self.concern_description,
             'risk_level': self.risk_level,

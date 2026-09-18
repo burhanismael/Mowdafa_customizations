@@ -94,15 +94,6 @@
                             <field name="followup_needed" widget="radio"
                                    options="{'horizontal': true}"/>
                         </group>
-                        <group>
-                            <label for="followup_interval" string="Follow up after — every"/>
-                            <div class="o_row">
-                                <field name="followup_interval" class="oe_inline"/>
-                                <field name="followup_unit" class="oe_inline"/>
-                            </div>
-                            <field name="followup_visits_count"
-                                   string="Number of visits to schedule"/>
-                        </group>
                     </group>
                     <label for="reintegration_priorities"
                            string="Priorities for reintegration support or follow-up, including any immediate assistance required"/>

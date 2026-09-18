@@ -31,10 +31,6 @@ class CpFollowup(models.Model):
         ('interim_care', 'In Interim Care'),
         ('after_reunification', 'After Reunification'),
     ], string='Type of Follow-up', default='after_reunification')
-    followup_period = fields.Char(
-        string='Follow up after — period',
-        compute='_compute_carried', store=True,
-        help='Set on the reunification.')
     visit_number = fields.Integer(string='Visit #', default=1)
     due_date = fields.Date(string='Due')
     status = fields.Selection([
@@ -168,9 +164,6 @@ class CpFollowup(models.Model):
                 reu.adult_district, reu.adult_village,
             ])) if reu else False
             record.caregiver = (reu.verified_adult if reu else False) or False
-            record.followup_period = (
-                ('%s %s' % (reu.followup_interval, reu.followup_unit))
-                if reu and reu.followup_interval else False)
 
     @api.depends('child_seen', 'due_date')
     def _compute_status(self):

@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_cp_caafag_batch_document">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="doc">
+      <t t-call="web.basic_layout">
+        <t t-set="data" t-value="doc._kpi_data()"/>
+        <div class="page cbk-page">
+          <style type="text/css">
+            .cbk-page { font-family: "DejaVu Sans", Arial, sans-serif;
+                        color: #37424e; font-size: 10px; line-height: 1.35; }
+            /* ── header banner ── */
+            .cbk-banner { background: #20528b; color: white;
+                          border-radius: 4px 4px 0 0; padding: 13px 16px;
+                          border-bottom: 3px solid #eaa332;
+                          margin-bottom: 10px; }
+            .cbk-banner table { width: 100%; border-collapse: collapse; }
+            .cbk-banner table td { border: 0 !important;
+                          background: transparent !important;
+                          padding: 0 6px; vertical-align: middle; }
+            .cbk-logo { width: 60px; height: 60px; object-fit: contain;
+                        background: white; border-radius: 50%; padding: 3px; }
+            .cbk-ministry { font-size: 7.5px; letter-spacing: 2.5px;
+                            color: #b7cee5; }
+            .cbk-title { font-size: 17px; font-weight: bold; color: white;
+                         margin: 1px 0; }
+            .cbk-sub { font-size: 9.5px; color: #d0deed; }
+            .cbk-issued { font-size: 7.5px; color: #93b2d2; margin-top: 3px; }
+            .cbk-conf { color: #ffffff; border: 1px solid #6f92ba;
+                        border-radius: 3px; padding: 4px 9px; font-size: 7.5px;
+                        letter-spacing: 1.5px; }
+            /* ── batch facts strip ── */
+            .cbk-head { width: 100%; border-collapse: collapse;
+                        table-layout: fixed; margin-bottom: 10px; }
+            .cbk-head td { border: 1px solid #e2e8ef;
+                           border-top: 0; border-bottom: 2px solid #d5dfeb;
+                           padding: 6px 9px; background: #fbfcfe; }
+            .cbk-head .lbl { font-size: 6.5px; letter-spacing: 1.2px;
+                             color: #8494a5; text-transform: uppercase;
+                             margin-bottom: 3px; }
+            .cbk-head .val { font-size: 10px; font-weight: bold;
+                             color: #20528b; }
+            /* ── section header ── */
+            .cbk-sec { background: #20528b; color: white; font-weight: bold;
+                       font-size: 10.5px; letter-spacing: 0.4px;
+                       padding: 4px 10px; margin: 12px 0 6px;
+                       border-radius: 3px; border-left: 4px solid #eaa332;
+                       page-break-after: avoid; }
+            /* ── KPI cards ── */
+            .cbk-cards { width: 100%; table-layout: fixed;
+                         border-collapse: separate; border-spacing: 3px 3px; }
+            .cbk-cards td { background: #ffffff; border: 1px solid #e3e9f0;
+                            border-top: 3px solid #20528b; border-radius: 3px;
+                            padding: 6px 2px 5px; text-align: center;
+                            height: 46px; vertical-align: top; }
+            .cbk-cards td.cbk-teal { border-top-color: #00988a; }
+            .cbk-cards td.cbk-gold { border-top-color: #eaa332; }
+            .cbk-num { font-size: 16px; line-height: 1.2; font-weight: bold;
+                       color: #20528b; }
+            .cbk-cap { font-size: 7.5px; color: #66737f; margin-top: 2px; }
+            .cbk-pct { font-size: 7.5px; font-weight: bold; color: #00988a;
+                       margin-top: 1px; }
+            .cbk-teal .cbk-num { color: #00988a; }
+            .cbk-gold .cbk-num, .cbk-gold .cbk-pct { color: #bc8317; }
+            /* ── chart/table split ── */
+            .cbk-age { width: 100%; table-layout: fixed;
+                       border-collapse: collapse; margin-top: 4px; }
+            .cbk-age-cell { width: 50%; vertical-align: top; padding: 0; }
+            .cbk-age .cbk-chart-cell { width: 55%; }
+            .cbk-age .cbk-table-cell { width: 45%; }
+            /* ── tables ── */
+            .cbk-table { width: 100%; border-collapse: collapse; }
+            .cbk-table th { background: #20528b; color: white;
+                            font-size: 8px; font-weight: bold;
+                            padding: 4px 7px; text-align: center;
+                            border: 1px solid #416b9b; }
+            .cbk-table td { border: 1px solid #e6ebf1; font-size: 8.5px;
+                            padding: 4px 7px; text-align: center;
+                            color: #37424e; }
+            .cbk-table tr:nth-child(even) td { background: #f7f9fc; }
+            .cbk-table .first { text-align: left; }
+            .cbk-table tr.tot td { background: #e8f0f9; color: #20528b;
+                                   font-weight: bold;
+                                   border-top: 2px solid #b9cde4; }
+            .cbk-geography { page-break-inside: avoid; margin-top: 6px; }
+            .cbk-note { font-size: 8px; font-style: italic; color: #8794a3;
+                        margin: 5px 2px 2px; }
+            .cbk-pill { display: inline-block; border-radius: 8px;
+                        padding: 1px 8px; font-weight: bold; font-size: 8px; }
+            .cbk-pill-good { background: #dff1ea; color: #0f7a5c; }
+            .cbk-pill-warn { background: #fdeed3; color: #b26a00; }
+            .cbk-callout { border-left: 3px solid #20528b; background: #f1f6fb;
+                           padding: 5px 10px; font-size: 8.5px;
+                           color: #37424e; margin-top: 8px; }
+          </style>
+          <div class="cbk-banner">
+            <table><tr>
+              <td style="width: 72px;">
+                <img t-if="res_company.logo" class="cbk-logo" t-att-src="image_data_uri(res_company.logo)" alt="Ministry logo"/>
+              </td>
+              <td>
+                <div class="cbk-ministry">MINISTRY OF WOMEN DEVELOPMENT AND FAMILY AFFAIRS — PUNTLAND</div>
+                <div class="cbk-title">CAAFAG Centre — Batch KPI Report</div>
+                <div class="cbk-sub">Batch Completion KPI Report · Batch <t t-esc="doc.name"/><t t-if="doc.centre"> · <t t-esc="doc.centre"/></t></div>
+                <div class="cbk-issued">Department of Child Protection · MERIT System · Issued <t t-esc="data['issued'].strftime('%d %B %Y')"/></div>
+              </td>
+              <td style="width: 105px; text-align: right;"><span class="cbk-conf">CONFIDENTIAL</span></td>
+            </tr></table>
+          </div>
+
+          <table class="cbk-head">
+            <tr>
+              <td><div class="lbl">Batch</div>
+                  <div class="val"><t t-esc="doc.name"/></div></td>
+              <td><div class="lbl">Started</div>
+                  <div class="val"><t t-esc="doc.date_start.strftime('%d %B %Y') if doc.date_start else '—'"/></div></td>
+              <td><div class="lbl">Completed</div>
+                  <div class="val"><t t-esc="doc.date_end.strftime('%d %B %Y') if doc.date_end else '—'"/></div></td>
+              <td><div class="lbl">Duration</div>
+                  <div class="val"><t t-esc="doc.duration or '—'"/></div></td>
+              <td><div class="lbl">Enrolled</div>
+                  <div class="val"><t t-esc="data['total']"/></div></td>
+              <td><div class="lbl">Graduated</div>
+                  <div class="val"><t t-esc="data['completed']"/>
+                    (<t t-esc="data['completed_pct']"/>%)</div></td>
+            </tr>
+          </table>
+
+          <div class="cbk-sec">1. Batch Summary</div>
+          <table class="cbk-cards"><tbody>
+<tr>
+<td class=""><div class="cbk-num"><t t-esc="data['total']"/></div><div class="cbk-cap">Total enrolled</div></td>
+<td class=""><div class="cbk-num"><t t-esc="data['boys']"/></div><div class="cbk-cap">Boys</div><div class="cbk-pct"><t t-esc="str(data['boys_pct']) + '%'"/></div></td>
+<td class="cbk-gold"><div class="cbk-num"><t t-esc="data['girls']"/></div><div class="cbk-cap">Girls</div><div class="cbk-pct"><t t-esc="str(data['girls_pct']) + '%'"/></div></td>
+<td class=""><div class="cbk-num"><t t-esc="data['avg_age']"/></div><div class="cbk-cap">Average age</div></td>
+<td class="cbk-teal"><div class="cbk-num"><t t-esc="data['completed']"/></div><div class="cbk-cap">Completed</div><div class="cbk-pct"><t t-esc="str(data['completed_pct']) + '%'"/></div></td>
+<td class="cbk-teal"><div class="cbk-num"><t t-esc="str(doc.attendance_percent) + '%' if doc.metrics_recorded else '—'"/></div><div class="cbk-cap">Attendance (month <t t-esc="doc.attendance_month"/>)</div><div class="cbk-pct"><t t-esc="('%+g pts' % data['attendance_change']) if doc.metrics_recorded else ''"/></div></td>
+</tr>
+<tr>
+<td class=""><div class="cbk-num"><t t-esc="data['region_count']"/></div><div class="cbk-cap">Regions of origin</div></td>
+<td class=""><div class="cbk-num"><t t-esc="data['district_count']"/></div><div class="cbk-cap">Districts of origin</div></td>
+<td class=""><div class="cbk-num"><t t-esc="doc.skills_count if doc.metrics_recorded else (data['skills_offered'] or '—')"/></div><div class="cbk-cap">Skills offered</div></td>
+<td class="cbk-teal"><div class="cbk-num"><t t-esc="doc.above_satisfactory_count if doc.metrics_recorded else '—'"/></div><div class="cbk-cap">Above satisfactory</div><div class="cbk-pct"><t t-esc="str(data['above_satisfactory_pct']) + '%' if doc.metrics_recorded else ''"/></div></td>
+<td class="cbk-teal"><div class="cbk-num"><t t-esc="data['pss']"/></div><div class="cbk-cap">Received PSS</div><div class="cbk-pct"><t t-esc="str(data['pss_pct']) + '%'"/></div></td>
+<td class="cbk-gold"><div class="cbk-num"><t t-esc="doc.dropout_count if doc.metrics_recorded else '—'"/></div><div class="cbk-cap">Dropped out</div><div class="cbk-pct"><t t-esc="str(data['dropout_pct']) + '%' if doc.metrics_recorded else ''"/></div></td>
+</tr>
+</tbody></table>
+          <div class="cbk-sec">2. Age &amp; Sex</div>
+          <table class="cbk-age"><tbody><tr><td class="cbk-age-cell cbk-chart-cell" style="vertical-align: top;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" width="100%" height="225" preserveAspectRatio="none" role="img" aria-label="Number of children by age and sex">
+              <t t-foreach="range(7)" t-as="tick">
+                <line t-att-x1="112 + tick * 63" y1="12" t-att-x2="112 + tick * 63" y2="246" stroke="#e8edf3" stroke-width="0.8"/>
+                <text t-att-x="112 + tick * 63" y="271" text-anchor="middle" fill="#7b8794" font-size="13"><t t-esc="'%g' % (tick * data['chart_max'] / 6)"/></text>
+              </t>
+              <line x1="112" y1="246" x2="490" y2="246" stroke="#c3cdd8" stroke-width="1"/>
+              <t t-foreach="data['age_rows'][::-1]" t-as="row">
+                <t t-set="y" t-value="22 + row_index * (224 / len(data['age_rows']))"/>
+                <text x="102" t-att-y="y + 23" text-anchor="end" fill="#66737f" t-att-font-size="12 if len(row['label']) > 8 else 15"><t t-esc="row['label']"/></text>
+                <rect x="112" t-att-y="y" t-att-width="378 * row['boys'] / data['chart_max']" height="19" fill="#20528b"/>
+                <rect x="112" t-att-y="y + 19" t-att-width="378 * row['girls'] / data['chart_max']" height="19" fill="#eaa332"/>
+                <text t-if="row['boys']" t-att-x="119 + 378 * row['boys'] / data['chart_max']" t-att-y="y + 14" fill="#37424e" font-size="14" font-weight="bold"><t t-esc="row['boys']"/></text>
+                <text t-if="row['girls']" t-att-x="119 + 378 * row['girls'] / data['chart_max']" t-att-y="y + 33" fill="#37424e" font-size="14" font-weight="bold"><t t-esc="row['girls']"/></text>
+              </t>
+              <rect x="405" y="204" width="23" height="9" fill="#20528b"/><text x="437" y="214" font-size="13" fill="#66737f">Boys</text>
+              <rect x="405" y="223" width="23" height="9" fill="#eaa332"/><text x="437" y="233" font-size="13" fill="#66737f">Girls</text>
+              <text x="290" y="293" text-anchor="middle" font-size="14" fill="#66737f">Number of children</text>
+            </svg>
+          </td><td class="cbk-age-cell cbk-table-cell" style="vertical-align: top;">
+          <table class="cbk-table">
+            <tr>
+              <th class="first">Age band</th><th>Boys</th><th>Girls</th>
+              <th>Total</th><th>%</th><th>Completed</th>
+            </tr>
+            <t t-foreach="data['age_rows']" t-as="row">
+              <tr>
+                <td class="first"><t t-esc="row['label']"/></td>
+                <td><t t-esc="row['boys']"/></td>
+                <td><t t-esc="row['girls']"/></td>
+                <td><t t-esc="row['total']"/></td>
+                <td><t t-esc="row['pct']"/>%</td>
+                <td><t t-esc="row['completed']"/></td>
+              </tr>
+            </t>
+            <tr class="tot">
+              <td class="first">TOTAL</td>
+              <td><t t-esc="data['boys']"/></td>
+              <td><t t-esc="data['girls']"/></td>
+              <td><t t-esc="data['total']"/></td>
+              <td><t t-esc="100 if data['total'] else 0"/>%</td>
+              <td><t t-esc="data['completed']"/></td>
+            </tr>
+          </table>
+
+          </td></tr></tbody></table>
+          <div class="cbk-geography">
+          <div class="cbk-sec">3. Region &amp; District of Origin</div>
+          <t t-set="palette"
+             t-value="['#20528b', '#00988a', '#eaa332', '#7d5ba6']"/>
+          <table class="cbk-age"><tbody><tr>
+            <td class="cbk-age-cell" style="padding-right: 6px;">
+              <t t-set="rows" t-value="data['regions']"/>
+              <t t-set="top" t-value="max(4, -(-data['max_region'] // 4) * 4)"/>
+              <t t-set="n" t-value="max(1, len(rows))"/>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 0 570 260"
+                   width="100%" height="195" preserveAspectRatio="none"
+                   role="img" aria-label="Children by region of origin">
+                <t t-foreach="range(5)" t-as="tick">
+                  <t t-set="ty" t-value="215 - tick * 50"/>
+                  <line x1="38" t-att-y1="ty" x2="505" t-att-y2="ty"
+                        stroke="#e8edf3" stroke-width="0.8"/>
+                  <text x="32" t-att-y="ty + 4" text-anchor="end"
+                        fill="#7b8794" font-size="12">
+                    <t t-esc="tick * top // 4"/></text>
+                </t>
+                <line x1="38" y1="215" x2="505" y2="215" stroke="#c3cdd8" stroke-width="1"/>
+                <t t-foreach="rows" t-as="row">
+                  <t t-set="bw" t-value="min((467.0 / n) * 0.6, 90.0)"/>
+                  <t t-set="bx" t-value="38 + row_index * (467.0 / n) + ((467.0 / n) - bw) / 2"/>
+                  <t t-set="bh" t-value="200.0 * row['count'] / top"/>
+                  <rect t-att-x="bx" t-att-y="215 - bh" t-att-width="bw"
+                        t-att-height="bh"
+                        t-att-fill="palette[row_index % 4]"/>
+                  <text t-att-x="bx + bw / 2" t-att-y="203 - bh"
+                        text-anchor="middle" font-size="13" font-weight="bold"
+                        fill="#37424e"><t t-esc="row['count']"/></text>
+                  <text t-att-x="bx + bw / 2" t-att-y="215 - bh - 1"
+                        text-anchor="middle" font-size="9" fill="#64717e"
+                        transform=""><t t-esc="'%g' % row['pct']"/>%</text>
+                  <text t-att-x="bx + bw / 2" y="231" text-anchor="middle"
+                        font-size="11" fill="#66737f">
+                    <t t-esc="row['label']"/></text>
+                </t>
+                <text x="270" y="253" text-anchor="middle" font-size="12"
+                      fill="#66737f">Region</text>
+              </svg>
+            </td>
+            <td class="cbk-age-cell" style="padding-left: 6px;">
+              <t t-set="rows" t-value="data['districts']"/>
+              <t t-set="top" t-value="max(4, -(-data['max_district'] // 4) * 4)"/>
+              <t t-set="n" t-value="max(1, len(rows))"/>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 0 570 278"
+                   width="100%" height="208" preserveAspectRatio="none"
+                   role="img" aria-label="Children by district of origin">
+                <t t-foreach="range(5)" t-as="tick">
+                  <t t-set="ty" t-value="215 - tick * 50"/>
+                  <line x1="38" t-att-y1="ty" x2="505" t-att-y2="ty"
+                        stroke="#e8edf3" stroke-width="0.8"/>
+                  <text x="32" t-att-y="ty + 4" text-anchor="end"
+                        fill="#7b8794" font-size="12">
+                    <t t-esc="tick * top // 4"/></text>
+                </t>
+                <line x1="38" y1="215" x2="505" y2="215" stroke="#c3cdd8" stroke-width="1"/>
+                <t t-foreach="rows" t-as="row">
+                  <t t-set="bw" t-value="min((467.0 / n) * 0.6, 90.0)"/>
+                  <t t-set="bx" t-value="38 + row_index * (467.0 / n) + ((467.0 / n) - bw) / 2"/>
+                  <t t-set="bh" t-value="200.0 * row['count'] / top"/>
+                  <rect t-att-x="bx" t-att-y="215 - bh" t-att-width="bw"
+                        t-att-height="bh"
+                        t-att-fill="palette[row['color'] % 4]"/>
+                  <text t-att-x="bx + bw / 2" t-att-y="207 - bh"
+                        text-anchor="middle" font-size="13" font-weight="bold"
+                        fill="#37424e"><t t-esc="row['count']"/></text>
+                  <text t-if="len(rows) &gt; 4" t-att-x="bx + bw / 2" y="234" text-anchor="end"
+                        t-attf-transform="rotate(-30 {{ bx + bw / 2 }} 234)"
+                        font-size="11" fill="#66737f">
+                          <t t-esc="row['label']"/></text>
+                        <text t-else="" t-att-x="bx + bw / 2" y="233" text-anchor="middle"
+                              font-size="11" fill="#66737f">
+                          <t t-esc="row['label']"/></text>
+                </t>
+                <t t-foreach="data['regions'][:4]" t-as="lg">
+                  <t t-set="lx" t-value="315 + (lg_index % 2) * 100"/>
+                  <t t-set="ly" t-value="16 + (lg_index // 2) * 20"/>
+                  <rect t-att-x="lx" t-att-y="ly" width="16" height="9"
+                        t-att-fill="palette[lg_index % 4]"/>
+                  <text t-att-x="lx + 22" t-att-y="ly + 9" font-size="12"
+                        fill="#37424e"><t t-esc="lg['label']"/></text>
+                </t>
+                <text x="270" y="272" text-anchor="middle" font-size="12"
+                      fill="#66737f">District</text>
+              </svg>
+            </td>
+          </tr></tbody></table>
+          <table class="cbk-table" style="margin-top: 6px;">
+            <tr>
+              <th class="first">Region</th>
+              <th class="first">Districts</th>
+              <th>Children</th><th>%</th><th>Boys</th><th>Girls</th>
+            </tr>
+            <t t-foreach="data['region_rows']" t-as="row">
+              <tr>
+                <td class="first"><t t-esc="row['label']"/></td>
+                <td class="first"><t t-esc="row['districts']"/></td>
+                <td><t t-esc="row['count']"/></td>
+                <td><t t-esc="row['pct']"/>%</td>
+                <td><t t-esc="row['boys']"/></td>
+                <td><t t-esc="row['girls']"/></td>
+              </tr>
+            </t>
+            <tr class="tot">
+              <td class="first">TOTAL</td>
+              <td class="first"><t t-esc="data['district_count']"/></td>
+              <td><t t-esc="data['total']"/></td>
+              <td><t t-esc="100 if data['total'] else 0"/>%</td>
+              <td><t t-esc="data['boys']"/></td>
+              <td><t t-esc="data['girls']"/></td>
+            </tr>
+          </table>
+          <p t-if="data['region_rows']" class="cbk-note">
+            <t t-esc="data['region_rows'][0]['label']"/> accounts for the
+            largest share
+            (<t t-esc="data['region_rows'][0]['count']"/> children,
+            <t t-esc="data['region_rows'][0]['pct']"/>%)<t t-if="doc.centre">,
+            reflecting the centre's location
+            (<t t-esc="doc.centre"/>)</t>.
+          </p>
+
+          <div class="cbk-sec">4. Chosen Vocational Skill</div>
+          <t t-if="data['skills']">
+            <table class="cbk-age"><tbody><tr>
+              <td class="cbk-age-cell" style="padding-right: 6px;">
+                <t t-set="rows" t-value="data['skills']"/>
+                <t t-set="top" t-value="max(4, -(-data['max_skill'] // 4) * 4)"/>
+                <t t-set="n" t-value="max(1, len(rows))"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 0 570 278"
+                     width="100%" height="208" preserveAspectRatio="none"
+                     role="img" aria-label="Enrolled per vocational skill">
+                  <t t-foreach="range(5)" t-as="tick">
+                    <t t-set="ty" t-value="215 - tick * 50"/>
+                    <line x1="38" t-att-y1="ty" x2="505" t-att-y2="ty"
+                          stroke="#e8edf3" stroke-width="0.8"/>
+                    <text x="32" t-att-y="ty + 4" text-anchor="end"
+                          fill="#7b8794" font-size="12">
+                      <t t-esc="tick * top // 4"/></text>
+                  </t>
+                  <line x1="38" y1="215" x2="505" y2="215" stroke="#c3cdd8" stroke-width="1"/>
+                  <text x="12" y="115" text-anchor="middle" font-size="12"
+                        fill="#66737f" transform="rotate(-90 12 115)">Enrolled</text>
+                  <t t-foreach="rows" t-as="row">
+                    <t t-set="bw" t-value="min((467.0 / n) * 0.6, 90.0)"/>
+                    <t t-set="bx" t-value="38 + row_index * (467.0 / n) + ((467.0 / n) - bw) / 2"/>
+                    <t t-set="bh" t-value="200.0 * row['enrolled'] / top"/>
+                    <rect t-att-x="bx" t-att-y="215 - bh" t-att-width="bw"
+                          t-att-height="bh" fill="#00988a"/>
+                    <text t-att-x="bx + bw / 2" t-att-y="207 - bh"
+                          text-anchor="middle" font-size="13"
+                          font-weight="bold" fill="#37424e">
+                      <t t-esc="row['enrolled']"/></text>
+                    <text t-if="len(rows) &gt; 4" t-att-x="bx + bw / 2" y="234" text-anchor="end"
+                          t-attf-transform="rotate(-30 {{ bx + bw / 2 }} 234)"
+                          font-size="11" fill="#66737f">
+                            <t t-esc="row['label']"/></text>
+                          <text t-else="" t-att-x="bx + bw / 2" y="233" text-anchor="middle"
+                                font-size="11" fill="#66737f">
+                            <t t-esc="row['label']"/></text>
+                  </t>
+                </svg>
+              </td>
+              <td class="cbk-age-cell" style="padding-left: 6px;">
+                <table class="cbk-table">
+                  <tr>
+                    <th class="first">Vocational skill</th>
+                    <th>Enrolled</th><th>B</th><th>G</th>
+                    <th>Compl.</th><th>Certified</th><th>Rate</th>
+                  </tr>
+                  <t t-foreach="data['skills']" t-as="row">
+                    <tr>
+                      <td class="first"><t t-esc="row['label']"/></td>
+                      <td><t t-esc="row['enrolled']"/></td>
+                      <td><t t-esc="row['boys']"/></td>
+                      <td><t t-esc="row['girls']"/></td>
+                      <td><t t-esc="row['completed']"/></td>
+                      <td><t t-esc="row['certified']"/></td>
+                      <td><span t-attf-class="cbk-pill {{ 'cbk-pill-good' if row['rate'] &gt;= 85 else 'cbk-pill-warn' }}"><t t-esc="row['rate']"/>%</span></td>
+                    </tr>
+                  </t>
+                  <tr class="tot">
+                    <td class="first">TOTAL</td>
+                    <td><t t-esc="data['skill_enrolments']"/><t t-if="data['skill_enrolments'] &gt; data['total']">*</t></td>
+                    <td><t t-esc="sum(s['boys'] for s in data['skills'])"/></td>
+                    <td><t t-esc="sum(s['girls'] for s in data['skills'])"/></td>
+                    <td><t t-esc="sum(s['completed'] for s in data['skills'])"/></td>
+                    <td><t t-esc="data['skill_certified_total']"/></td>
+                    <td><t t-esc="data['skill_rate_total']"/>%</td>
+                  </tr>
+                </table>
+              </td>
+            </tr></tbody></table>
+            <p t-if="data['skill_enrolments'] &gt; data['total']"
+               class="cbk-note">
+              * Some children took two skills, so skill enrolments total
+              <t t-esc="data['skill_enrolments']"/> against a batch of
+              <t t-esc="data['total']"/> children.
+            </p>
+          </t>
+          <p t-else="" class="cbk-note">
+            No vocational skill recorded on this batch's registrations yet —
+            pick one on each CAAFAG registration (Centre Enrolment section).
+          </p>
+
+          <div class="cbk-sec">5. Education Level on Entry</div>
+          <t t-if="data['edu_rows']">
+            <table class="cbk-age"><tbody><tr>
+              <td class="cbk-age-cell" style="padding-right: 6px;">
+                <t t-set="rows" t-value="data['edu_rows']"/>
+                <t t-set="top" t-value="max(4, -(-data['max_edu'] // 4) * 4)"/>
+                <t t-set="n" t-value="max(1, len(rows))"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 0 570 278"
+                     width="100%" height="208" preserveAspectRatio="none"
+                     role="img" aria-label="Children per education level on entry">
+                  <t t-foreach="range(5)" t-as="tick">
+                    <t t-set="ty" t-value="215 - tick * 50"/>
+                    <line x1="38" t-att-y1="ty" x2="505" t-att-y2="ty"
+                          stroke="#e8edf3" stroke-width="0.8"/>
+                    <text x="32" t-att-y="ty + 4" text-anchor="end"
+                          fill="#7b8794" font-size="12">
+                      <t t-esc="tick * top // 4"/></text>
+                  </t>
+                  <line x1="38" y1="215" x2="505" y2="215" stroke="#c3cdd8" stroke-width="1"/>
+                  <text x="12" y="115" text-anchor="middle" font-size="12"
+                        fill="#66737f" transform="rotate(-90 12 115)">Count</text>
+                  <t t-foreach="rows" t-as="row">
+                    <t t-set="bw" t-value="min((467.0 / n) * 0.6, 90.0)"/>
+                    <t t-set="bx" t-value="38 + row_index * (467.0 / n) + ((467.0 / n) - bw) / 2"/>
+                    <t t-set="bh" t-value="200.0 * row['count'] / top"/>
+                    <rect t-att-x="bx" t-att-y="215 - bh" t-att-width="bw"
+                          t-att-height="bh" fill="#7d5ba6"/>
+                    <text t-att-x="bx + bw / 2" t-att-y="207 - bh"
+                          text-anchor="middle" font-size="13"
+                          font-weight="bold" fill="#37424e">
+                      <t t-esc="row['count']"/></text>
+                    <text t-if="len(rows) &gt; 4" t-att-x="bx + bw / 2" y="234" text-anchor="end"
+                          t-attf-transform="rotate(-30 {{ bx + bw / 2 }} 234)"
+                          font-size="11" fill="#66737f">
+                            <t t-esc="row['label']"/></text>
+                          <text t-else="" t-att-x="bx + bw / 2" y="233" text-anchor="middle"
+                                font-size="11" fill="#66737f">
+                            <t t-esc="row['label']"/></text>
+                  </t>
+                </svg>
+              </td>
+              <td class="cbk-age-cell" style="padding-left: 6px;">
+                <table class="cbk-table">
+                  <tr>
+                    <th class="first">Level</th>
+                    <th>Children</th><th>%</th>
+                  </tr>
+                  <t t-foreach="data['edu_rows']" t-as="row">
+                    <tr>
+                      <td class="first"><t t-esc="row['label']"/></td>
+                      <td><t t-esc="row['count']"/></td>
+                      <td><t t-esc="row['pct']"/>%</td>
+                    </tr>
+                  </t>
+                  <tr class="tot">
+                    <td class="first">TOTAL</td>
+                    <td><t t-esc="data['total']"/></td>
+                    <td><t t-esc="100 if data['total'] else 0"/>%</td>
+                  </tr>
+                </table>
+                <div t-if="data['edu_top']" class="cbk-callout">
+                  <b>Note:</b> <t t-esc="data['edu_top']['count']"/> children
+                  (<t t-esc="data['edu_top']['pct']"/>%) entered at
+                  "<t t-esc="data['edu_top']['label']"/>" — the most common
+                  education level on entry.
+                </div>
+              </td>
+            </tr></tbody></table>
+          </t>
+          <p t-else="" class="cbk-note">
+            No education level recorded on this batch's registrations yet —
+            fill "Highest grade completed" on each CAAFAG registration.
+          </p>
+          </div>
+        </div>
+      </t>
+    </t>
+  </t>
+</template>
+
+<record id="paperformat_cp_caafag_batch" model="report.paperformat">
+  <field name="name">CAAFAG KPI A4</field>
+  <field name="format">A4</field>
+  <field name="orientation">Portrait</field>
+  <field name="margin_top">8</field>
+  <field name="margin_bottom">8</field>
+  <field name="margin_left">7</field>
+  <field name="margin_right">7</field>
+  <field name="header_line" eval="False"/>
+  <field name="header_spacing">0</field>
+  <field name="dpi">96</field>
+</record>
+
+<record id="action_report_cp_caafag_batch" model="ir.actions.report">
+  <field name="name">CAAFAG Batch KPI Report</field>
+  <field name="model">cp.caafag.batch</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="paperformat_id" ref="paperformat_cp_caafag_batch"/>
+  <field name="report_name">mowdafa_child_protection.report_cp_caafag_batch_document</field>
+  <field name="report_file">mowdafa_child_protection.report_cp_caafag_batch_document</field>
+  <field name="print_report_name">'Batch KPI Report - %s' % (object.name)</field>
+  <field name="binding_model_id" ref="model_cp_caafag_batch"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

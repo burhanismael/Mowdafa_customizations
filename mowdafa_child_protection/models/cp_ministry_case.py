@@ -217,7 +217,7 @@ class CpMinistryCase(models.Model):
             'region_id': self.region_id.id,
             'district_id': self.district_id.id,
             'date_identified': self.date_identified,
-            'referral_source': self.referral_source_id.name or '',
+            'referral_source_id': self.referral_source_id.id,
             'protection_concern_id': self.protection_concern_id.id,
             'concern_description': self.concern_description,
             'risk_level': self.risk_level,
