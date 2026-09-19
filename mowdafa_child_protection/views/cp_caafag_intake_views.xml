@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="caafag_seq_cp_intake" model="ir.sequence">
+        <field name="name">CAAFAG Client Intake</field>
+        <field name="code">cp.caafag.intake</field>
+        <field name="prefix">CIN/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="caafag_view_cp_intake_form" model="ir.ui.view">
+        <field name="name">cp.caafag.intake.form</field>
+        <field name="model">cp.caafag.intake</field>
+        <field name="arch" type="xml">
+            <form string="Client Intake Form" class="o_cp_intake_form">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_case" type="object"
+                                class="oe_stat_button" icon="fa-folder-open"
+                                invisible="not case_id">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Case</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3 class="text-muted">Client Intake Form</h3>
+                    </div>
+                    <p class="text-muted"><b>Disclaimer:</b> This form is
+                        used to collect information about new clients for
+                        internal purposes only and is kept confidential.</p>
+
+                    <separator string="Personal Information"/>
+                    <group>
+                        <group>
+                            <field name="case_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="client_name"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                        <group>
+                            <field name="gender" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="date_of_birth"/>
+                            <field name="phone" widget="phone"/>
+                        </group>
+                    </group>
+                    <separator string="Location"/>
+                    <group>
+                        <group>
+                            <field name="country_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="region_id" readonly="1"
+                                   force_save="1"/>
+                        </group>
+                        <group>
+                            <field name="district_id" readonly="1"
+                                   force_save="1"/>
+                            <field name="village" readonly="1"
+                                   force_save="1"/>
+                        </group>
+                    </group>
+
+                    <separator string="Service Request"/>
+                    <div class="cp-intake-text-field">
+                        <label for="service_reason"
+                               string="What is the reason for seeking our services?"/>
+                        <field name="service_reason" nolabel="1"
+                               placeholder="Describe the services requested…"/>
+                    </div>
+                    <div class="cp-intake-text-field">
+                        <label for="heard_about"/>
+                        <field name="heard_about" nolabel="1"/>
+                    </div>
+
+                    <separator string="Signature"/>
+                    <group>
+                        <group>
+                            <field name="sign"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <div class="cp-intake-signature">
+                        <label for="sign_img" string="Signature (drawn)"/>
+                        <field name="sign_img" nolabel="1" widget="signature"/>
+                    </div>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="caafag_view_cp_intake_tree" model="ir.ui.view">
+        <field name="name">cp.caafag.intake.tree</field>
+        <field name="model">cp.caafag.intake</field>
+        <field name="arch" type="xml">
+            <tree string="Client Intake Forms">
+                <field name="name"/>
+                <field name="case_id"/>
+                <field name="client_name"/>
+                <field name="date"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

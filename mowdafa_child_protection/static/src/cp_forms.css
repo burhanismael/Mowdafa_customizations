@@ -319,3 +319,72 @@
     overflow-wrap: anywhere;
     line-height: 1.5;
 }
+
+/* Client intake: consistent label columns across every two-column section. */
+.o_cp_intake_form .o_form_sheet {
+    padding: 24px !important;
+}
+
+.o_cp_intake_form .o_horizontal_separator {
+    margin: 24px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.o_cp_intake_form .o_inner_group {
+    row-gap: 12px;
+    align-items: start;
+}
+
+.o_cp_intake_form .o_inner_group > .o_cell {
+    min-width: 0;
+    align-self: start;
+}
+
+.o_cp_intake_form .o_form_label {
+    white-space: normal !important;
+    line-height: 1.5;
+}
+
+.o_cp_intake_form .o_field_radio.o_horizontal {
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.o_cp_intake_form .cp-intake-text-field {
+    margin-bottom: 18px;
+}
+
+.o_cp_intake_form .cp-intake-text-field > .o_form_label,
+.o_cp_intake_form .cp-intake-signature > .o_form_label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.o_cp_intake_form .cp-intake-text-field > .o_field_widget,
+.o_cp_intake_form .cp-intake-signature > .o_field_widget {
+    width: 100%;
+}
+
+.o_cp_intake_form .cp-intake-text-field textarea {
+    min-height: 80px;
+}
+
+.o_cp_intake_form .cp-intake-signature {
+    width: 100%;
+    max-width: 520px;
+    margin-top: 12px;
+}
+
+@media (min-width: 576px) {
+    .o_cp_intake_form .o_inner_group {
+        grid-template-columns: 150px minmax(0, 1fr);
+        column-gap: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .o_cp_intake_form .o_form_sheet {
+        padding: 16px !important;
+    }
+}

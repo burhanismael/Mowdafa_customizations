@@ -56,6 +56,31 @@ class CpCaafagCase(models.Model):
         return self._view_cp_records(
             'cp.caafag.case.report', 'Case Reports', self.case_report_ids)
 
+    intake_ids = fields.One2many(
+        'cp.caafag.intake', 'case_id', string='Intake Forms')
+    intake_count = fields.Integer(
+        string='Intake Forms', compute='_compute_intake_count')
+
+    @api.depends('intake_ids')
+    def _compute_intake_count(self):
+        for case in self:
+            case.intake_count = len(case.intake_ids)
+
+    def action_create_intake(self):
+        return self._open_cp_form(
+            'cp.caafag.intake', 'Client Intake Form',
+            {'default_client_name': self.child_name,
+             'default_gender': self.sex,
+             'default_date_of_birth': self.date_of_birth,
+             'default_country_id': self.country_id.id,
+             'default_region_id': self.region_id.id,
+             'default_district_id': self.district_id.id,
+             'default_village': self.village})
+
+    def action_view_intakes(self):
+        return self._view_cp_records(
+            'cp.caafag.intake', 'Client Intake Forms', self.intake_ids)
+
     _CAAFAG_FORM_MODELS = {
         'cp.placement': 'cp.caafag.placement',
         'cp.handover': 'cp.caafag.handover',
@@ -699,3 +724,45 @@ class CpCaafagSkill(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)', 'That skill already exists.'),
     ]
+
+
+# ── client intake form (in-care) — CAAFAG only ───────────────────────────
+class CpCaafagIntake(models.Model):
+    """The client intake form: who the child is, why the service is
+    sought, and the signed consent to keep it on file."""
+    _name = 'cp.caafag.intake'
+    _description = 'CAAFAG Client Intake Form'
+    _inherit = ['cp.form.mixin']
+    _sequence_code = 'cp.caafag.intake'
+    _order = 'date desc, id desc'
+
+    case_id = fields.Many2one(
+        'cp.caafag.case', string='Case', required=True, ondelete='cascade')
+
+    # ── personal information ─────────────────────────────────────────────
+    client_name = fields.Char(string='Name')
+    gender = fields.Selection([
+        ('male', 'Male'), ('female', 'Female'), ('other', 'Other'),
+    ], string='Gender')
+    email = fields.Char(string='E-Mail')
+    phone = fields.Char(string='Phone')
+    date_of_birth = fields.Date(string='Date of Birth')
+
+    # ── location (from the case) ─────────────────────────────────────────
+    country_id = fields.Many2one('res.country', string='Country')
+    region_id = fields.Many2one('gbv.region', string='Region')
+    district_id = fields.Many2one(
+        'gbv.district', string='District',
+        domain="[('region_id', '=?', region_id)]")
+    village = fields.Char(string='Village / Section')
+
+    # ── service request ──────────────────────────────────────────────────
+    service_reason = fields.Text(
+        string='What is the reason for seeking our services?')
+    heard_about = fields.Char(string='How did you hear about us?')
+
+    # ── signature ────────────────────────────────────────────────────────
+    sign = fields.Char(string='Signature')
+    sign_img = fields.Binary(string='Signature (drawn)')
+    date = fields.Date(
+        string='Date', required=True, default=fields.Date.context_today)
