@@ -742,7 +742,7 @@ class CpCaafagIntake(models.Model):
     # ── personal information ─────────────────────────────────────────────
     client_name = fields.Char(string='Name')
     gender = fields.Selection([
-        ('male', 'Male'), ('female', 'Female'), ('other', 'Other'),
+        ('male', 'Male'), ('female', 'Female'),
     ], string='Gender')
     email = fields.Char(string='E-Mail')
     phone = fields.Char(string='Phone')

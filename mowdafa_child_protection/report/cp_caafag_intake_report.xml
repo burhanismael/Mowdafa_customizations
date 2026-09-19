@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="report_cp_caafag_intake_document">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="doc">
+      <t t-call="web.external_layout">
+        <div class="page cin-page">
+          <style type="text/css">
+            .cin-page { font-family: "DejaVu Serif", Georgia, serif;
+                        color: #232b33; font-size: 11.5px;
+                        line-height: 1.65; }
+            .cin-title { text-align: center; font-family: "DejaVu Sans",
+                         Arial, sans-serif; font-size: 20px;
+                         font-weight: bold; letter-spacing: 2px;
+                         color: #1f3a57; margin: 4px 0 2px; }
+            .cin-title-rule { width: 130px; margin: 0 auto 12px;
+                              border-bottom: 2px solid #1f3a57; }
+            .cin-ref { text-align: center; font-family: "DejaVu Sans",
+                       Arial, sans-serif; font-size: 9px;
+                       letter-spacing: 1.5px; text-transform: uppercase;
+                       color: #6b7684; margin-bottom: 12px; }
+            .cin-disclaimer { font-size: 10.5px; color: #4c565d;
+                              text-align: justify; margin-bottom: 16px; }
+            .cin-sec { background: #e7eef6; border: 1px solid #b9cbdd;
+                       border-left: 4px solid #1f3a57;
+                       font-family: "DejaVu Sans", Arial, sans-serif;
+                       text-align: center; font-weight: bold;
+                       font-size: 11px; letter-spacing: 1.5px;
+                       color: #1f3a57; padding: 5px 8px;
+                       margin: 18px 0 12px; }
+            .cin-lbl { font-family: "DejaVu Sans", Arial, sans-serif;
+                       font-weight: bold; font-size: 10px;
+                       letter-spacing: 0.3px; color: #1f3a57; }
+            .cin-val { border-bottom: 1px solid #8b97a5;
+                       display: inline-block; min-width: 180px;
+                       padding: 0 8px 1px; font-size: 12px;
+                       color: #14181b; }
+            .cin-box { border: 1px solid #8b97a5; border-radius: 2px;
+                       min-height: 95px; padding: 8px 10px;
+                       margin: 6px 0 12px; font-size: 12px;
+                       color: #14181b; }
+            .cin-check { font-family: "DejaVu Sans"; font-size: 13px;
+                         color: #1f3a57; }
+            .cin-sign-img { max-height: 70px; }
+            .cin-table { width: 100%; border-collapse: collapse; }
+            .cin-table td { padding: 6px 8px 5px 0;
+                            vertical-align: bottom; }
+          </style>
+
+          <p class="cin-title">CLIENT INTAKE FORM</p>
+          <div class="cin-title-rule"/>
+          <p class="cin-ref"><t t-esc="doc.name"/>
+            <t t-if="doc.case_id"> · Case <t t-esc="doc.case_id.name"/></t></p>
+          <p class="cin-disclaimer"><b>DISCLAIMER</b>: Thank you for your
+            interest in being a client of
+            <b><t t-esc="doc.case_id.case_worker_id.institution or res_company.name"/></b>.
+            This form is used to collect information about new clients for
+            internal purposes only and to be kept confidential.</p>
+
+          <div class="cin-sec">PERSONAL INFORMATION</div>
+          <table class="cin-table"><tr>
+            <td style="width: 60%;"><span class="cin-lbl">Name</span>:
+              <span class="cin-val"><t t-esc="doc.client_name or ''"/></span></td>
+            <td><span class="cin-lbl">Gender</span>:
+              <span class="cin-check"><t t-esc="'☑' if doc.gender == 'male' else '☐'"/></span> Male
+              <span class="cin-check"><t t-esc="'☑' if doc.gender == 'female' else '☐'"/></span> Female</td>
+          </tr><tr>
+            <td><span class="cin-lbl">E-Mail</span>:
+              <span class="cin-val"><t t-esc="doc.email or ''"/></span></td>
+            <td><span class="cin-lbl">Phone</span>:
+              <span class="cin-val"><t t-esc="doc.phone or ''"/></span></td>
+          </tr><tr>
+            <td colspan="2"><span class="cin-lbl">Date of Birth</span>:
+              <span class="cin-val">
+                <t t-esc="doc.date_of_birth.strftime('%d / %m / %Y') if doc.date_of_birth else ''"/>
+              </span></td>
+          </tr></table>
+
+          <div class="cin-sec">LOCATION</div>
+          <table class="cin-table"><tr>
+            <td style="width: 50%;"><span class="cin-lbl">Country</span>:
+              <span class="cin-val"><t t-esc="doc.country_id.name or ''"/></span></td>
+            <td><span class="cin-lbl">Region</span>:
+              <span class="cin-val"><t t-esc="doc.region_id.name or ''"/></span></td>
+          </tr><tr>
+            <td><span class="cin-lbl">District</span>:
+              <span class="cin-val"><t t-esc="doc.district_id.name or ''"/></span></td>
+            <td><span class="cin-lbl">Village / Section</span>:
+              <span class="cin-val"><t t-esc="doc.village or ''"/></span></td>
+          </tr></table>
+
+          <div class="cin-sec">SERVICE REQUEST</div>
+          <p style="margin: 2px 0;">What is the reason for seeking our
+            services?</p>
+          <div class="cin-box">
+            <t t-if="doc.service_reason">
+              <t t-foreach="(doc.service_reason or '').split('\n')" t-as="line">
+                <t t-esc="line"/><br/>
+              </t>
+            </t>
+          </div>
+          <p><span class="cin-lbl">How did you hear about us?</span>
+            <span class="cin-val" style="min-width: 320px;">
+              <t t-esc="doc.heard_about or ''"/></span></p>
+
+          <div class="cin-sec">SIGNATURE</div>
+          <table class="cin-table"><tr>
+            <td style="width: 60%;"><span class="cin-lbl">Signature</span>:
+              <t t-if="doc.sign_img">
+                <img class="cin-sign-img"
+                     t-att-src="image_data_uri(doc.sign_img)"
+                     alt="Signature"/>
+              </t>
+              <t t-else="">
+                <span class="cin-val" style="min-width: 240px;">
+                  <t t-esc="doc.sign or ''"/></span>
+              </t>
+            </td>
+            <td><span class="cin-lbl">Date</span>:
+              <span class="cin-val">
+                <t t-esc="doc.date.strftime('%d %B %Y') if doc.date else ''"/>
+              </span></td>
+          </tr></table>
+        </div>
+      </t>
+    </t>
+  </t>
+</template>
+
+<record id="action_report_cp_caafag_intake" model="ir.actions.report">
+  <field name="name">Client Intake Form</field>
+  <field name="model">cp.caafag.intake</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_cp_caafag_intake_document</field>
+  <field name="report_file">mowdafa_child_protection.report_cp_caafag_intake_document</field>
+  <field name="print_report_name">'Client Intake Form - %s' % (object.name)</field>
+  <field name="binding_model_id" ref="model_cp_caafag_intake"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>
