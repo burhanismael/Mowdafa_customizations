@@ -14,3 +14,9 @@ class HrEmployee(models.Model):
         string='Child Protection',
         help='Show this employee in the Child Protection case worker '
              'and supervisor directories.')
+    is_case_worker = fields.Boolean(
+        string='Case Worker',
+        help='Show this employee in the Case Workers directory.')
+    is_supervisor = fields.Boolean(
+        string='Supervisor',
+        help='Show this employee in the Supervisors directory.')

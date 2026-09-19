@@ -9,3 +9,4 @@ from . import referral_form
 from . import case_closure
 from . import master_data
 from . import gbv_case
+from . import gbv_intake

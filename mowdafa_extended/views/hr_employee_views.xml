@@ -5,9 +5,36 @@
     <field name="model">hr.employee</field>
     <field name="inherit_id" ref="hr.view_employee_form"/>
     <field name="arch" type="xml">
-      <xpath expr="//field[@name='work_email']" position="after">
-        <field name="is_gbv_worker" widget="boolean_toggle"/>
-        <field name="is_cp_worker" widget="boolean_toggle"/>
+      <xpath expr="//page[@name='public']" position="inside">
+        <group string="Programme Directories">
+          <group>
+            <field name="is_gbv_worker" widget="boolean_toggle"/>
+            <field name="is_cp_worker" widget="boolean_toggle"/>
+          </group>
+          <group>
+            <field name="is_case_worker" widget="boolean_toggle"/>
+            <field name="is_supervisor" widget="boolean_toggle"/>
+          </group>
+        </group>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="view_employee_filter_mowdafa" model="ir.ui.view">
+    <field name="name">hr.employee.search.mowdafa</field>
+    <field name="model">hr.employee</field>
+    <field name="inherit_id" ref="hr.view_employee_filter"/>
+    <field name="arch" type="xml">
+      <xpath expr="//search" position="inside">
+        <separator/>
+        <filter string="GBV" name="filter_gbv_worker"
+                domain="[('is_gbv_worker', '=', True)]"/>
+        <filter string="Child Protection" name="filter_cp_worker"
+                domain="[('is_cp_worker', '=', True)]"/>
+        <filter string="Case Worker" name="filter_case_worker"
+                domain="[('is_case_worker', '=', True)]"/>
+        <filter string="Supervisor" name="filter_supervisor"
+                domain="[('is_supervisor', '=', True)]"/>
       </xpath>
     </field>
   </record>

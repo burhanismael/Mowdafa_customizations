@@ -30,6 +30,8 @@ signatures of the guardian, case worker and survivor.
         'views/referral_form_views.xml',
         'views/case_closure_views.xml',
         'views/master_data_views.xml',
+        'report/gbv_intake_report.xml',
+        'views/gbv_intake_views.xml',
         'views/gbv_case_views.xml',
         'wizard/gbv_case_report_wizard_views.xml',
         'wizard/gbv_dashboard_report_wizard_views.xml',

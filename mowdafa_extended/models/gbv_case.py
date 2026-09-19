@@ -35,6 +35,49 @@ class GbvCase(models.Model):
 
     name = fields.Char(
         string='Case Reference', readonly=True, copy=False, default='New')
+    intake_ids = fields.One2many(
+        'gbv.intake', 'case_id', string='Intake Forms')
+    intake_count = fields.Integer(
+        string='Intake Forms', compute='_compute_intake_count')
+
+    @api.depends('intake_ids')
+    def _compute_intake_count(self):
+        for case in self:
+            case.intake_count = len(case.intake_ids)
+
+    def action_create_intake(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Client Intake Form',
+            'res_model': 'gbv.intake',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_case_id': self.id,
+                'default_client_name': self.survivor_id.display_name,
+                'default_gender': self.sex,
+                'default_date_of_birth': self.survivor_id.birth_date,
+                'default_region_id': self.region_id.id,
+                'default_district_id': self.district_id.id,
+            },
+        }
+
+    def action_view_intakes(self):
+        self.ensure_one()
+        action = {
+            'type': 'ir.actions.act_window',
+            'name': 'Client Intake Forms',
+            'res_model': 'gbv.intake',
+            'view_mode': 'tree,form',
+            'domain': [('case_id', '=', self.id)],
+            'context': {'default_case_id': self.id},
+        }
+        if len(self.intake_ids) == 1:
+            action.update({'view_mode': 'form',
+                           'res_id': self.intake_ids.id})
+        return action
+
     survivor_id = fields.Many2one(
         comodel_name='survivor.master', string='Survivor',
         required=True, tracking=True, index=True,
@@ -509,13 +552,11 @@ class GbvCasePerpetrator(models.Model):
         'gbv.case', string='Case', required=True, ondelete='cascade')
     name = fields.Char(string='Identifier / Initials')
     sex = fields.Selection(
-        selection=[('female', 'Female'), ('male', 'Male'), ('unknown', 'Unknown')],
-        string='Sex', default='unknown')
+        selection=[('female', 'Female'), ('male', 'Male')],
+        string='Sex')
     age_estimate = fields.Integer(string='Age (est.)')
     relationship_id = fields.Many2one(
-        'gbv.perpetrator.relationship', string='Relationship to Survivor',
-        default=lambda self: self.env[
-            'gbv.perpetrator.relationship']._default_unknown())
+        'gbv.perpetrator.relationship', string='Relationship to Survivor')
 
     def init(self):
         """One-time migration: map the old selection column onto the

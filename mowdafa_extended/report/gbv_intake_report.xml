@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<template id="report_cp_caafag_intake_document">
+<template id="report_gbv_intake_document">
   <t t-call="web.html_container">
     <t t-foreach="docs" t-as="doc">
       <t t-call="web.external_layout">
@@ -84,10 +84,8 @@
             <td><span class="cin-lbl">Region</span>:
               <span class="cin-val"><t t-esc="doc.region_id.name or ''"/></span></td>
           </tr><tr>
-            <td><span class="cin-lbl">District</span>:
+            <td colspan="2"><span class="cin-lbl">District</span>:
               <span class="cin-val"><t t-esc="doc.district_id.name or ''"/></span></td>
-            <td><span class="cin-lbl">Village / Section</span>:
-              <span class="cin-val"><t t-esc="doc.village or ''"/></span></td>
           </tr></table>
 
           <div class="cin-sec">SERVICE REQUEST</div>
@@ -128,14 +126,14 @@
   </t>
 </template>
 
-<record id="action_report_cp_caafag_intake" model="ir.actions.report">
+<record id="action_report_gbv_intake" model="ir.actions.report">
   <field name="name">Client Intake Form</field>
-  <field name="model">cp.caafag.intake</field>
+  <field name="model">gbv.intake</field>
   <field name="report_type">qweb-pdf</field>
-  <field name="report_name">mowdafa_child_protection.report_cp_caafag_intake_document</field>
-  <field name="report_file">mowdafa_child_protection.report_cp_caafag_intake_document</field>
+  <field name="report_name">mowdafa_extended.report_gbv_intake_document</field>
+  <field name="report_file">mowdafa_extended.report_gbv_intake_document</field>
   <field name="print_report_name">'Client Intake Form - %s' % (object.name)</field>
-  <field name="binding_model_id" ref="model_cp_caafag_intake"/>
+  <field name="binding_model_id" ref="model_gbv_intake"/>
   <field name="binding_type">report</field>
 </record>
 

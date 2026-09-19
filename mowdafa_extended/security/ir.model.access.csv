@@ -41,3 +41,4 @@ access_gbv_service_manager,gbv.service.manager,model_gbv_service,base.group_syst
 access_gbv_case_report_wizard_user,gbv.case.report.wizard.user,model_gbv_case_report_wizard,base.group_user,1,1,1,1
 access_case_closure_checklist_line_user,case.closure.checklist.line.user,model_case_closure_checklist_line,base.group_user,1,1,1,1
 access_gbv_dashboard_report_wizard_user,gbv.dashboard.report.wizard.user,model_gbv_dashboard_report_wizard,base.group_user,1,1,1,1
+access_gbv_intake_user,gbv.intake.user,model_gbv_intake,base.group_user,1,1,1,1
