@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- The case file, laid out like the case form: same sections, same
+     field pairs. Shared by Street Children and CAAFAG cases. -->
+<template id="report_cp_case_document">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="doc">
+      <t t-set="o" t-value="doc"/>
+      <t t-call="web.external_layout">
+        <t t-set="helper" t-value="doc.env['mowdafa.pdf.helper']"/>
+        <t t-set="f" t-value="lambda name: helper._fmt(doc, doc._fields[name])"/>
+        <div class="page ccr-page">
+          <style type="text/css">
+            .ccr-page { font-family: "DejaVu Sans", Arial, sans-serif;
+                        color: #263445; font-size: 11px; line-height: 1.45; }
+            /* Isolate our tables from the company layout's zebra rows
+               (Striped: .o_report_layout_striped tbody tr:nth-child(odd)). */
+            .ccr-page table, .ccr-page tbody, .ccr-page tr,
+            .ccr-page td { background: transparent; color: inherit; }
+            .ccr-page table tbody tr:nth-child(odd),
+            .ccr-page table tbody tr:nth-child(even) {
+                background-color: transparent !important; }
+            .ccr-page table { border: 0; }
+
+            /* ── title block ── */
+            .ccr-head { border-left: 5px solid #24465a;
+                        border-bottom: 1px solid #dfe6eb;
+                        padding: 4px 0 12px 14px; margin: 0 0 16px;
+                        page-break-inside: avoid; }
+            .ccr-head-side { float: right; text-align: right;
+                             margin-left: 16px; }
+            .ccr-doctype { font-size: 9.5px; letter-spacing: 2px;
+                           text-transform: uppercase; color: #7a8c99; }
+            .ccr-ref { font-size: 26px; line-height: 1.2; font-weight: bold;
+                       color: #24465a; margin: 3px 0 2px; }
+            .ccr-name { font-size: 14px; color: #37424e; }
+            .ccr-stage { display: inline-block; white-space: nowrap;
+                         padding: 4px 12px; border-radius: 12px;
+                         background: #24465a; color: #ffffff;
+                         font-size: 9.5px; font-weight: bold;
+                         letter-spacing: 0.5px; }
+            .ccr-stage-lbl { display: block; font-size: 8px;
+                             letter-spacing: 1.5px; text-transform: uppercase;
+                             color: #7a8c99; margin-bottom: 3px; }
+            .ccr-photo { display: block; margin: 8px 0 0 auto;
+                         max-width: 76px; max-height: 88px;
+                         border: 1px solid #d5dfe5; padding: 3px; }
+            .ccr-clear { clear: both; }
+            .ccr-sec { background: #edf3f5; color: #24465a;
+                       border-left: 3px solid #387d89; font-weight: bold;
+                       font-size: 11px; padding: 6px 9px; margin: 14px 0 0;
+                       page-break-after: avoid; }
+            .ccr-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+            .ccr-grid tr { page-break-inside: avoid; }
+            .ccr-page .ccr-grid td { border: 1px solid #dfe6eb; padding: 6px 8px;
+                                    vertical-align: top; word-wrap: break-word; }
+            .ccr-page .ccr-grid td.lbl { width: 21%; background: #f7f9fa;
+                                       font-size: 9px; font-weight: bold; color: #526777; }
+            .ccr-page .ccr-grid td.val { width: 29%; background: #fff;
+                                       font-size: 11px; color: #263445; white-space: pre-wrap; }
+            .ccr-notes { border: 1px solid #dfe6eb; padding: 9px;
+                         min-height: 42px; white-space: pre-wrap; word-wrap: break-word; }
+          </style>
+
+          <!-- header: reference, name, stage, photo -->
+          <div class="ccr-head">
+            <div class="ccr-head-side">
+              <span class="ccr-stage-lbl">Current stage</span>
+              <span class="ccr-stage"><t t-esc="f('stage')"/></span>
+              <img t-if="doc.photo" class="ccr-photo"
+                   t-att-src="image_data_uri(doc.photo)" alt="Photo"/>
+            </div>
+            <div class="ccr-doctype"><t t-esc="doc._description"/></div>
+            <div class="ccr-ref"><t t-esc="doc.name"/></div>
+            <div class="ccr-name"><t t-esc="doc.child_name or ''"/></div>
+            <div class="ccr-clear"/>
+          </div>
+
+          <!-- 1 · Child identification -->
+          <div class="ccr-sec">1 · Child Identification</div>
+          <table class="ccr-grid">
+            <tr><td class="lbl">First Name</td><td class="val"><t t-esc="f('first_name')"/></td>
+                <td class="lbl">Sex</td><td class="val"><t t-esc="f('sex')"/></td></tr>
+            <tr><td class="lbl">Middle / Father's Name</td><td class="val"><t t-esc="f('middle_name')"/></td>
+                <td class="lbl">Date of Birth</td><td class="val"><t t-esc="f('date_of_birth')"/></td></tr>
+            <tr><td class="lbl">Last / Grandfather's Name</td><td class="val"><t t-esc="f('last_name')"/></td>
+                <td class="lbl">DOB Estimated?</td><td class="val"><t t-esc="f('dob_estimated')"/></td></tr>
+            <tr><td class="lbl">Other Name(s)</td><td class="val"><t t-esc="f('other_names')"/></td>
+                <td class="lbl">Age (years)</td><td class="val"><t t-esc="f('age_years')"/></td></tr>
+            <tr><td class="lbl">Full Name</td><td class="val"><t t-esc="f('child_name')"/></td>
+                <td class="lbl">Nationality</td><td class="val"><t t-esc="f('nationality_id')"/></td></tr>
+            <tr><td class="lbl">Nickname</td><td class="val"><t t-esc="f('nickname')"/></td>
+                <td class="lbl">Population Group</td><td class="val"><t t-esc="f('population_group')"/></td></tr>
+            <tr><td class="lbl"/><td class="val"/>
+                <td class="lbl">Disability</td><td class="val"><t t-esc="f('disability')"/></td></tr>
+          </table>
+
+          <!-- Location -->
+          <div class="ccr-sec">2 · Location &amp; Referral</div>
+          <table class="ccr-grid">
+            <tr><td class="lbl">Country</td><td class="val"><t t-esc="f('country_id')"/></td>
+                <td class="lbl">Camp / Settlement</td><td class="val"><t t-esc="f('camp')"/></td></tr>
+            <tr><td class="lbl">Region</td><td class="val"><t t-esc="f('region_id')"/></td>
+                <td class="lbl">Date Identified</td><td class="val"><t t-esc="f('date_identified')"/></td></tr>
+            <tr><td class="lbl">District</td><td class="val"><t t-esc="f('district_id')"/></td>
+                <td class="lbl">Referral Source</td><td class="val"><t t-esc="f('referral_source_id')"/></td></tr>
+            <tr><td class="lbl">Village / Section</td><td class="val"><t t-esc="f('village')"/></td>
+                <td class="lbl"/><td class="val"/></tr>
+          </table>
+
+          <!-- Full-width narrative rows remain readable for longer case details. -->
+          <div class="ccr-sec">3 · Protection &amp; Safety</div>
+          <table class="ccr-grid">
+            <tr><td class="lbl">Primary Concern</td><td class="val"><t t-esc="f('protection_concern_id')"/></td>
+                <td class="lbl">Risk Level</td><td class="val"><t t-esc="f('risk_level')"/></td></tr>
+            <tr><td class="lbl">Concern Description</td><td class="val" colspan="3"><t t-esc="f('concern_description')"/></td></tr>
+            <tr><td class="lbl">Immediate Risk?</td><td class="val" colspan="3"><t t-esc="f('immediate_risk')"/></td></tr>
+            <tr><td class="lbl">Risk Factors</td><td class="val" colspan="3"><t t-esc="f('risk_factors')"/></td></tr>
+          </table>
+
+          <!-- Case management -->
+          <div class="ccr-sec">4 · Case Management</div>
+          <table class="ccr-grid">
+            <tr><td class="lbl">Case Worker</td><td class="val"><t t-esc="f('case_worker_id')"/></td>
+                <td class="lbl">Placement</td><td class="val"><t t-esc="f('placement_type')"/></td></tr>
+            <tr><td class="lbl">Supervisor</td><td class="val"><t t-esc="f('supervisor_id')"/></td>
+                <td class="lbl">Recommendation</td><td class="val"><t t-esc="f('recommendation')"/></td></tr>
+          </table>
+
+          <!-- Verification gate — only when it applies, as on screen -->
+          <t t-if="doc.verification_conflict or doc.supervisor_decision">
+            <div class="ccr-sec">Verification Gate</div>
+            <table class="ccr-grid">
+              <tr><td class="lbl">Accounts Disagree</td>
+                  <td class="val"><t t-esc="f('verification_conflict')"/></td>
+                  <td class="lbl">Supervisor Decision</td>
+                  <td class="val"><t t-esc="f('supervisor_decision')"/></td></tr>
+              <tr><td class="lbl">Reason</td>
+                  <td class="val" colspan="3"><t t-esc="f('supervisor_reason')"/></td></tr>
+            </table>
+          </t>
+
+          <!-- Notes -->
+          <div class="ccr-sec">Notes</div>
+          <div class="ccr-notes"><t t-esc="doc.notes or ''"/></div>
+        </div>
+      </t>
+    </t>
+  </t>
+</template>
+
+
+<!-- Case Form -->
+<template id="report_form_cp_case">
+  <t t-call="mowdafa_child_protection.report_cp_case_document"/>
+</template>
+
+<record id="action_report_form_cp_case" model="ir.actions.report">
+  <field name="name">Case Form</field>
+  <field name="model">cp.case</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_form_cp_case</field>
+  <field name="report_file">mowdafa_child_protection.report_form_cp_case</field>
+  <field name="print_report_name">'Case Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_cp_case"/>
+  <field name="binding_type">report</field>
+</record>
+
+<!-- CAAFAG Case Form -->
+<template id="report_form_cp_caafag_case">
+  <t t-call="mowdafa_child_protection.report_cp_case_document"/>
+</template>
+
+<record id="action_report_form_cp_caafag_case" model="ir.actions.report">
+  <field name="name">CAAFAG Case Form</field>
+  <field name="model">cp.caafag.case</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_form_cp_caafag_case</field>
+  <field name="report_file">mowdafa_child_protection.report_form_cp_caafag_case</field>
+  <field name="print_report_name">'CAAFAG Case Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_cp_caafag_case"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

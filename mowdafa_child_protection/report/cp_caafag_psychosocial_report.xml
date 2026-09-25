@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- CAAFAG Psychosocial Form — printed with the generic form layout (mowdafa_extended/report/mowdafa_form_layout.xml) -->
+<template id="report_form_cp_caafag_psychosocial">
+  <t t-call="mowdafa_extended.report_mowdafa_form_document"/>
+</template>
+
+<record id="action_report_form_cp_caafag_psychosocial" model="ir.actions.report">
+  <field name="name">CAAFAG Psychosocial Form</field>
+  <field name="model">cp.caafag.psychosocial</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_form_cp_caafag_psychosocial</field>
+  <field name="report_file">mowdafa_child_protection.report_form_cp_caafag_psychosocial</field>
+  <field name="print_report_name">'CAAFAG Psychosocial Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_cp_caafag_psychosocial"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

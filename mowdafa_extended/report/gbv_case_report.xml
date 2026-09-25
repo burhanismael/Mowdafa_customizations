@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- GBV Case Form — printed with the generic form layout (report/mowdafa_form_layout.xml) -->
+<template id="report_form_gbv_case">
+  <t t-call="mowdafa_extended.report_mowdafa_form_document"/>
+</template>
+
+<record id="action_report_form_gbv_case" model="ir.actions.report">
+  <field name="name">GBV Case Form</field>
+  <field name="model">gbv.case</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_extended.report_form_gbv_case</field>
+  <field name="report_file">mowdafa_extended.report_form_gbv_case</field>
+  <field name="print_report_name">'GBV Case Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_gbv_case"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

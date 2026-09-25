@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- The hand-over certificate (CP-06), laid out like the hand-over form.
+     Shared by Street Children and CAAFAG hand-overs. -->
+<template id="report_cp_handover_document">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="doc">
+      <t t-set="o" t-value="doc"/>
+      <t t-call="web.external_layout">
+        <t t-set="helper" t-value="doc.env['mowdafa.pdf.helper']"/>
+        <t t-set="f" t-value="lambda name: helper._fmt(doc, doc._fields[name])"/>
+        <div class="page chr-page">
+          <style type="text/css">
+            .chr-page { font-family: "DejaVu Sans", Arial, sans-serif;
+                        color: #263445; font-size: 11px; line-height: 1.45; }
+            /* keep the company layout's zebra rows off our tables */
+            .chr-page table, .chr-page tbody, .chr-page tr,
+            .chr-page td { background: transparent; color: inherit; }
+            .chr-page table tbody tr:nth-child(odd),
+            .chr-page table tbody tr:nth-child(even) {
+                background-color: transparent !important; }
+            .chr-page table { border: 0; }
+
+            /* title block */
+            .chr-head { border-left: 5px solid #24465a;
+                        border-bottom: 1px solid #dfe6eb;
+                        padding: 4px 0 12px 14px; margin: 0 0 16px;
+                        page-break-inside: avoid; }
+            .chr-head-side { float: right; text-align: right;
+                             margin-left: 16px; }
+            .chr-doctype { font-size: 9.5px; letter-spacing: 2px;
+                           text-transform: uppercase; color: #7a8c99; }
+            .chr-ref { font-size: 26px; line-height: 1.2; font-weight: bold;
+                       color: #24465a; margin: 3px 0 2px; }
+            .chr-name { font-size: 14px; color: #37424e; }
+            .chr-pill-lbl { display: block; font-size: 8px;
+                            letter-spacing: 1.5px; text-transform: uppercase;
+                            color: #7a8c99; margin-bottom: 3px; }
+            .chr-pill { display: inline-block; white-space: nowrap;
+                        padding: 4px 12px; border-radius: 12px;
+                        background: #24465a; color: #ffffff;
+                        font-size: 9.5px; font-weight: bold; }
+            .chr-clear { clear: both; }
+
+            /* sections + label/value grids */
+            .chr-sec { background: #edf3f5; color: #24465a;
+                       border-left: 3px solid #387d89; font-weight: bold;
+                       font-size: 11px; padding: 6px 9px; margin: 14px 0 0;
+                       page-break-after: avoid; }
+            .chr-grid { width: 100%; border-collapse: collapse;
+                        table-layout: fixed; }
+            .chr-grid tr { page-break-inside: avoid; }
+            .chr-page .chr-grid td { border: 1px solid #dfe6eb;
+                                     padding: 6px 8px; vertical-align: top;
+                                     word-wrap: break-word; }
+            .chr-page .chr-grid td.lbl { width: 21%; background: #f7f9fa;
+                                         font-size: 9px; font-weight: bold;
+                                         color: #526777; }
+            .chr-page .chr-grid td.val { width: 29%; background: #fff;
+                                         font-size: 11px; color: #263445;
+                                         white-space: pre-wrap; }
+
+            /* signing block: one column per signatory */
+            .chr-sign-wrap { page-break-inside: avoid; margin-top: 0; }
+            .chr-signs { width: 100%; border-collapse: collapse;
+                         table-layout: fixed; }
+            .chr-page .chr-signs th { background: #24465a; color: #fff;
+                         font-size: 9px; font-weight: bold;
+                         letter-spacing: 1px; text-transform: uppercase;
+                         text-align: center; padding: 6px 4px;
+                         border: 1px solid #24465a; }
+            .chr-page .chr-signs td { border: 1px solid #dfe6eb;
+                         padding: 5px 7px; vertical-align: top;
+                         font-size: 10px; word-wrap: break-word; }
+            .chr-page .chr-signs td.rl { width: 13%; background: #f7f9fa;
+                         font-size: 8.5px; font-weight: bold;
+                         color: #526777; }
+            .chr-page .chr-signs td.sign { height: 78px; text-align: center;
+                         vertical-align: bottom; padding: 4px 6px 2px; }
+            .chr-sign-img { max-height: 60px; max-width: 100%; }
+            .chr-sign-line { border-top: 1px solid #8b97a5;
+                             margin-top: 3px; padding-top: 2px;
+                             font-size: 7.5px; color: #7a8c99;
+                             letter-spacing: 0.5px; }
+
+            .chr-notes { border: 1px solid #dfe6eb; padding: 9px;
+                         min-height: 42px; white-space: pre-wrap;
+                         word-wrap: break-word; }
+          </style>
+
+          <!-- title block -->
+          <div class="chr-head">
+            <div class="chr-head-side">
+              <span class="chr-pill-lbl">This form certifies the child was</span>
+              <span class="chr-pill"><t t-esc="f('direction')"/></span>
+            </div>
+            <div class="chr-doctype">Child Hand-over Form (CP-06)</div>
+            <div class="chr-ref"><t t-esc="doc.name"/></div>
+            <div class="chr-name"><t t-esc="doc.child_full_name or ''"/></div>
+            <div class="chr-clear"/>
+          </div>
+
+          <!-- the child -->
+          <div class="chr-sec">1 · The Child</div>
+          <table class="chr-grid">
+            <tr><td class="lbl">Case</td><td class="val"><t t-esc="f('case_id')"/></td>
+                <td class="lbl">Father's Name</td><td class="val"><t t-esc="f('child_father')"/></td></tr>
+            <tr><td class="lbl">Full Name</td><td class="val"><t t-esc="f('child_full_name')"/></td>
+                <td class="lbl">Nationality</td><td class="val"><t t-esc="f('child_nationality')"/></td></tr>
+            <tr><td class="lbl">Sex</td><td class="val"><t t-esc="f('child_sex')"/></td>
+                <td class="lbl">Case Worker</td><td class="val"><t t-esc="f('case_worker_id')"/></td></tr>
+            <tr><td class="lbl">Date of Birth</td><td class="val"><t t-esc="f('child_dob')"/></td>
+                <td class="lbl">Supervisor</td><td class="val"><t t-esc="f('supervisor_id')"/></td></tr>
+            <tr><td class="lbl">DOB Estimated?</td><td class="val"><t t-esc="f('child_dob_estimated')"/></td>
+                <td class="lbl">Date &amp; Time</td><td class="val"><t t-esc="f('handover_datetime')"/></td></tr>
+          </table>
+
+          <!-- from -->
+          <div class="chr-sec">2 · From — Handed Over By</div>
+          <table class="chr-grid">
+            <tr><td class="lbl">Full Name</td><td class="val"><t t-esc="f('by_name')"/></td>
+                <td class="lbl">Position / Title</td><td class="val"><t t-esc="f('by_position')"/></td></tr>
+            <tr><td class="lbl">Organisation</td><td class="val"><t t-esc="f('by_organisation')"/></td>
+                <td class="lbl">Location</td><td class="val"><t t-esc="f('by_location')"/></td></tr>
+            <tr><td class="lbl"/><td class="val"/>
+                <td class="lbl">Contact</td><td class="val"><t t-esc="f('by_contact')"/></td></tr>
+          </table>
+
+          <!-- to -->
+          <div class="chr-sec">3 · To — Received By</div>
+          <table class="chr-grid">
+            <tr><td class="lbl">Institution</td><td class="val"><t t-esc="f('to_institution')"/></td>
+                <td class="lbl">Name of MOWDAFA staff</td><td class="val"><t t-esc="f('received_by')"/></td></tr>
+            <tr><td class="lbl">Location</td><td class="val"><t t-esc="f('to_location')"/></td>
+                <td class="lbl">Role</td><td class="val"><t t-esc="f('received_role')"/></td></tr>
+            <tr><td class="lbl">Child was handed over to</td>
+                <td class="val"><t t-esc="f('handed_to_type')"/><t t-if="doc.handed_to_type == 'other' and doc.handed_to_other"> — <t t-esc="doc.handed_to_other"/></t></td>
+                <td class="lbl">Contact</td><td class="val"><t t-esc="f('received_contact')"/></td></tr>
+            <tr><td class="lbl">Complete Address</td>
+                <td class="val" colspan="3"><t t-esc="f('received_address')"/></td></tr>
+          </table>
+
+          <!-- signatures: the chain of custody -->
+          <div class="chr-sec">4 · Signatures — Chain of Custody</div>
+          <t t-set="cards" t-value="[
+              ('Handing Over', doc.by_name, doc.by_position, doc.sign_handing_over, doc.sign_handing_over_img),
+              ('Child', doc.child_full_name, doc.child_title, doc.sign_child, doc.sign_child_img),
+              ('Receiver', doc.received_by, doc.received_role, doc.sign_receiver, doc.sign_receiver_img),
+              ('Witness', doc.witness_name, doc.witness_role, doc.sign_witness, doc.sign_witness_img),
+          ]"/>
+          <div class="chr-sign-wrap">
+            <table class="chr-signs">
+              <tr>
+                <th style="width: 13%;"/>
+                <t t-foreach="cards" t-as="card">
+                  <th><t t-esc="card[0]"/></th>
+                </t>
+              </tr>
+              <tr>
+                <td class="rl">Name</td>
+                <t t-foreach="cards" t-as="card">
+                  <td><t t-esc="card[1] or ''"/></td>
+                </t>
+              </tr>
+              <tr>
+                <td class="rl">Title</td>
+                <t t-foreach="cards" t-as="card">
+                  <td><t t-esc="card[2] or ''"/></td>
+                </t>
+              </tr>
+              <tr>
+                <td class="rl">Signature</td>
+                <t t-foreach="cards" t-as="card">
+                  <td><t t-esc="card[3] or ''"/></td>
+                </t>
+              </tr>
+              <tr>
+                <td class="rl">Signed</td>
+                <t t-foreach="cards" t-as="card">
+                  <td class="sign">
+                    <img t-if="card[4]" class="chr-sign-img"
+                         t-att-src="image_data_uri(card[4])" alt="Signature"/>
+                    <div class="chr-sign-line">Signature</div>
+                  </td>
+                </t>
+              </tr>
+              <tr>
+                <td class="rl">Date</td>
+                <t t-foreach="cards" t-as="card">
+                  <td><t t-esc="f('sign_date')"/></td>
+                </t>
+              </tr>
+            </table>
+          </div>
+
+          <!-- notes -->
+          <div class="chr-sec">Notes</div>
+          <div class="chr-notes"><t t-esc="doc.notes or ''"/></div>
+        </div>
+      </t>
+    </t>
+  </t>
+</template>
+
+
+<!-- Hand-over Form -->
+<template id="report_form_cp_handover">
+  <t t-call="mowdafa_child_protection.report_cp_handover_document"/>
+</template>
+
+<record id="action_report_form_cp_handover" model="ir.actions.report">
+  <field name="name">Hand-over Form</field>
+  <field name="model">cp.handover</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_form_cp_handover</field>
+  <field name="report_file">mowdafa_child_protection.report_form_cp_handover</field>
+  <field name="print_report_name">'Hand-over Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_cp_handover"/>
+  <field name="binding_type">report</field>
+</record>
+
+<!-- CAAFAG Hand-over Form -->
+<template id="report_form_cp_caafag_handover">
+  <t t-call="mowdafa_child_protection.report_cp_handover_document"/>
+</template>
+
+<record id="action_report_form_cp_caafag_handover" model="ir.actions.report">
+  <field name="name">CAAFAG Hand-over Form</field>
+  <field name="model">cp.caafag.handover</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_child_protection.report_form_cp_caafag_handover</field>
+  <field name="report_file">mowdafa_child_protection.report_form_cp_caafag_handover</field>
+  <field name="print_report_name">'CAAFAG Hand-over Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_cp_caafag_handover"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

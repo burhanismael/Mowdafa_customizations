@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- Case Closure Form — printed with the generic form layout (report/mowdafa_form_layout.xml) -->
+<template id="report_form_case_closure">
+  <t t-call="mowdafa_extended.report_mowdafa_form_document"/>
+</template>
+
+<record id="action_report_form_case_closure" model="ir.actions.report">
+  <field name="name">Case Closure Form</field>
+  <field name="model">case.closure</field>
+  <field name="report_type">qweb-pdf</field>
+  <field name="report_name">mowdafa_extended.report_form_case_closure</field>
+  <field name="report_file">mowdafa_extended.report_form_case_closure</field>
+  <field name="print_report_name">'Case Closure Form - %s' % (object.display_name)</field>
+  <field name="binding_model_id" ref="model_case_closure"/>
+  <field name="binding_type">report</field>
+</record>
+
+</odoo>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- One generic, external-layout form document shared by every form
+     report action in the GBV and Child Protection modules. -->
+<template id="report_mowdafa_form_document">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="doc">
+      <t t-call="web.external_layout">
+        <t t-set="helper" t-value="doc.env['mowdafa.pdf.helper']"/>
+        <div class="page mfr-page">
+          <style type="text/css">
+            .mfr-page { font-family: "DejaVu Sans", Arial, sans-serif;
+                        color: #232b33; font-size: 10.5px;
+                        line-height: 1.5; }
+            .mfr-doctype { font-size: 9px; letter-spacing: 2px;
+                           text-transform: uppercase; color: #6b7684; }
+            .mfr-ref { font-size: 18px; font-weight: bold;
+                       color: #1f3a57; margin: 1px 0 2px; }
+            .mfr-head { border-bottom: 3px solid #1f3a57;
+                        padding-bottom: 4px; margin-bottom: 6px; }
+            .mfr-rows { width: 100%; border-collapse: collapse;
+                        table-layout: fixed; }
+            .mfr-rows td { border: 1px solid #e2e8ef; padding: 3px 7px;
+                           vertical-align: top; }
+            .mfr-lbl { font-size: 8px; letter-spacing: 0.8px;
+                       text-transform: uppercase; color: #6b7684;
+                       margin-bottom: 1px; }
+            .mfr-val { font-size: 10.5px; color: #14181b; min-height: 13px;
+                       white-space: pre-wrap; }
+            .mfr-sec { background: #1f3a57; color: white;
+                       font-weight: bold; font-size: 10px;
+                       letter-spacing: 1px; padding: 4px 10px;
+                       margin: 9px 0 4px; border-radius: 2px;
+                       page-break-after: avoid; }
+            .mfr-tbl { width: 100%; border-collapse: collapse; }
+            .mfr-tbl th { background: #eef3f8; color: #1f3a57;
+                          font-size: 8.5px; padding: 4px 7px;
+                          border: 1px solid #d5dfeb; text-align: left; }
+            .mfr-tbl td { font-size: 9.5px; padding: 4px 7px;
+                          border: 1px solid #e2e8ef; }
+            /* keep the company layout's zebra rows (Striped:
+               .o_report_layout_striped tbody tr:nth-child(odd)) off
+               our tables; the line tables get their own soft tint */
+            .mfr-page table tbody tr:nth-child(odd),
+            .mfr-page table tbody tr:nth-child(even) {
+                background-color: transparent !important; }
+            .mfr-page .mfr-tbl tr:nth-child(even) td { background: #f8fafc; }
+
+            /* signing block: heading + signatures never split */
+            .mfr-sign-wrap { page-break-inside: avoid; }
+            .mfr-signs { width: 100%; border-collapse: collapse;
+                         table-layout: fixed; margin-top: 4px; }
+            .mfr-page .mfr-signs td { padding: 4px 16px 2px;
+                            text-align: center; vertical-align: bottom;
+                            border: 0; }
+            .mfr-sign-img { max-height: 44px; max-width: 100%; }
+            .mfr-sign-cell { height: 46px; border-bottom: 1px solid #8b97a5;
+                             text-align: center; margin: 1px 8px 2px; }
+            .mfr-sign-line { border-top: 1px solid #8b97a5;
+                             margin-top: 3px; padding-top: 3px;
+                             font-size: 8.5px; color: #4c565d; }
+          </style>
+
+          <div class="mfr-head">
+            <div class="mfr-doctype"><t t-esc="doc._description"/></div>
+            <div class="mfr-ref"><t t-esc="doc.display_name"/></div>
+          </div>
+
+          <t t-set="layout" t-value="helper.layout(doc)"/>
+          <t t-foreach="layout['blocks']" t-as="block">
+            <div t-if="block['title']" class="mfr-sec">
+              <t t-esc="block['title']"/></div>
+            <t t-if="block['kind'] == 'rows'">
+              <table class="mfr-rows">
+                <t t-foreach="block['rows']" t-as="row">
+                  <tr>
+                    <t t-foreach="row" t-as="cell">
+                      <td t-att-colspan="2 if len(row) == 1 else None">
+                        <div class="mfr-lbl"><t t-esc="cell['label']"/></div>
+                        <div t-if="'image' in cell" class="mfr-sign-cell">
+                          <img t-if="cell['image']" class="mfr-sign-img"
+                               t-att-src="image_data_uri(cell['image'])"
+                               alt="Signature"/>
+                        </div>
+                        <div t-else="" class="mfr-val"
+                             t-att-style="'min-height: 48px;' if cell.get('note') and not cell['value'] else None"><t t-esc="cell['value']"/></div>
+                      </td>
+                    </t>
+                  </tr>
+                </t>
+              </table>
+            </t>
+            <t t-if="block['kind'] == 'table'">
+              <table class="mfr-tbl">
+                <tr>
+                  <t t-foreach="block['columns']" t-as="col">
+                    <th><t t-esc="col"/></th>
+                  </t>
+                </tr>
+                <t t-foreach="block['rows']" t-as="line">
+                  <tr>
+                    <t t-foreach="line" t-as="cell">
+                      <td><t t-esc="cell"/></td>
+                    </t>
+                  </tr>
+                </t>
+              </table>
+            </t>
+          </t>
+
+        </div>
+      </t>
+    </t>
+  </t>
+</template>
+
+</odoo>
