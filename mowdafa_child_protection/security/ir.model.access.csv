@@ -70,10 +70,6 @@ access_cp_caafag_registration_user,cp.caafag.registration.user,model_cp_caafag_r
 access_cp_caafag_registration_manager,cp.caafag.registration.manager,model_cp_caafag_registration,base.group_system,1,1,1,1
 access_cp_caafag_registration_action_user,cp.caafag.registration.action.user,model_cp_caafag_registration_action,base.group_user,1,1,1,1
 access_cp_caafag_registration_action_manager,cp.caafag.registration.action.manager,model_cp_caafag_registration_action,base.group_system,1,1,1,1
-access_cp_caafag_verification_child_user,cp.caafag.verification.child.user,model_cp_caafag_verification_child,base.group_user,1,1,1,0
-access_cp_caafag_verification_child_manager,cp.caafag.verification.child.manager,model_cp_caafag_verification_child,base.group_system,1,1,1,1
-access_cp_caafag_verification_adult_user,cp.caafag.verification.adult.user,model_cp_caafag_verification_adult,base.group_user,1,1,1,0
-access_cp_caafag_verification_adult_manager,cp.caafag.verification.adult.manager,model_cp_caafag_verification_adult,base.group_system,1,1,1,1
 access_cp_caafag_psychosocial_user,cp.caafag.psychosocial.user,model_cp_caafag_psychosocial,base.group_user,1,1,1,0
 access_cp_caafag_psychosocial_manager,cp.caafag.psychosocial.manager,model_cp_caafag_psychosocial,base.group_system,1,1,1,1
 access_cp_caafag_daily_record_user,cp.caafag.daily.record.user,model_cp_caafag_daily_record,base.group_user,1,1,1,1
@@ -99,3 +95,6 @@ access_cp_caafag_batch_report_wizard_user,cp.caafag.batch.report.wizard.user,mod
 access_cp_caafag_skill_user,cp.caafag.skill.user,model_cp_caafag_skill,base.group_user,1,1,1,1
 access_cp_registration_care_location_user,cp.registration.care.location.user,model_cp_registration_care_location,base.group_user,1,1,1,1
 access_cp_caafag_registration_care_location_user,cp.caafag.registration.care.location.user,model_cp_caafag_registration_care_location,base.group_user,1,1,1,1
+access_cp_caafag_child_info_user,cp.caafag.child.info.user,model_cp_caafag_child_info,base.group_user,1,1,1,1
+access_cp_caafag_child_info_action_user,cp.caafag.child.info.action.user,model_cp_caafag_child_info_action,base.group_user,1,1,1,1
+access_cp_caafag_child_info_care_location_user,cp.caafag.child.info.care.location.user,model_cp_caafag_child_info_care_location,base.group_user,1,1,1,1

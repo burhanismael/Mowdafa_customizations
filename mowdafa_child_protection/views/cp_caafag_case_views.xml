@@ -25,15 +25,9 @@
                     <button name="action_create_registration" type="object"
                         string="Create Registration" class="btn-primary"
                         invisible="stage != 'registration' or registration_count &gt; 0"/>
-                    <button name="action_create_verification_adult" type="object"
-                        string="Adult Verification" class="btn-primary"
-                        invisible="stage != 'verification' or adult_verified"/>
-                    <button name="action_create_verification_child" type="object"
-                        string="Child Verification" class="btn-primary"
-                        invisible="stage != 'verification' or child_verified"/>
-                    <button name="action_move_in_care" type="object"
-                        string="Move to In Care" class="btn-primary"
-                        invisible="stage != 'verification' or not adult_verified or not child_verified"/>
+                    <button name="action_create_child_info" type="object"
+                        string="Child Information" class="btn-primary"
+                        invisible="stage not in ('verification', 'in_care') or child_info_count &gt; 0"/>
                     <button name="action_create_psychosocial" type="object"
                         string="Create Psychosocial"
                         invisible="stage != 'in_care'"/>
@@ -71,16 +65,6 @@
                                 invisible="registration_count == 0">
                             <field name="registration_count" widget="statinfo" string="Registration"/>
                         </button>
-                        <button name="action_view_adult_verifications" type="object"
-                                class="oe_stat_button" icon="fa-user-o"
-                                invisible="adult_verification_count == 0">
-                            <field name="adult_verification_count" widget="statinfo" string="Adult Verif."/>
-                        </button>
-                        <button name="action_view_verifications" type="object"
-                                class="oe_stat_button" icon="fa-check-square-o"
-                                invisible="verification_count == 0">
-                            <field name="verification_count" widget="statinfo" string="Child Verif."/>
-                        </button>
                         <button name="action_view_placements" type="object"
                                 class="oe_stat_button" icon="fa-home"
                                 invisible="placement_count == 0">
@@ -105,6 +89,11 @@
                                 class="oe_stat_button" icon="fa-exclamation-triangle"
                                 invisible="case_report_count == 0">
                             <field name="case_report_count" widget="statinfo" string="Case Reports"/>
+                        </button>
+                        <button name="action_view_child_info" type="object"
+                                class="oe_stat_button" icon="fa-id-badge"
+                                invisible="child_info_count == 0">
+                            <field name="child_info_count" widget="statinfo" string="Child Info"/>
                         </button>
                         <button name="action_view_reunifications" type="object"
                                 class="oe_stat_button" icon="fa-handshake-o"

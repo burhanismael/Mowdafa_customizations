@@ -1,0 +1,338 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+  <record id="caafag_seq_cp_child_info" model="ir.sequence">
+    <field name="name">cp.caafag.child.info</field>
+    <field name="code">cp.caafag.child.info</field>
+    <field name="prefix">CINF/%(year)s/</field>
+    <field name="padding">4</field>
+    <field name="company_id" eval="False"/>
+  </record>
+  <record id="caafag_view_cp_child_info_form" model="ir.ui.view">
+    <field name="name">cp.caafag.child.info.form</field>
+    <field name="model">cp.caafag.child.info</field>
+    <field name="arch" type="xml">
+      <form string="Child Information" class="o_cp_registration_form">
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+            <button name="action_view_case" type="object" class="oe_stat_button" icon="fa-folder-open" invisible="not case_id">
+              <div class="o_stat_info">
+                <span class="o_stat_text">Case</span>
+              </div>
+            </button>
+          </div>
+          <div class="oe_title">
+            <span class="cp-registration-eyebrow">CAAFAG · Child Information</span>
+            <h1>
+              <field name="name" readonly="1"/>
+            </h1>
+          </div>
+          <!-- child summary card, read from the case -->
+          <group class="cp-registration-summary">
+            <group>
+              <field name="case_id" readonly="1" force_save="1"/>
+              <field name="child_full_name" string="Full Name" readonly="1"/>
+              <field name="child_sex" readonly="1"/>
+            </group>
+            <group>
+              <field name="child_dob" readonly="1"/>
+              <field name="child_nationality" readonly="1" force_save="1"/>
+            </group>
+          </group>
+          <notebook class="cp-registration-tabs">
+            <page name="registration" string="Registration &amp; Consent">
+              <div class="cp-registration-section">
+                <separator string="Registration Details"/>
+                <group>
+                  <group>
+                    <field name="name" string="Ref. Number" readonly="1"/>
+                    <field name="date" string="Date of registration" readonly="1" force_save="1"/>
+                    <field name="population_group" readonly="1"/>
+                    <field name="village" readonly="1" force_save="1"/>
+                    <field name="date_of_arrival"/>
+                  </group>
+                  <group>
+                    <field name="country_id" readonly="1" force_save="1"/>
+                    <field name="region_id" readonly="1" force_save="1"/>
+                    <field name="district_id" readonly="1" force_save="1"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="Consent"/>
+                <group>
+                  <group>
+                    <field name="consent_registration" widget="radio" options="{'horizontal': true}"/>
+                    <field name="consent_registration_by" string="Given By"/>
+                  </group>
+                  <group>
+                    <field name="consent_data" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="Centre Enrolment"/>
+                <group>
+                  <group>
+                    <field name="batch_id" options="{'no_create': true}"/>
+                    <field name="skill_ids" widget="many2many_tags"
+                           options="{'no_create': true}"/>
+                    <field name="skill_certified"/>
+                    <field name="centre"/>
+                    <field name="entry_month"/>
+                    <field name="education_level"/>
+                  </group>
+                  <group>
+                    <field name="emergency_contact"/>
+                    <field name="health_problems"/>
+                    <field name="on_medication" widget="radio"/>
+                  </group>
+                </group>
+                <group>
+                  <field name="emergency_treatment_auth"/>
+                </group>
+              </div>
+            </page>
+            <page name="personal" string="Personal &amp; Education">
+              <div class="cp-registration-section">
+                <separator string="Child's Personal Details (Rapid Registration Assessment)"/>
+                <group>
+                  <group>
+                    <field name="child_full_name" string="Full name" readonly="1"/>
+                    <field name="nickname" string="Also known as (nickname)"/>
+                    <field name="father_name" string="Father — full name"/>
+                    <field name="father_tel" string="Father — Tel"/>
+                    <field name="mother_name" string="Mother — full name"/>
+                    <field name="mother_tel" string="Mother — Tel"/>
+                  </group>
+                  <group>
+                    <field name="relative_name" string="Relative — full name" placeholder="e.g. Xasan Cali Faarax"/>
+                    <field name="relative_tel" string="Relative — Tel" placeholder="e.g. 907 111 302"/>
+                    <field name="household_tel" string="Telephone (child / household)" placeholder="e.g. 907 111 302"/>
+                    <field name="nationality_origin_id" string="Nationality / Country of Origin" options="{'no_create': true}"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="A9 · Schooling"/>
+                <group>
+                  <group>
+                    <field name="prev_schooling" string="Previous schooling?" widget="radio" options="{'horizontal': true}"/>
+                    <field name="literacy_level_ids" string="Current literacy level" widget="many2many_tags" options="{'no_create': true}"/>
+                  </group>
+                  <group>
+                    <field name="highest_grade_id" string="Highest grade completed" options="{'no_create': true}"/>
+                  </group>
+                </group>
+                <label for="wants_to_learn" string="Interest in learning or vocational training"/>
+                <field name="wants_to_learn" nolabel="1" class="col-12"/>
+              </div>
+            </page>
+            <page name="profile" string="CAAFAG Profile" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+              <div class="cp-registration-section" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                <separator string="CAAFAG Profile" groups="mowdafa_child_protection.group_cp_protection_supervisor"/>
+                <p class="text-muted" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                        Section 2 of the CAAFAG registration. Restricted to
+                        the protection-supervisor group; excluded from
+                        reports and exports.</p>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="force_type" widget="radio"/>
+                    <field name="group_name"/>
+                    <field name="military_unit"/>
+                    <field name="commander" placeholder="optional"/>
+                  </group>
+                  <group>
+                    <field name="unit_location"/>
+                    <field name="clan"/>
+                    <field name="landmarks"/>
+                  </group>
+                  <group>
+                    <field name="recruit_status" widget="radio"/>
+                    <field name="date_joined"/>
+                    <field name="recruitment_process" widget="radio"/>
+                  </group>
+                  <group>
+                    <field name="recruitment_place"/>
+                  </group>
+                </group>
+                <group string="If not forced — reasons" groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="reason_services"/>
+                    <field name="reason_financial"/>
+                    <field name="reason_family"/>
+                  </group>
+                  <group>
+                    <field name="reason_friends"/>
+                    <field name="reason_beliefs"/>
+                    <field name="reason_defend"/>
+                  </group>
+                </group>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <group>
+                    <field name="main_role" widget="radio"/>
+                    <field name="weapon_used" widget="radio"/>
+                    <field name="date_left"/>
+                    <field name="still_associated" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                  <group>
+                    <field name="leave_how"/>
+                    <field name="demobilisation_place"/>
+                    <field name="release_papers" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                </group>
+                <group groups="mowdafa_child_protection.group_cp_protection_supervisor">
+                  <field name="wishes_after_release" placeholder="free text"/>
+                </group>
+              </div>
+            </page>
+            <page name="care" string="Location &amp; Care">
+              <div class="cp-registration-section">
+                <separator string="Place of Birth / Origin"/>
+                <group>
+                  <group>
+                    <field name="pob_region" string="Region" readonly="1" force_save="1"/>
+                    <field name="pob_village" string="Village / Camp" readonly="1" force_save="1"/>
+                  </group>
+                  <group>
+                    <field name="pob_district" string="District / Town" readonly="1" force_save="1"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="Current Address"/>
+                <group>
+                  <group>
+                    <field name="addr_region" string="Region" readonly="1" force_save="1"/>
+                    <field name="addr_village" string="Village / Camp" readonly="1" force_save="1"/>
+                  </group>
+                  <group>
+                    <field name="addr_district" string="District / Town" readonly="1" force_save="1"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="Identification and Referral Details"/>
+                <group>
+                  <group>
+                    <field name="found_at"/>
+                    <field name="referrer_type_id" options="{'no_create': true}"/>
+                  </group>
+                  <group>
+                    <field name="referrer_name"/>
+                    <field name="referrer_contact"/>
+                    <field name="referral_reason"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="Current Care Arrangements of the Child"/>
+                <group>
+                  <group>
+                    <field name="care_type" widget="radio"/>
+                    <field name="care_before"/>
+                  </group>
+                  <group>
+                    <field name="care_adequate" widget="radio" options="{'horizontal': true}"/>
+                    <field name="care_action_needed" widget="radio" options="{'horizontal': true}"/>
+                  </group>
+                </group>
+                <separator string="Caregivers"/>
+                <field name="care_location_ids" nolabel="1" class="w-100">
+                  <tree editable="bottom">
+                    <field name="name"/>
+                    <field name="telephone"/>
+                    <field name="institution"/>
+                    <field name="region_id" optional="show"
+                           options="{'no_create': true}"/>
+                    <field name="district_id" optional="show"
+                           options="{'no_create': true}"/>
+                    <field name="village" optional="show"/>
+                  </tree>
+                </field>
+              </div>
+            </page>
+            <page name="protection" string="Protection &amp; Actions">
+              <div class="cp-registration-section">
+                <separator string="Protection Concerns Related to the Child (tick all that apply)"/>
+                <field name="concern_ids" nolabel="1" class="o_cp_protection_concerns" widget="many2many_checkboxes" options="{'no_create_edit': True}"/>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="What Action Needs to be Taken Immediately?"/>
+                <field name="action_ids">
+                  <tree editable="bottom">
+                    <field name="sequence" widget="handle"/>
+                    <field name="action"/>
+                    <field name="agency"/>
+                    <field name="other_specify"/>
+                    <field name="status"/>
+                  </tree>
+                </field>
+                <label for="rehab_action" string="Action for the rehabilitation centre based on protection concerns"/>
+                <field name="rehab_action" nolabel="1" class="col-12" placeholder="…"/>
+              </div>
+            </page>
+            <page name="confidentiality" string="Confidentiality &amp; Officer">
+              <div class="cp-registration-section">
+                <separator string="D · Data Confidentiality"/>
+                <group>
+                  <group>
+                    <field name="withhold" widget="radio" options="{'horizontal': true}"/>
+                    <label for="withhold_family" string="Who do they want to withhold it from?" invisible="withhold != 'yes'"/>
+                    <div invisible="withhold != 'yes'">
+                      <field name="withhold_family"/>
+                      <field name="withhold_government"/>
+                      <field name="withhold_nonstate"/>
+                      <field name="withhold_agencies"/>
+                      <field name="withhold_other"/>
+                    </div>
+                    <field name="next_followup_date"/>
+                  </group>
+                  <group>
+                    <field name="withhold_what" invisible="withhold != 'yes'"/>
+                    <field name="withhold_reason" invisible="withhold != 'yes'"/>
+                    <field name="care_plan_date"/>
+                  </group>
+                </group>
+              </div>
+              <div class="cp-registration-section">
+                <separator string="E · Details of Child Protection / Social Worker Officer"/>
+                <group>
+                  <group>
+                    <field name="officer_name"/>
+                    <field name="officer_position"/>
+                    <field name="officer_agency"/>
+                  </group>
+                  <group>
+                    <field name="officer_date"/>
+                    <field name="officer_location"/>
+                    <field name="officer_sign"/>
+                    <field name="officer_sign_img"
+                           string="Signature (drawn)" widget="signature"/>
+                  </group>
+                </group>
+              </div>
+            </page>
+          </notebook>
+        </sheet>
+        <div class="oe_chatter">
+          <field name="message_follower_ids"/>
+          <field name="activity_ids"/>
+          <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <record id="caafag_view_cp_child_info_tree" model="ir.ui.view">
+    <field name="name">cp.caafag.child.info.tree</field>
+    <field name="model">cp.caafag.child.info</field>
+    <field name="arch" type="xml">
+      <tree string="Child Information">
+        <field name="name"/>
+        <field name="case_id"/>
+        <field name="child_full_name"/>
+        <field name="date"/>
+      </tree>
+    </field>
+  </record>
+</odoo>

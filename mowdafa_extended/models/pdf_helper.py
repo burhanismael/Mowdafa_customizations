@@ -103,6 +103,49 @@ class MowdafaPdfHelper(models.AbstractModel):
                      for line in lines],
         }
 
+    def _cell(self, record, name, label):
+        """One printed cell — the same shape for the generic engine and
+        the fixed layouts. None for an unticked checkbox (never printed)."""
+        field = record._fields[name]
+        if field.type == 'binary':
+            return {'label': label, 'value': '',
+                    'image': record[name] or False,
+                    'filled': bool(record[name]), 'signoff': True,
+                    'long': False}
+        if field.type == 'boolean' and not record[name]:
+            return None
+        text = self._fmt(record, field)
+        return {'label': label, 'value': text,
+                'filled': bool(record[name]),
+                'note': field.type in ('text', 'html'),
+                'signoff': (name.startswith(('completed_', 'officer_'))
+                            or 'sign' in name),
+                'long': field.type == 'text' or len(text) > 60}
+
+    def _chunk(self, cells):
+        """Two cells per printed row; long text takes a full row."""
+        rows, pending = [], []
+        for cell in cells:
+            if cell['long']:
+                if pending:
+                    rows.append(pending)
+                    pending = []
+                rows.append([cell])
+                continue
+            pending.append(cell)
+            if len(pending) == 2:
+                rows.append(pending)
+                pending = []
+        if pending:
+            rows.append(pending)
+        return rows
+
+    @api.model
+    def grid(self, record, spec):
+        """Rows for a fixed layout: spec is [(label, field_name), ...]."""
+        cells = [self._cell(record, name, label) for label, name in spec]
+        return self._chunk([c for c in cells if c])
+
     @api.model
     def layout(self, record):
         """Ordered blocks mirroring the form view: field sections (with
@@ -155,28 +198,12 @@ class MowdafaPdfHelper(models.AbstractModel):
                         flush()
                         blocks.append(
                             self._o2m_table(record, field, child, label))
-                    elif field.type == 'binary':
-                        if 'sign' in name:
-                            current['cells'].append({
-                                'label': label, 'value': '',
-                                'image': record[name] or False,
-                                'filled': bool(record[name]),
-                                'signoff': True,
-                                'long': False,
-                            })
+                    elif field.type == 'binary' and 'sign' not in name:
+                        pass            # photos etc. don't print
                     else:
-                        if field.type == 'boolean' and not record[name]:
-                            continue    # unticked checkboxes don't print
-                        text = self._fmt(record, field)
-                        current['cells'].append({
-                            'label': label, 'value': text,
-                            'filled': bool(record[name]),
-                            'note': field.type in ('text', 'html'),
-                            'signoff': (name.startswith(('completed_',
-                                                         'officer_'))
-                                        or 'sign' in name),
-                            'long': field.type == 'text' or len(text) > 60,
-                        })
+                        cell = self._cell(record, name, label)
+                        if cell:
+                            current['cells'].append(cell)
                     continue
                 walk(child)
 
@@ -207,23 +234,7 @@ class MowdafaPdfHelper(models.AbstractModel):
             kept.append(block)
         blocks = kept
 
-        # chunk each rows block two cells per printed row
         for block in blocks:
-            if block['kind'] != 'rows':
-                continue
-            rows, pending = [], []
-            for cell in block['cells']:
-                if cell['long']:
-                    if pending:
-                        rows.append(pending)
-                        pending = []
-                    rows.append([cell])
-                    continue
-                pending.append(cell)
-                if len(pending) == 2:
-                    rows.append(pending)
-                    pending = []
-            if pending:
-                rows.append(pending)
-            block['rows'] = rows
+            if block['kind'] == 'rows':
+                block['rows'] = self._chunk(block['cells'])
         return {'blocks': blocks, 'signatures': signs}

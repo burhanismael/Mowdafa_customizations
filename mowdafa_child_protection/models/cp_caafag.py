@@ -14,6 +14,17 @@ class CpCaafagCase(models.Model):
     _description = 'CAAFAG Case'
 
     case_type = fields.Selection(default='caafag')
+    # same stage keys as the street track (shared logic), but CAAFAG's
+    # third step is Child Information, not verification
+    stage = fields.Selection([
+        ('handover', 'Hand-over'),
+        ('registration', 'Registration'),
+        ('verification', 'Child Info'),
+        ('in_care', 'In Care'),
+        ('reunification', 'Reunification'),
+        ('followup', 'Follow-up'),
+    ], string='Stage', default='handover', tracking=True,
+        group_expand='_group_expand_stage')
 
     placement_ids = fields.One2many(
         'cp.caafag.placement', 'case_id', string='Placements')
@@ -21,12 +32,20 @@ class CpCaafagCase(models.Model):
         'cp.caafag.handover', 'case_id', string='Hand-overs')
     registration_ids = fields.One2many(
         'cp.caafag.registration', 'case_id', string='Registrations')
-    verification_ids = fields.One2many(
-        'cp.caafag.verification.child', 'case_id',
+    # CAAFAG has no verification forms. The shared case logic still reads
+    # these links, so they stay — permanently empty.
+    verification_ids = fields.Many2many(
+        'cp.verification.child', compute='_compute_no_verifications',
         string='Child Verifications')
-    adult_verification_ids = fields.One2many(
-        'cp.caafag.verification.adult', 'case_id',
+    adult_verification_ids = fields.Many2many(
+        'cp.verification.adult', compute='_compute_no_verifications',
         string='Adult Verifications')
+
+    def _compute_no_verifications(self):
+        for case in self:
+            case.verification_ids = False
+            case.adult_verification_ids = False
+
     psychosocial_ids = fields.One2many(
         'cp.caafag.psychosocial', 'case_id', string='Psychosocial Sessions')
     daily_record_ids = fields.One2many(
@@ -56,12 +75,40 @@ class CpCaafagCase(models.Model):
         return self._view_cp_records(
             'cp.caafag.case.report', 'Case Reports', self.case_report_ids)
 
+    child_info_ids = fields.One2many(
+        'cp.caafag.child.info', 'case_id', string='Child Information')
+    child_info_count = fields.Integer(
+        string='Child Information', compute='_compute_child_info_count')
+
+    @api.depends('child_info_ids')
+    def _compute_child_info_count(self):
+        for case in self:
+            case.child_info_count = len(case.child_info_ids)
+
+    def action_create_registration(self):
+        action = super().action_create_registration()
+        action['context'].update({
+            'default_social_worker_id': self.case_worker_id.id,
+            'default_city': self.district_id.name,
+        })
+        return action
+
+    def action_create_child_info(self):
+        """Same pre-fill as the registration, into Child Information."""
+        action = self.action_create_registration()
+        action.update({'res_model': 'cp.caafag.child.info',
+                       'name': 'Child Information'})
+        return action
+
+    def action_view_child_info(self):
+        return self._view_cp_records(
+            'cp.caafag.child.info', 'Child Information',
+            self.child_info_ids)
+
     _CAAFAG_FORM_MODELS = {
         'cp.placement': 'cp.caafag.placement',
         'cp.handover': 'cp.caafag.handover',
         'cp.registration': 'cp.caafag.registration',
-        'cp.verification.child': 'cp.caafag.verification.child',
-        'cp.verification.adult': 'cp.caafag.verification.adult',
         'cp.psychosocial': 'cp.caafag.psychosocial',
         'cp.daily.record': 'cp.caafag.daily.record',
         'cp.mentoring': 'cp.caafag.mentoring',
@@ -144,6 +191,24 @@ class CpCaafagRegistration(models.Model):
         help='The child was certified in the chosen vocational skill.')
     centre = fields.Char(string='Centre')
     entry_month = fields.Char(string='Entry month / year')
+    age_years = fields.Integer(
+        related='case_id.age_years', string='Age')
+    city = fields.Char(string='City')
+    # parent authorisation: parent + social worker both sign
+    parent_sign_img = fields.Binary(string='Signature of parent')
+    parent_sign_date = fields.Date(
+        string='Date', default=fields.Date.context_today)
+    social_worker_id = fields.Many2one(
+        'cp.case.worker', string='Social worker')
+    social_worker_sign_img = fields.Binary(string='Signature')
+    social_worker_sign_date = fields.Date(
+        string='Date', default=fields.Date.context_today)
+    centre_info = fields.Text(
+        string='Centre Information',
+        default='Visit time: 08:00–12:00 morning · 15:30–17:00 afternoon '
+                '(Fridays only)\n'
+                'Contact: Fatxi Mukhtaar, MOWDAFA Child Protection '
+                'Director · +252 907 913 000')
     education_level = fields.Char(string='Education level')
     emergency_contact = fields.Char(string='Emergency contact / phone')
     health_problems = fields.Char(
@@ -237,29 +302,6 @@ class CpCaafagRegistrationAction(models.Model):
     registration_id = fields.Many2one(
         'cp.caafag.registration', string='Registration',
         required=True, ondelete='cascade')
-
-
-class CpCaafagVerificationChild(models.Model):
-    _name = 'cp.caafag.verification.child'
-    _inherit = 'cp.verification.child'
-    _description = 'CAAFAG Child Verification (CP-10)'
-    _sequence_code = 'cp.caafag.verification'
-
-    case_id = fields.Many2one(
-        'cp.caafag.case', string='Case', required=True, ondelete='cascade')
-    registration_id = fields.Many2one(
-        'cp.caafag.registration', string='Registration',
-        compute='_compute_registration_info', store=True)
-
-
-class CpCaafagVerificationAdult(models.Model):
-    _name = 'cp.caafag.verification.adult'
-    _inherit = 'cp.verification.adult'
-    _description = 'CAAFAG Adult Verification (CP-09)'
-    _sequence_code = 'cp.caafag.verification'
-
-    case_id = fields.Many2one(
-        'cp.caafag.case', string='Case', required=True, ondelete='cascade')
 
 
 class CpCaafagPsychosocial(models.Model):
@@ -701,3 +743,57 @@ class CpCaafagSkill(models.Model):
     ]
 
 
+
+
+# ── child information (in care) — same fields as the CAAFAG registration,
+#    its own table, filled while the child is in the centre ─────────────
+class CpCaafagChildInfo(models.Model):
+    _name = 'cp.caafag.child.info'
+    _inherit = 'cp.caafag.registration'
+    _description = 'CAAFAG Child Information'
+    _sequence_code = 'cp.caafag.child.info'
+
+    case_id = fields.Many2one(
+        'cp.caafag.case', string='Case', required=True, ondelete='cascade')
+    # relational fields re-pointed at this form's own tables
+    action_ids = fields.One2many(
+        'cp.caafag.child.info.action', 'registration_id',
+        string='Immediate Actions')
+    care_location_ids = fields.One2many(
+        'cp.caafag.child.info.care.location', 'registration_id',
+        string='Caregivers')
+    concern_ids = fields.Many2many(
+        'cp.protection.concern', 'cp_caafag_child_info_concern_rel',
+        'child_info_id', 'concern_id', string='Protection Concerns')
+    skill_ids = fields.Many2many(
+        'cp.caafag.skill', 'cp_caafag_child_info_skill_rel',
+        'child_info_id', 'skill_id', string='Chosen vocational skills')
+    literacy_level_ids = fields.Many2many(
+        'cp.literacy.level', 'cp_caafag_child_info_literacy_rel',
+        'child_info_id', 'literacy_id', string='Current Literacy Level')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        records.case_id._advance_stage('in_care')
+        return records
+
+
+class CpCaafagChildInfoAction(models.Model):
+    _name = 'cp.caafag.child.info.action'
+    _inherit = 'cp.registration.action'
+    _description = 'CAAFAG Child Information Immediate Action'
+
+    registration_id = fields.Many2one(
+        'cp.caafag.child.info', string='Child Information',
+        required=True, ondelete='cascade')
+
+
+class CpCaafagChildInfoCareLocation(models.Model):
+    _name = 'cp.caafag.child.info.care.location'
+    _inherit = 'cp.registration.care.location'
+    _description = 'CAAFAG Child Information Caregiver'
+
+    registration_id = fields.Many2one(
+        'cp.caafag.child.info', string='Child Information',
+        required=True, ondelete='cascade')
